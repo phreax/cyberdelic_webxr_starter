@@ -87,3 +87,46 @@ describe('setClosed()', () => {
     });
   });
 });
+
+import { restoreSnakeState, serializeSnakeState } from './snake-model.js';
+import { DEFAULT_LOOK } from './snake-look.js';
+
+describe('snake persistence', () => {
+  test('round trip', () => {
+    let state = addSnake(createSnakeState(), { path: line(), name: 'Coral', palette: 'Ember' });
+    state = updateSnake(state, state.snakes[0]!.id, { look: { ...DEFAULT_LOOK, thickness: 0.04 }, transform: { position: [1, 2, 3], quaternion: [0, 0, 0, 1], scale: 1.5 } });
+    const restored = restoreSnakeState(JSON.parse(JSON.stringify(serializeSnakeState(state))))!;
+    const snake = restored.snakes[0]!;
+
+    assert({
+      given: 'a saved snake list',
+      should: 'restore names, paths, looks, palettes and placement, not in edit mode',
+      actual: [snake.name, snake.path.length, snake.look.thickness, snake.palette, snake.transform?.scale, restored.editing],
+      expected: ['Coral', 2, 0.04, 'Ember', 1.5, false],
+    });
+  });
+
+  test('validation', () => {
+    const restored = restoreSnakeState({
+      snakes: [
+        { id: 'snake-3', name: 'Ok', closed: false, palette: 'Nope', look: { thickness: 'thick', spread: 0.3 }, path: [{ point: { x: 0, y: 1, z: 0 }, inHandle: { x: 0, y: 1, z: 0 }, outHandle: { x: 0, y: 1, z: 0 } }, { point: { x: 1, y: 1, z: 0 }, inHandle: { x: 1, y: 1, z: 0 }, outHandle: { x: 1, y: 1, z: 0 } }] },
+        { id: 'bad', name: 'Broken', path: 'not a path' },
+      ],
+    })!;
+    assert({
+      given: 'saved data with a broken snake, an unknown palette and wrongly typed look values',
+      should: 'drop the broken snake, fall back per field, and keep numbering after the highest id',
+      actual: [restored.snakes.length, restored.snakes[0]!.look.thickness, restored.snakes[0]!.look.spread, restored.snakes[0]!.palette, restored.nextNumber],
+      expected: [1, DEFAULT_LOOK.thickness, 0.3, 'Ethereal Garden', 4],
+    });
+  });
+
+  test('nothing saved', () => {
+    assert({
+      given: 'no or unusable saved data',
+      should: 'return undefined so the demo snake is used',
+      actual: [restoreSnakeState(undefined), restoreSnakeState({ snakes: 'x' })],
+      expected: [undefined, undefined],
+    });
+  });
+});

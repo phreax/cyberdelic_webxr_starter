@@ -20,7 +20,7 @@ describe('garden scene + panel contract', () => {
 
   test('panel ids', () => {
     const needed = [
-      'panel', 'btn-hide', 'mode-dot', 'status', 'fps-dot', 'fps', 'btn-vr', 'btn-mr', 'btn-exit',
+      'panel', 'btn-hide', 'btn-reset-settings', 'mode-dot', 'status', 'fps-dot', 'fps', 'btn-vr', 'btn-mr', 'btn-exit',
       'audio-dot', 'audio-status', 'btn-mic', 'btn-capture', 'btn-demo', 'btn-stop',
       ...['garden', 'audio', 'session'].flatMap((n) => [`tab-${n}`, `page-${n}`]),
       ...['density', 'turbulence', 'speed', 'stir', 'memory', 'size', 'reactivity'].flatMap((id) => [id, `${id}-fill`, `${id}-value`]),

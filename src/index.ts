@@ -36,6 +36,7 @@ World.create(document.getElementById('scene-container') as HTMLDivElement, proje
               history.replaceState(null, '', `?example=${next}`);
               start(next as ExampleId, false);
             },
+            reload: () => start(id, false),
           },
         });
       } catch (error) {

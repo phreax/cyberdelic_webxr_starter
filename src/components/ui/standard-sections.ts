@@ -64,6 +64,10 @@ export const bindSessionSection = (ctx: ExperienceContext, panel: ElementSource,
   const vr = track(bindButton(panel, 'btn-vr', { ...common, disabled: noXR, onClick: () => report(ctx.xr.enter('vr')) }));
   const mr = track(bindButton(panel, 'btn-mr', { ...common, disabled: noXR, onClick: () => report(ctx.xr.enter('mixed-reality')) }));
   const exit = track(bindButton(panel, 'btn-exit', { ...common, disabled: true, onClick: () => ctx.xr.exit() }));
+  // Reset settings: clears this example's saved settings and restarts it (after the click ends).
+  if (has(panel, 'btn-reset-settings')) {
+    track(bindButton(panel, 'btn-reset-settings', { ...common, onClick: () => setTimeout(() => ctx.resetSettings(), 0) }));
+  }
   if (has(panel, 'haptics')) track(bindToggle(panel, 'haptics', { ...common, value: true, onChange: (v) => haptics.setEnabled(v) }));
   xrInfo?.setProperties({ text: `VR ${support.vr ? 'available' : 'unavailable'} | MR ${support.ar ? 'available' : 'unavailable'}` });
   track(

@@ -50,3 +50,10 @@ Bind to parameters two-way with `controlOptions(params, id)` + `bindUI(params, i
 ## OSC (`src/components/osc/`)
 
 `ctx.osc` (see docs/osc.md) · `createOscMonitor()` + `osc.onAny()` for a live monitor (Playground → OSC tab).
+
+## Settings persistence (`src/core/persistence/`)
+
+`createExperience` saves the parameter store per example in localStorage (`cyberdelic:v1:<example>:params`)
+and restores it after `init()`. Opt out with `persist: { params: false }`. Experiences save anything
+else through `ctx.storage.save(key, value)` / `ctx.storage.load(key)`; `ctx.resetSettings()` (the
+**Reset settings** button in session sections) clears the example's settings and restarts it.

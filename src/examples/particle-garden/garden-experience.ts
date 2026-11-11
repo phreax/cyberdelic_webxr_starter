@@ -72,6 +72,7 @@ export const createParticleGardenExperience = (): Experience<ExperienceContext> 
       const moodButtons = new Map<GardenMood, ReturnType<typeof bindButton>>();
       const setMood = (next: GardenMood, instant = false) => {
         mood = next;
+        ctx.storage.save('mood', next);
         palettes.set(next, instant);
         fade = instant ? 1 : 0;
         zoneMaterials.forEach((material, name) => {
@@ -119,7 +120,8 @@ export const createParticleGardenExperience = (): Experience<ExperienceContext> 
       for (const name of GARDEN_MOODS) {
         moodButtons.set(name, track(bindButton(panel, `mood-${slug(name)}`, { ...common, onClick: () => setMood(name) })));
       }
-      setMood('Cyberdelic', true);
+      const savedMood = ctx.storage.load<string>('mood');
+      setMood(GARDEN_MOODS.find((name) => name === savedMood) ?? 'Cyberdelic', true);
       bindAudioSection(ctx, panel, common);
       bindSessionSection(ctx, panel, common);
 

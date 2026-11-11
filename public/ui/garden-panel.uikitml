@@ -390,6 +390,9 @@
     <div class="row">
       <div id="btn-exit" class="button">Exit to browser</div>
     </div>
+    <div class="row">
+      <div id="btn-reset-settings" class="small-button">Reset settings</div>
+    </div>
     <div class="status">
       <div id="fps-dot" class="status-dot"></div>
       <span id="fps" class="muted">-- fps</span>

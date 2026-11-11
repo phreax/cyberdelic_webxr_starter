@@ -62,4 +62,5 @@ performance HUD or OVR Metrics Tool while the orb animates.
 - [ ] Snake objects: grab to move / rotate, two hands to resize uniformly; grabbing selects the snake.
 - [ ] Playground (?example=playground): every control, trigger, toolbar button, hum sound, surface placement (MR), OSC tab.
 - [ ] Demos row: switching between all four examples works on desktop and inside an XR session (no exit), and back again without duplicated behaviour (e.g. single haptic pulse on grab).
+- [ ] Settings persist per demo after a reload (sculpture / garden parameters, garden mood, all snakes with paths, looks and placement); Reset settings (session section) restores defaults in place.
 - [ ] Quest 3S: stable 72 FPS (see docs/performance.md).

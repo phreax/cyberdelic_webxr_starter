@@ -21,7 +21,9 @@ export const EXAMPLES = {
   },
   snake: {
     title: 'Snake Creator',
-    config: () => ({ level: scene('snake.iwsdk.scene.json'), scene: createSnakeExperience() }),
+    // Snakes are saved by the experience itself (list, paths, looks, placement); the params
+    // store only mirrors the selected snake, so it is not persisted.
+    config: () => ({ level: scene('snake.iwsdk.scene.json'), persist: { params: false }, scene: createSnakeExperience() }),
   },
   playground: {
     title: 'Developer Playground',

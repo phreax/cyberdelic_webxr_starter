@@ -17,7 +17,7 @@ const usedIds = () => {
     ...['coral', 'nebula', 'ember', 'void'].map((name) => `preset-${name}`),
     ...['volume', 'bass', 'mid', 'high'].map((signal) => `meter-${signal}`),
     ...Array.from({ length: 16 }, (_, i) => `spec-${i}`),
-    'audio-dot', 'audio-status', 'mode-dot', 'status', 'fps-dot', 'fps',
+    'audio-dot', 'audio-status', 'mode-dot', 'status', 'fps-dot', 'fps', 'btn-reset-settings',
   ];
   return [...new Set([...literal, ...derived])];
 };

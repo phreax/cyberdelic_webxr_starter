@@ -32,7 +32,9 @@ import {
   createSnakeState,
   deleteSnake,
   MAX_SNAKES,
+  restoreSnakeState,
   selectedSnake,
+  serializeSnakeState,
   selectSnake,
   setClosed,
   setEditing,
@@ -183,9 +185,25 @@ export const createSnakeExperience = (): Experience<ExperienceContext> => {
         if (listMenu.visible) syncWindows(true);
       };
 
+      // Persistence: the whole snake list (paths, looks, palettes, placement), throttled.
+      let saveTimer: ReturnType<typeof setTimeout> | undefined;
+      const saveNow = () => {
+        clearTimeout(saveTimer);
+        saveTimer = undefined;
+        const snakes = state.snakes.map((snake) => ({ ...snake, transform: objects.get(snake.id)?.readTransform() ?? snake.transform }));
+        ctx.storage.save('snakes', serializeSnakeState({ ...state, snakes }));
+      };
+      const scheduleSave = () => {
+        saveTimer ??= setTimeout(saveNow, 400);
+      };
+      track(() => {
+        if (saveTimer !== undefined) saveNow();
+      });
+
       let lastSelectedId: string | null = null;
       const commit = (next: SnakeState) => {
         state = next;
+        scheduleSave();
         const selected = selectedSnake(state);
         if (selected && selected.id !== lastSelectedId) loadSettings(selected.look, selected.palette);
         lastSelectedId = selected?.id ?? null;
@@ -300,6 +318,7 @@ export const createSnakeExperience = (): Experience<ExperienceContext> => {
         if (!selected || loading) return;
         state = updateSnake(state, selected.id, { look: { ...selected.look, ...patch }, ...(palette ? { palette } : {}) });
         objects.get(selected.id)?.setRecord(selectedSnake(state)!);
+        scheduleSave();
       };
       for (const id of Object.keys(SNAKE_PARAMS) as ParamId[]) {
         if (BOOLEAN_PARAMS.has(id)) {
@@ -424,7 +443,9 @@ export const createSnakeExperience = (): Experience<ExperienceContext> => {
 
       // --- Start ----------------------------------------------------------------------------------
       setTool('draw');
-      commit(addSnake(createSnakeState(), { path: demoLoopPath(), closed: true, name: 'Snake 1' }));
+      const restored = restoreSnakeState(ctx.storage.load('snakes'));
+      commit(restored && restored.snakes.length ? restored : addSnake(createSnakeState(), { path: demoLoopPath(), closed: true, name: 'Snake 1' }));
+      const wasGrabbed = new Set<string>();
 
       frame = (dt) => {
         listMenu.update();
@@ -442,7 +463,11 @@ export const createSnakeExperience = (): Experience<ExperienceContext> => {
             const record = object.record;
             state = updateSnake(state, record.id, { path: moveAnchor(record.path, dragged.index, dragged.point) });
             object.setRecord(state.snakes.find((s) => s.id === record.id)!);
+            scheduleSave();
           }
+          // Save the placement when a grab ends.
+          if (object.grabbed) wasGrabbed.add(object.id);
+          else if (wasGrabbed.delete(object.id)) scheduleSave();
           // Grabbing a snake selects it.
           if (object.grabbed && state.selectedId !== object.id && !state.editing) commit(selectSnake(state, object.id));
         }

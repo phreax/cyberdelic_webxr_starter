@@ -9,6 +9,7 @@ import { createAudioEngine, type AudioEngine, type AudioEngineOptions } from '..
 import { createInteractionSounds, type InteractionSounds } from '../../components/audio/interaction-sounds.js';
 import { createOscClient, type OscClient, type OscClientOptions } from '../../components/osc/osc-client.js';
 import { createParameterStore, type ParameterStore } from '../parameters/store.js';
+import { createSettingsStorage, defaultStorage, persistParams, type SettingsStorage } from '../persistence/settings-storage.js';
 import { createHaptics, type Hand, type Haptics, type HapticPatternName } from '../../components/interaction/haptics.js';
 import { createGrabHapticsSystem } from '../../components/interaction/manipulable.js';
 import { cyberdelicTheme, type Theme } from '../../themes/cyberdelic.js';
@@ -24,12 +25,18 @@ export type ExampleSwitcher = {
   current: string;
   list: ReadonlyArray<{ id: string; title: string }>;
   switchTo(id: string): void;
+  /** Restart the current example (e.g. after a settings reset). */
+  reload(): void;
 };
 
 export type ExperienceContext = {
   world: World;
   /** Present when the app hosts several examples (see src/index.ts). */
   examples?: ExampleSwitcher;
+  /** This example's saved settings (localStorage, namespaced). */
+  storage: SettingsStorage;
+  /** Clear this example's saved settings and restart it with defaults. */
+  resetSettings(): void;
   theme: Theme;
   /** Shared parameters: UI, audio and OSC write here; visuals read here (PRD §9). */
   params: ParameterStore;
@@ -65,6 +72,11 @@ export type ExperienceConfig = {
   level?: string;
   sounds?: boolean;
   examples?: ExampleSwitcher;
+  /**
+   * Settings persistence. `namespace` keys the saved data (default: the example id or 'app');
+   * `params: false` opts out of saving the parameter store automatically.
+   */
+  persist?: { namespace?: string; params?: boolean } | false;
   scene: Experience<ExperienceContext>;
 };
 
@@ -134,8 +146,20 @@ export const createExperience = async (world: World, config: ExperienceConfig) =
   const audio = config.audio ? disposables.add(createAudioEngine(config.audio === true ? {} : config.audio)) : undefined;
   const osc = config.osc ? disposables.add(createOscClient(config.osc === true ? {} : config.osc)) : undefined;
 
+  const persistence = config.persist === false ? undefined : config.persist ?? {};
+  const storage = createSettingsStorage(persistence?.namespace ?? config.examples?.current ?? 'app', persistence ? defaultStorage() : undefined);
+  let savedParams: ReturnType<typeof persistParams> | undefined;
+
   const ctx: ExperienceContext = {
     world,
+    storage,
+    resetSettings() {
+      savedParams?.cancel();
+      storage.clear();
+      storage.disable();
+      if (config.examples) config.examples.reload();
+      else location.reload();
+    },
     theme,
     examples: config.examples,
     params,
@@ -182,12 +206,18 @@ export const createExperience = async (world: World, config: ExperienceConfig) =
   runtime.tick = tick;
   runtime.haptics = haptics;
   lifecycle.start();
+  // After init() has defined the parameters: restore saved values, then keep saving changes.
+  if (persistence && persistence.params !== false) savedParams = persistParams(params, storage);
+  const flushOnHide = () => savedParams?.flush();
+  window.addEventListener('pagehide', flushOnHide);
+  disposables.add(() => window.removeEventListener('pagehide', flushOnHide));
 
   const dispose = () => {
     if (runtime.tick === tick) {
       runtime.tick = undefined;
       runtime.haptics = undefined;
     }
+    savedParams?.stop();
     lifecycle.stop();
     disposables.disposeAll();
   };

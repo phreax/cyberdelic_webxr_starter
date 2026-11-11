@@ -27,7 +27,7 @@ describe('snake scene + windows contract', () => {
   test('list window', () => {
     const panel = ids('snake-list');
     const needed = [...literal('listPanel'), ...Array.from({ length: 8 }, (_, i) => [`snake-row-${i}`, `snake-row-${i}-name`, `snake-row-${i}-info`]).flat(),
-      'btn-vr', 'btn-mr', 'btn-exit', 'mode-dot', 'status', 'fps-dot', 'fps', 'list-empty'];
+      'btn-vr', 'btn-mr', 'btn-exit', 'mode-dot', 'status', 'fps-dot', 'fps', 'list-empty', 'btn-reset-settings'];
     assert({ given: 'the list window ids the experience uses', should: 'all exist', actual: needed.filter((id) => !panel.has(id)), expected: [] });
   });
 

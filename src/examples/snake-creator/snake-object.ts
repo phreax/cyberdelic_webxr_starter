@@ -21,7 +21,7 @@ import { crawlAt } from './crawl.js';
 import { CURVE_SAMPLES, sampleCurve, type Curve } from './curve.js';
 import { SNAKE_PALETTES, type SnakePaletteName } from './gradient.js';
 import type { Point } from './path.js';
-import type { SnakeRecord } from './snake-model.js';
+import type { SnakeRecord, SnakeTransform } from './snake-model.js';
 import { createSnakeRenderer } from './snake-renderer.js';
 
 export type SnakeMode = 'view' | 'edit';
@@ -37,6 +37,11 @@ export const createSnakeObject = (ctx: ExperienceContext, initial: SnakeRecord) 
   const { world, theme } = ctx;
   const root = new Group();
   root.name = initial.id;
+  if (initial.transform) {
+    root.position.fromArray(initial.transform.position);
+    root.quaternion.fromArray(initial.transform.quaternion);
+    root.scale.setScalar(initial.transform.scale);
+  }
   const entity: Entity = world.createTransformEntity(root);
 
   const renderer = createSnakeRenderer();
@@ -166,6 +171,14 @@ export const createSnakeObject = (ctx: ExperienceContext, initial: SnakeRecord) 
     selectHandle(index: number) {
       selectedHandle = index;
       handles.forEach((h, i) => ((h.object3D as Mesh).material = i === index ? selectedMaterial : handleMaterial));
+    },
+    /** Current placement (after grabbing / resizing), for saving. */
+    readTransform(): SnakeTransform {
+      return {
+        position: root.position.toArray() as SnakeTransform['position'],
+        quaternion: root.quaternion.toArray() as SnakeTransform['quaternion'],
+        scale: root.scale.x,
+      };
     },
     /** World point → snake-local point (for drawing). */
     toLocal(world: Vector3): Point {
