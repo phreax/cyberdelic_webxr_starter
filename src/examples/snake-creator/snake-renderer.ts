@@ -17,7 +17,7 @@ import { CURVE_ROWS, CURVE_SAMPLES, type Curve } from './curve.js';
 import type { Crawl } from './crawl.js';
 import { buildGradientData, GRADIENT_SIZE } from './gradient.js';
 import { PATTERN_INDEX, patternCells, SNAKE_FRAGMENT_COMMON, SNAKE_SPECTRAL_GLSL, SNAKE_VERTEX_COMMON } from './snake-glsl.js';
-import { effectiveTwist, gradientRepeats, type SnakeLook } from './snake-look.js';
+import { effectiveTwist, gradientRepeats, MAX_SPHERES, sphereCount, type SnakeLook } from './snake-look.js';
 
 export type { SnakeLook } from './snake-look.js';
 export { DEFAULT_LOOK } from './snake-look.js';
@@ -48,6 +48,47 @@ export const createSnakeGeometry = (along = ALONG, around = AROUND): BufferGeome
   }
   const geometry = new BufferGeometry();
   geometry.setAttribute('position', new BufferAttribute(positions, 3));
+  geometry.setIndex(indices);
+  return geometry;
+};
+
+/** Sphere strip quality (low, as in shader-lab's low preset): 10 around × 6 rows per sphere. */
+const SPHERE_AROUND = 10;
+const SPHERE_ROWS = 6;
+export const SPHERE_INDICES = SPHERE_ROWS * SPHERE_AROUND * 6;
+
+/** MAX_SPHERES unit UV spheres; `snakeIndex` places each one, `snakeFace` wraps the texture. */
+export const createSnakeSphereGeometry = (count = MAX_SPHERES): BufferGeometry => {
+  const columns = SPHERE_AROUND + 1;
+  const perSphere = (SPHERE_ROWS + 1) * columns;
+  const positions = new Float32Array(count * perSphere * 3);
+  const indexAttr = new Float32Array(count * perSphere);
+  const faces = new Float32Array(count * perSphere * 2);
+  const indices: number[] = [];
+  for (let sphere = 0; sphere < count; sphere += 1) {
+    const base = sphere * perSphere;
+    for (let row = 0; row <= SPHERE_ROWS; row += 1) {
+      const polar = (row / SPHERE_ROWS) * Math.PI;
+      for (let column = 0; column < columns; column += 1) {
+        const angle = (column / SPHERE_AROUND) * 2 * Math.PI + Math.PI;
+        const v = base + row * columns + column;
+        positions.set([-Math.cos(polar), Math.sin(polar) * Math.cos(angle), Math.sin(polar) * Math.sin(angle)], v * 3);
+        indexAttr[v] = sphere;
+        faces.set([column / SPHERE_AROUND, row / SPHERE_ROWS], v * 2);
+      }
+    }
+    for (let row = 0; row < SPHERE_ROWS; row += 1) {
+      for (let column = 0; column < SPHERE_AROUND; column += 1) {
+        const a = base + row * columns + column;
+        const b = a + columns;
+        indices.push(a, a + 1, b, a + 1, b + 1, b);
+      }
+    }
+  }
+  const geometry = new BufferGeometry();
+  geometry.setAttribute('position', new BufferAttribute(positions, 3));
+  geometry.setAttribute('snakeIndex', new BufferAttribute(indexAttr, 1));
+  geometry.setAttribute('snakeFace', new BufferAttribute(faces, 2));
   geometry.setIndex(indices);
   return geometry;
 };
@@ -86,6 +127,8 @@ export const createSnakeRenderer = () => {
     uSnakeGradient: { value: gradientTexture },
     uSnakeGradientRepeats: { value: 1 },
     uSnakeHilbertRound: { value: 1 },
+    uSnakeSphereCount: { value: 1 },
+    uSnakeSphereSize: { value: 1 },
     // Lighting (world space). Key and fill colours follow gold_fractal's warm / cyan pair.
     uKeyDirection: { value: new Vector3(-0.4, 0.8, 0.45).normalize() },
     uKeyColor: { value: new Color(0.953, 0.922, 0.824) },
@@ -107,6 +150,7 @@ export const createSnakeRenderer = () => {
   const material = new ShaderMaterial({
     name: 'cyberdelic-snake',
     uniforms,
+    defines: { SNAKE_GEOMETRY: 0 },
     side: DoubleSide, // transparent patterns show the inside of the tube
     vertexShader: /* glsl */ `
       ${SNAKE_VERTEX_COMMON}
@@ -170,7 +214,10 @@ export const createSnakeRenderer = () => {
   });
   material.toneMapped = true;
 
-  const mesh = new Mesh(createSnakeGeometry(), material);
+  const tubeGeometry = createSnakeGeometry();
+  const sphereGeometry = createSnakeSphereGeometry();
+  const mesh = new Mesh(tubeGeometry, material);
+  let body: SnakeLook['body'] = 'tube';
   mesh.name = 'snake';
   mesh.frustumCulled = false; // the shader moves every vertex
   mesh.visible = false;
@@ -220,12 +267,25 @@ export const createSnakeRenderer = () => {
       uniforms.uSnakeBackgroundMode.value = look.transparent ? 0 : 1;
       uniforms.uSnakeBackgroundOffset.value = look.backgroundOffset;
       uniforms.uSnakeBackgroundBrightness.value = look.backgroundBrightness;
+      if (look.body !== body) {
+        body = look.body;
+        mesh.geometry = body === 'spheres' ? sphereGeometry : tubeGeometry;
+        material.defines.SNAKE_GEOMETRY = body === 'spheres' ? 1 : 0;
+        material.needsUpdate = true;
+      }
+      if (body === 'spheres') {
+        const count = sphereCount(uniforms.uSnakeBodyLength.value, look.thickness * look.sphereSize, look.sphereDensity);
+        uniforms.uSnakeSphereCount.value = count;
+        uniforms.uSnakeSphereSize.value = look.sphereSize;
+        sphereGeometry.setDrawRange(0, count * SPHERE_INDICES);
+      }
       uniforms.uRoughness.value = look.roughness;
       uniforms.uMetallic.value = look.metallic;
       uniforms.uIridescence.value = look.iridescence;
     },
     dispose() {
-      mesh.geometry.dispose();
+      tubeGeometry.dispose();
+      sphereGeometry.dispose();
       material.dispose();
       curveTexture.dispose();
       gradientTexture.dispose();

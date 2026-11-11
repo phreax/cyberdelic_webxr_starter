@@ -18,6 +18,12 @@ export type SnakeLook = {
   headTaper: number;
   tailTaper: number;
   headShape: number;
+  /** Tube or spheres strung along the body. */
+  body: 'tube' | 'spheres';
+  /** Spheres: 0 = one, 0.5 = just touching, 1 = densely overlapping. */
+  sphereDensity: number;
+  /** Spheres: size relative to the body radius. */
+  sphereSize: number;
   profile: 0 | 4;
   twist: number;
   pattern: SnakePattern;
@@ -39,8 +45,23 @@ export type SnakeLook = {
 };
 
 export const DEFAULT_LOOK: Readonly<SnakeLook> = {
-  thickness: 0.02, length: 0.35, headTaper: 0.1, tailTaper: 0.5, headShape: 0.6, profile: 0, twist: 0,
+  thickness: 0.02, length: 0.35, headTaper: 0.1, tailTaper: 0.5, headShape: 0.6, body: 'tube', sphereDensity: 0.5, sphereSize: 1, profile: 0, twist: 0,
   pattern: 'rings', scale: 1, width: 0.5, spread: 0.05, transparent: false, backgroundOffset: 0.5,
   backgroundBrightness: 0, iridescence: 0.5, metallic: 0.2, roughness: 0.35, speed: 0.15, reverse: false,
 };
 
+
+/** Sphere budget per snake (one static strip, drawn up to the active count). */
+export const MAX_SPHERES = 256;
+
+/**
+ * Spheres strung along the body (shader-lab getSnakeShapeCount): density 0 → one sphere,
+ * 0.5 → spheres just touching (2.2 r apart), 1 → densely overlapping (0.55 r apart).
+ */
+export const sphereCount = (bodyLength: number, radius: number, density: number): number => {
+  const r = Math.max(1e-5, radius);
+  const maximum = Math.max(1, Math.min(MAX_SPHERES, Math.floor(bodyLength / (0.55 * r))));
+  const normal = Math.max(1, Math.min(maximum, Math.floor(bodyLength / (2.2 * r) + 1e-9)));
+  const d = Math.max(0, Math.min(1, density));
+  return Math.round(d <= 0.5 ? 1 + (normal - 1) * d * 2 : normal + (maximum - normal) * (d - 0.5) * 2);
+};

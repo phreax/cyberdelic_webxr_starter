@@ -351,6 +351,30 @@
   </div>
 
   <div id="page-shape" class="page">
+    <div class="row">
+      <div id="body-tube" class="small-button">Tube</div>
+      <div id="body-spheres" class="small-button">Spheres</div>
+    </div>
+    <div id="sphere-settings" class="column">
+      <div class="column">
+        <div class="row">
+          <span class="label">Sphere density</span>
+          <span id="sphereDensity-value" class="value">0.50</span>
+        </div>
+        <div id="sphereDensity" class="track">
+          <div id="sphereDensity-fill" class="fill"></div>
+        </div>
+      </div>
+      <div class="column">
+        <div class="row">
+          <span class="label">Sphere size</span>
+          <span id="sphereSize-value" class="value">1.00</span>
+        </div>
+        <div id="sphereSize" class="track">
+          <div id="sphereSize-fill" class="fill"></div>
+        </div>
+      </div>
+    </div>
     <div class="column">
       <div class="row">
         <span class="label">Thickness</span>
@@ -423,7 +447,7 @@
     </div>
     <div class="row">
       <div id="palette-ocean" class="small-button">Ocean</div>
-      <div id="palette-amber" class="small-button">Amber</div>
+      <div id="palette-ember" class="small-button">Ember</div>
     </div>
     <div class="column">
       <div class="row">

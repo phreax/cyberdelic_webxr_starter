@@ -34,3 +34,27 @@ describe('gradientRepeats()', () => {
     });
   });
 });
+
+import { MAX_SPHERES, sphereCount } from './snake-look.js';
+
+describe('sphereCount()', () => {
+  test('density', () => {
+    const length = 1;
+    const radius = 0.02;
+    assert({
+      given: 'density 0, 0.5 and 1 for a 1 m body of 2 cm radius',
+      should: 'give one sphere, touching spheres (2.2 r spacing), and densely overlapping spheres (capped)',
+      actual: [sphereCount(length, radius, 0), sphereCount(length, radius, 0.5), sphereCount(length, radius, 1)],
+      expected: [1, Math.floor(length / (2.2 * radius)), Math.min(MAX_SPHERES, Math.floor(length / (0.55 * radius)))],
+    });
+  });
+
+  test('cap', () => {
+    assert({
+      given: 'a very long, thin body at full density',
+      should: 'never exceed the sphere budget',
+      actual: sphereCount(10, 0.005, 1),
+      expected: MAX_SPHERES,
+    });
+  });
+});

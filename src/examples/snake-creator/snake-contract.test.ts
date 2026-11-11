@@ -10,7 +10,7 @@ const code = read('./snake-experience.ts');
 const literal = (panel: string) =>
   [...code.matchAll(new RegExp(`(?:requireElement|bindButton|bindSlider|bindToggle)\\(${panel}, ['\`]([^'\`$]+)['\`]`, 'g'))].map((m) => m[1]!);
 
-const PARAMS = ['thickness', 'length', 'headTaper', 'tailTaper', 'headShape', 'twist', 'spread', 'scale', 'width',
+const PARAMS = ['thickness', 'length', 'headTaper', 'tailTaper', 'headShape', 'sphereDensity', 'sphereSize', 'twist', 'spread', 'scale', 'width',
   'backgroundOffset', 'backgroundBrightness', 'iridescence', 'metallic', 'roughness', 'speed'];
 
 describe('snake scene + windows contract', () => {
@@ -44,8 +44,8 @@ describe('snake scene + windows contract', () => {
       ...['shape', 'pattern', 'material', 'motion'].flatMap((n) => [`tab-${n}`, `page-${n}`]),
       ...PARAMS.flatMap((id) => [id, `${id}-fill`, `${id}-value`]),
       ...['transparent', 'reverse'].flatMap((id) => [id, `${id}-thumb`]),
-      'profile-round', 'profile-square', 'pattern-solid', 'pattern-rings', 'pattern-hilbert',
-      'palette-ethereal-garden', 'palette-cyberdelic', 'palette-ocean', 'palette-amber', 'bg-settings',
+      'body-tube', 'body-spheres', 'sphere-settings', 'profile-round', 'profile-square', 'pattern-solid', 'pattern-rings', 'pattern-hilbert',
+      'palette-ethereal-garden', 'palette-cyberdelic', 'palette-ocean', 'palette-ember', 'bg-settings',
     ];
     assert({ given: 'the settings window ids the experience uses', should: 'all exist', actual: needed.filter((id) => !panel.has(id)), expected: [] });
   });

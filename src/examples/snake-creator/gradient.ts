@@ -26,11 +26,11 @@ export const buildGradientData = (stops: readonly string[], sharpness = 0): Uint
   return data;
 };
 
-/** Ethereal Garden + Cyberdelic from shader-lab (Karleido) config/palettes.json; Ocean + Amber. */
+/** Ethereal Garden + Cyberdelic from shader-lab (Karleido) config/palettes.json; Ocean + Ember. */
 export const SNAKE_PALETTES = {
   'Ethereal Garden': ['#2c1b69', '#6a00ff', '#a64aff', '#00e5ff', '#54ad25', '#d6e316'],
   Cyberdelic: ['#2c1b69', '#6a00ff', '#a64aff', '#00e5ff'],
   Ocean: ['#03256C', '#2541B2', '#1768AC', '#06BEE1', '#FFFFFF'],
-  Amber: ['#2B0A3D', '#C81D25', '#FF9500', '#FFE066'],
+  Ember: ['#2B0A3D', '#C81D25', '#FF9500', '#FFE066'],
 } as const;
 export type SnakePaletteName = keyof typeof SNAKE_PALETTES;

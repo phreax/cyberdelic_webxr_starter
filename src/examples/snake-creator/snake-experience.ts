@@ -50,6 +50,8 @@ export const SNAKE_PARAMS = {
   headTaper: { default: 0.1, min: 0, max: 0.5, label: 'Head taper' },
   tailTaper: { default: 0.5, min: 0, max: 1, label: 'Tail taper' },
   headShape: { default: 0.6, min: 0, max: 1, label: 'Head shape' },
+  sphereDensity: { default: 0.5, min: 0, max: 1, label: 'Sphere density' },
+  sphereSize: { default: 1, min: 0.4, max: 1.6, label: 'Sphere size' },
   twist: { default: 0, min: 0, max: 6, label: 'Twist' },
   spread: { default: 0.05, min: 0, max: 1, label: 'Gradient spread' },
   scale: { default: 1, min: 0.2, max: 4, label: 'Pattern scale' },
@@ -67,7 +69,7 @@ type ParamId = keyof typeof SNAKE_PARAMS;
 const BOOLEAN_PARAMS = new Set<ParamId>(['transparent', 'reverse']);
 
 const SLIDER_STEPS: Partial<Record<ParamId, number>> = {
-  thickness: 0.001, length: 0.01, headTaper: 0.01, tailTaper: 0.01, headShape: 0.01, twist: 0.25, spread: 0.01,
+  thickness: 0.001, length: 0.01, headTaper: 0.01, tailTaper: 0.01, headShape: 0.01, sphereDensity: 0.01, sphereSize: 0.05, twist: 0.25, spread: 0.01,
   scale: 0.05, width: 0.01, backgroundOffset: 0.01, backgroundBrightness: 0.01, iridescence: 0.01,
   metallic: 0.01, roughness: 0.01, speed: 0.01,
 };
@@ -328,6 +330,11 @@ export const createSnakeExperience = (): Experience<ExperienceContext> => {
         };
         return select;
       };
+      const sphereSettings = requireElement(paramsPanel, 'sphere-settings');
+      const selectBody = choice(paramsPanel, 'body', ['Tube', 'Spheres'] as const, (name) => {
+        writeLook({ body: name === 'Spheres' ? 'spheres' : 'tube' });
+        sphereSettings.setProperties({ display: name === 'Spheres' ? 'flex' : 'none' });
+      });
       const selectProfile = choice(paramsPanel, 'profile', ['Round', 'Square'] as const, (name) => writeLook({ profile: name === 'Square' ? 4 : 0 }));
       const selectPattern = choice(paramsPanel, 'pattern', ['Solid', 'Rings', 'Hilbert'] as const, (name) =>
         writeLook({ pattern: name.toLowerCase() as SnakePattern }),
@@ -343,6 +350,8 @@ export const createSnakeExperience = (): Experience<ExperienceContext> => {
           values[id] = typeof value === 'boolean' ? (value ? 1 : 0) : (value as number);
         }
         params.apply(values, 'code');
+        selectBody(look.body === 'spheres' ? 'Spheres' : 'Tube', false);
+        sphereSettings.setProperties({ display: look.body === 'spheres' ? 'flex' : 'none' });
         selectProfile(look.profile === 4 ? 'Square' : 'Round', false);
         selectPattern((look.pattern.charAt(0).toUpperCase() + look.pattern.slice(1)) as 'Solid' | 'Rings' | 'Hilbert', false);
         selectPalette((palette in SNAKE_PALETTES ? palette : DEFAULT_PALETTE) as SnakePaletteName, false);

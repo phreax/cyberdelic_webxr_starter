@@ -23,9 +23,9 @@ describe('SNAKE_PALETTES', () => {
   test('catalogue', () => {
     assert({
       given: 'the snake palettes',
-      should: 'offer Ethereal Garden, Cyberdelic (shader-lab colours), Ocean and Amber',
+      should: 'offer Ethereal Garden, Cyberdelic (shader-lab colours), Ocean and Ember',
       actual: [Object.keys(SNAKE_PALETTES), SNAKE_PALETTES.Cyberdelic],
-      expected: [['Ethereal Garden', 'Cyberdelic', 'Ocean', 'Amber'], ['#2c1b69', '#6a00ff', '#a64aff', '#00e5ff']],
+      expected: [['Ethereal Garden', 'Cyberdelic', 'Ocean', 'Ember'], ['#2c1b69', '#6a00ff', '#a64aff', '#00e5ff']],
     });
   });
 });

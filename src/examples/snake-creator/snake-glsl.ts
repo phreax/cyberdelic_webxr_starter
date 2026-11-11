@@ -23,7 +23,17 @@ uniform float uSnakeHeadShape;
 uniform float uSnakeProfile;
 uniform float uSnakeTwist;
 uniform float uSnakeTwistPhase;
+uniform float uSnakeSphereCount;
+uniform float uSnakeSphereSize;
 varying vec2 vSnakeBody;
+#ifndef SNAKE_GEOMETRY
+#define SNAKE_GEOMETRY 0
+#endif
+#if SNAKE_GEOMETRY == 1
+// Spheres strung along the body (shader-lab "spheres"): each vertex knows its sphere index.
+attribute float snakeIndex;
+attribute vec2 snakeFace;
+#endif
 // Body direction at the vertex (diffraction grooves run along it).
 vec3 gSnakeForward;
 
@@ -111,6 +121,21 @@ void snakeProfile(float around, out vec2 point, out vec2 faceNormal) {
   faceNormal = vec2(cos(corner + 0.5 * stepAngle), sin(corner + 0.5 * stepAngle));
 }
 
+#if SNAKE_GEOMETRY == 1
+// A unit sphere at its anchor on the body, turned with the frame, sized by the body radius there.
+void snakeDeform(vec3 local, out vec3 snakePosition, out vec3 snakeNormal) {
+  float anchor = (snakeIndex + 0.5) / max(uSnakeSphereCount, 1.0);
+  vec3 center, forward, frameNormal, binormal;
+  snakeFrame(anchor, center, forward, frameNormal, binormal);
+  vec2 section = snakeSection(anchor);
+  float size = 0.5 * (section.x + section.y) * uSnakeSphereSize;
+  mat3 frame = mat3(forward, frameNormal, binormal);
+  snakePosition = center + frame * (local * size);
+  snakeNormal = frame * local;
+  gSnakeForward = forward;
+  vSnakeBody = vec2(anchor * snakeBodyLength() + local.x * size, snakeFace.x);
+}
+#else
 void snakeDeform(vec3 local, out vec3 snakePosition, out vec3 snakeNormal) {
   // Grid: x is the body parameter (tail 0 → head 1), y the angle around.
   float b = local.x;
@@ -135,6 +160,7 @@ void snakeDeform(vec3 local, out vec3 snakePosition, out vec3 snakeNormal) {
   snakeNormal = normalize(sectionNormal - (slope + twistSlope) * forward);
   vSnakeBody = vec2(b * snakeBodyLength(), around);
 }
+#endif
 `;
 
 export const SNAKE_FRAGMENT_COMMON = /* glsl */ `
