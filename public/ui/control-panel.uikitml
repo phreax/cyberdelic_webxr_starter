@@ -239,6 +239,28 @@
     font-size: 16px;
     font-weight: 700;
   }
+  .demos {
+    flex-direction: row;
+    align-items: center;
+    gap: 6px;
+  }
+  .demos-label {
+    color: #9baeab;
+    font-size: 13px;
+    margin-right: 4px;
+  }
+  .demo-chip {
+    padding-top: 7px;
+    padding-bottom: 7px;
+    padding-left: 10px;
+    padding-right: 10px;
+    border-radius: 10px;
+    border-width: 2px;
+    border-color: #00d9c7;
+    color: #f1f7f5;
+    font-size: 13px;
+    font-weight: 700;
+  }
 </style>
 
 <!--
@@ -257,6 +279,14 @@
       </div>
     </div>
     <div id="btn-hide" class="icon-button">Hide</div>
+  </div>
+
+  <div class="demos">
+    <span class="demos-label">Demos</span>
+    <div id="example-sculpture" class="demo-chip">Sculpture</div>
+    <div id="example-garden" class="demo-chip">Garden</div>
+    <div id="example-snake" class="demo-chip">Snake</div>
+    <div id="example-playground" class="demo-chip">Playground</div>
   </div>
 
   <div class="tabs">

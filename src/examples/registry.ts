@@ -11,7 +11,10 @@ const scene = (file: string) => `${import.meta.env.BASE_URL}scenes/${file}`;
  * `level` loads the example's own scene (the default example uses the one in iwsdk.config.json).
  */
 export const EXAMPLES = {
-  sculpture: { title: 'Reactive Sculpture', config: () => ({ audio: true, scene: createReactiveSculptureExperience() }) },
+  sculpture: {
+    title: 'Reactive Sculpture',
+    config: () => ({ level: scene('main.iwsdk.scene.json'), audio: true, scene: createReactiveSculptureExperience() }),
+  },
   garden: {
     title: 'Particle Garden',
     config: () => ({ level: scene('garden.iwsdk.scene.json'), audio: true, scene: createParticleGardenExperience() }),

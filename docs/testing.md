@@ -56,4 +56,5 @@ performance HUD or OVR Metrics Tool while the orb animates.
 - [ ] Garden (?example=garden): open hand repels, pinch attracts; touching a ring fades to its mood; Demo beat bursts.
 - [ ] Snake (?example=snake): demo loop crawls endlessly; Draw tool records a stroke with trigger/pinch (not when pointing at the menu); ending near the start makes a closed loop; Edit tool handles reshape the path; Add/Delete point; Shape/Look/Motion controls apply live.
 - [ ] Playground (?example=playground): every control, trigger, toolbar button, hum sound, surface placement (MR), OSC tab.
+- [ ] Demos row: switching between all four examples works on desktop and inside an XR session (no exit), and back again without duplicated behaviour (e.g. single haptic pulse on grab).
 - [ ] Quest 3S: stable 72 FPS (see docs/performance.md).

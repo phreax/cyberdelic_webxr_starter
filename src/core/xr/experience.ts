@@ -10,6 +10,7 @@ import { createInteractionSounds, type InteractionSounds } from '../../component
 import { createOscClient, type OscClient, type OscClientOptions } from '../../components/osc/osc-client.js';
 import { createParameterStore, type ParameterStore } from '../parameters/store.js';
 import { createHaptics, type Hand, type Haptics, type HapticPatternName } from '../../components/interaction/haptics.js';
+import { createGrabHapticsSystem } from '../../components/interaction/manipulable.js';
 import { cyberdelicTheme, type Theme } from '../../themes/cyberdelic.js';
 import { clampDelta, createDisposables, createLifecycle, type Disposable, type Experience } from './lifecycle.js';
 import { resolveXRMode, type ExperienceMode, type ResolvedXRMode, type XRSupport } from './mode.js';
@@ -18,8 +19,17 @@ import { resolveXRMode, type ExperienceMode, type ResolvedXRMode, type XRSupport
  * Thin bootstrap around an IWSDK World (PRD §4.1). Everything native stays reachable
  * through `ctx.world`; this only adds lifecycle, VR/MR entry, theme and haptics.
  */
+/** Lets an experience offer the other examples (menu "Demos" row) without a page reload. */
+export type ExampleSwitcher = {
+  current: string;
+  list: ReadonlyArray<{ id: string; title: string }>;
+  switchTo(id: string): void;
+};
+
 export type ExperienceContext = {
   world: World;
+  /** Present when the app hosts several examples (see src/index.ts). */
+  examples?: ExampleSwitcher;
   theme: Theme;
   /** Shared parameters: UI, audio and OSC write here; visuals read here (PRD §9). */
   params: ParameterStore;
@@ -54,6 +64,7 @@ export type ExperienceConfig = {
   /** Scene JSON to load before init (e.g. './scenes/garden.iwsdk.scene.json'). Default: the one in iwsdk.config.json. */
   level?: string;
   sounds?: boolean;
+  examples?: ExampleSwitcher;
   scene: Experience<ExperienceContext>;
 };
 
@@ -66,6 +77,28 @@ const detectSupport = async (): Promise<XRSupport> => {
 };
 
 const HANDS: readonly Hand[] = ['right', 'left'];
+
+/**
+ * Systems are registered once per world and forward to whichever experience is active, so
+ * experiences can be swapped in place (examples menu) without stacking systems up.
+ */
+type Runtime = { tick?: (delta: number, time: number) => void; haptics?: Haptics };
+const runtimes = new WeakMap<World, Runtime>();
+const runtimeFor = (world: World): Runtime => {
+  let runtime = runtimes.get(world);
+  if (runtime) return runtime;
+  const created: Runtime = {};
+  runtime = created;
+  runtimes.set(world, created);
+  class ExperienceRunnerSystem extends createSystem({}) {
+    update(delta: number, time: number): void {
+      created.tick?.(delta, time);
+    }
+  }
+  world.registerSystem(ExperienceRunnerSystem);
+  world.registerSystem(createGrabHapticsSystem({ play: (hand, pattern) => created.haptics?.play(hand, pattern) }));
+  return created;
+};
 
 export const createExperience = async (world: World, config: ExperienceConfig) => {
   const theme = config.theme ?? cyberdelicTheme;
@@ -104,6 +137,7 @@ export const createExperience = async (world: World, config: ExperienceConfig) =
   const ctx: ExperienceContext = {
     world,
     theme,
+    examples: config.examples,
     params,
     audio,
     osc,
@@ -136,20 +170,24 @@ export const createExperience = async (world: World, config: ExperienceConfig) =
 
   const lifecycle = createLifecycle(config.scene, ctx);
 
-  class ExperienceSystem extends createSystem({}) {
-    update(delta: number, time: number): void {
-      // Order per frame: audio analysis → parameters (modulation + smoothing) → experience.
-      const dt = clampDelta(delta);
-      audio?.update(dt);
-      params.update(dt);
-      frameCallbacks.forEach((fn) => fn(dt, time));
-      lifecycle.tick(delta, time);
-    }
-  }
-  world.registerSystem(ExperienceSystem);
+  const runtime = runtimeFor(world);
+  // Order per frame: audio analysis → parameters (modulation + smoothing) → frame hooks → experience.
+  const tick = (delta: number, time: number) => {
+    const dt = clampDelta(delta);
+    audio?.update(dt);
+    params.update(dt);
+    frameCallbacks.forEach((fn) => fn(dt, time));
+    lifecycle.tick(delta, time);
+  };
+  runtime.tick = tick;
+  runtime.haptics = haptics;
   lifecycle.start();
 
   const dispose = () => {
+    if (runtime.tick === tick) {
+      runtime.tick = undefined;
+      runtime.haptics = undefined;
+    }
     lifecycle.stop();
     disposables.disposeAll();
   };

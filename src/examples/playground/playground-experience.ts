@@ -9,12 +9,12 @@ import {
   makeRotatable,
   makeScalable,
 } from '../../components/interaction/behaviors.js';
-import { createGrabHapticsSystem } from '../../components/interaction/manipulable.js';
 import { createSurfacePlacer, type PlacementStatus } from '../../components/interaction/surface-placement.js';
 import { createOscMonitor } from '../../components/osc/osc-monitor.js';
 import { bindColorPicker, bindDropdown, bindValueDisplay } from '../../components/ui/controls-advanced.js';
 import { bindButton, bindSlider, bindStatus, bindTabs, requireElement, type Feedback } from '../../components/ui/controls.js';
 import { createPanelMenu } from '../../components/ui/panel-menu.js';
+import { bindExampleSwitcher } from '../../components/ui/standard-sections.js';
 import type { ExperienceContext } from '../../core/xr/experience.js';
 import type { Experience } from '../../core/xr/lifecycle.js';
 import { panelStyle } from '../../themes/cyberdelic.js';
@@ -64,6 +64,7 @@ export const createPlaygroundExperience = (): Experience<ExperienceContext> => (
       }
     };
     const common = { theme, onFeedback: feedback };
+    bindExampleSwitcher(ctx, panel, common);
     const menu = track(createPanelMenu(ctx, { nodeId: NODE_IDS.panel, distance: 0.6, drop: 0.2 }));
     ctx.onFrame(() => menu.update());
     track(bindButton(panel, 'btn-hide', { ...common, onClick: () => menu.hide() }));
@@ -85,7 +86,6 @@ export const createPlaygroundExperience = (): Experience<ExperienceContext> => (
     makeRotatable(cube);
     makeScalable(gem, { min: 0.4, max: 3 });
     makeDraggable(knob, { axis: 'x', range: 0.28 });
-    world.registerSystem(createGrabHapticsSystem(haptics));
 
     let accent: string = ACCENTS.Teal;
     for (const e of [cube, gem, knob, entity(NODE_IDS.button)]) track(createInteractionHighlight(ctx, e, { color: () => accent }));

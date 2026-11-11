@@ -47,8 +47,8 @@ export const makeManipulable = (entity: Entity, options: ManipulableOptions = {}
   return entity;
 };
 
-/** Plays `grab` / `release` haptics on the holding controller. Register once per world. */
-export const createGrabHapticsSystem = (haptics: Haptics) =>
+/** Plays `grab` / `release` haptics on the holding controller. createExperience registers it once per world. */
+export const createGrabHapticsSystem = (haptics: Pick<Haptics, 'play'>) =>
   class GrabHapticsSystem extends createSystem({ held: { required: [Grabbed] } }) {
     private holders = new Map<Entity, Hand>();
 

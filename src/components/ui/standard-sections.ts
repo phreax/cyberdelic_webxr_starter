@@ -52,6 +52,7 @@ export const bindAudioSection = (ctx: ExperienceContext, panel: ElementSource, c
 
 export const bindSessionSection = (ctx: ExperienceContext, panel: ElementSource, common: BindOptions) => {
   const { world, theme, track, haptics } = ctx;
+  bindExampleSwitcher(ctx, panel, common);
   const { support } = ctx.xr;
   const noXR = !support.vr && !support.ar;
   const xrInfo = has(panel, 'xr-info') ? (panel.getElementById('xr-info') as UIElement) : undefined;
@@ -88,6 +89,27 @@ export const bindSessionSection = (ctx: ExperienceContext, panel: ElementSource,
       const value = meter.fps();
       setFps(value >= 70 ? 'ok' : value >= 55 ? 'warn' : 'error', `${Math.round(value)} fps`);
     });
+  }
+};
+
+/**
+ * "Demos" row: one button per example (`example-<id>`), current one selected. Switching happens
+ * after the click finishes, so the panel isn't torn down mid-event.
+ */
+export const bindExampleSwitcher = (ctx: ExperienceContext, panel: ElementSource, common: BindOptions) => {
+  const { examples, track } = ctx;
+  if (!examples) return;
+  for (const { id } of examples.list) {
+    if (!has(panel, `example-${id}`)) continue;
+    track(
+      bindButton(panel, `example-${id}`, {
+        ...common,
+        selected: id === examples.current,
+        onClick: () => {
+          if (id !== examples.current) setTimeout(() => examples.switchTo(id), 0);
+        },
+      }),
+    );
   }
 };
 

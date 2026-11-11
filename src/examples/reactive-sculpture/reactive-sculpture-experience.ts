@@ -1,7 +1,7 @@
 import { Grabbed, Mesh, ShaderMaterial, type UIKitMLAsset } from '@iwsdk/core';
 import type { AudioSignal } from '../../components/audio/audio-engine.js';
 import { spectrumBars } from '../../components/audio/spectrum-bars.js';
-import { createGrabHapticsSystem, makeManipulable } from '../../components/interaction/manipulable.js';
+import { makeManipulable } from '../../components/interaction/manipulable.js';
 import { bindButton, bindKnob, bindSlider, bindTabs, bindToggle, requireElement, type UIElement } from '../../components/ui/controls.js';
 import { bindPresetSelector } from '../../components/ui/controls-advanced.js';
 import { createPanelMenu } from '../../components/ui/panel-menu.js';
@@ -70,7 +70,6 @@ export const createReactiveSculptureExperience = (): Experience<ExperienceContex
       uniforms.uSecondary.value.set(theme.colors.secondary);
       uniforms.uDeep.value.set(theme.colors.background);
       makeManipulable(entity, { grab: 'near', scale: { min: 0.4, max: 3 } });
-      world.registerSystem(createGrabHapticsSystem(haptics));
       const home = { position: object.position.clone(), quaternion: object.quaternion.clone(), scale: object.scale.clone() };
 
       // --- Panel ------------------------------------------------------------------------

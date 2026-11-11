@@ -4,6 +4,7 @@ Open the **Developer Playground** to try everything: `https://localhost:8081/?ex
 
 ## Examples
 
+Switch from any panel's **Demos** row (in place, the XR session stays open) or with the URL. 
 `?example=sculpture` (default) · `?example=garden` · `?example=snake` · `?example=playground`. Register new ones in `src/examples/registry.ts`
 (each can load its own scene with `level`).
 
