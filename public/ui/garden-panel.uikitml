@@ -295,11 +295,11 @@
   </div>
 
   <div id="page-garden" class="page">
-    <span class="muted">Open hand pushes particles away, pinch or trigger pulls them in. Touch a ring to change the mood.</span>
+    <span class="muted">Move your hands through the particles to stir currents that linger. Pinch or pull the trigger to draw particles in. Touch a ring to change the mood.</span>
     <div class="column">
       <div class="row">
         <span class="label">Density</span>
-        <span id="density-value" class="value">16000</span>
+        <span id="density-value" class="value">14000</span>
       </div>
       <div id="density" class="track">
         <div id="density-fill" class="fill"></div>
@@ -325,11 +325,20 @@
     </div>
     <div class="column">
       <div class="row">
-        <span class="label">Hand radius</span>
-        <span id="radius-value" class="value">0.30</span>
+        <span class="label">Stir strength</span>
+        <span id="stir-value" class="value">1.00</span>
       </div>
-      <div id="radius" class="track">
-        <div id="radius-fill" class="fill"></div>
+      <div id="stir" class="track">
+        <div id="stir-fill" class="fill"></div>
+      </div>
+    </div>
+    <div class="column">
+      <div class="row">
+        <span class="label">Field memory</span>
+        <span id="memory-value" class="value">2.5 s</span>
+      </div>
+      <div id="memory" class="track">
+        <div id="memory-fill" class="fill"></div>
       </div>
     </div>
     <div class="column">

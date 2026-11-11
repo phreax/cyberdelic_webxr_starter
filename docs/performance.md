@@ -26,8 +26,10 @@ Levers if a device drops frames: `SphereGeometry` segments in
 
 | Item | Cost | Notes |
 |---|---|---|
-| Field | 1 draw, 16k points default (2k–24k via Density, drawRange, no rebuild) | Vertex: 3 simplex per particle; stateless (no simulation buffers). |
-| Fragment | additive soft sprite, 6–14 mm, capped at 64 px | Overdraw is the main cost: lower Density or Particle size first. |
+| Simulation | 2 small GPU passes per frame on 128×128 float textures (16 384 particles) | Velocity pass: 3 simplex + one 3D texture fetch per particle. Runs with XR rendering disabled for the pass. |
+| Stirred field | 12×8×12 cells on the CPU, stamped by moving hands, decayed by Field memory | Uploaded each frame as a 1 152-texel half-float 3D texture. |
+| Render | 1 draw, additive soft sprites, 6–14 mm, capped at 64 px | Overdraw dominates: lower Density or Particle size first. |
+| Fallback | Stateless particles (no float render targets) | Hands then warp particles instead of stirring currents. |
 
 ## Snake Creator budget
 

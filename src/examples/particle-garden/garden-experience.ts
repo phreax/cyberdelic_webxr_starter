@@ -9,7 +9,10 @@ import type { ParameterDefinition } from '../../core/parameters/store.js';
 import type { ExperienceContext } from '../../core/xr/experience.js';
 import type { Experience } from '../../core/xr/lifecycle.js';
 import { panelStyle } from '../../themes/cyberdelic.js';
-import { GARDEN_MAX_PARTICLES } from '../../scene-assets/particle-garden.scene-asset.js';
+import { GARDEN_BOUNDS } from '../../scene-assets/particle-garden.scene-asset.js';
+import { createFlowField, decayField, stampField } from './flow-field.js';
+import { createParticleLayout } from './garden-math.js';
+import { createParticleSim, SIM_PARTICLES } from './particle-sim.js';
 import { GARDEN_MOODS, type GardenMood } from './garden-math.js';
 import type { GardenUniforms } from './particle-material.js';
 
@@ -17,10 +20,11 @@ export const NODE_IDS = { field: 'particle-garden', panel: 'garden-panel' } as c
 const ZONES: Record<GardenMood, string> = { Lagoon: 'zone-lagoon', Ember: 'zone-ember', Aurora: 'zone-aurora' };
 
 export const GARDEN_PARAMS = {
-  density: { default: 16000, min: 2000, max: GARDEN_MAX_PARTICLES, label: 'Density' },
+  density: { default: 14000, min: 2000, max: SIM_PARTICLES, label: 'Density' },
   turbulence: { default: 0.12, min: 0, max: 0.4, smoothing: 0.25, label: 'Turbulence' },
   speed: { default: 1, min: 0, max: 3, smoothing: 0.3, label: 'Flow speed' },
-  radius: { default: 0.3, min: 0.1, max: 0.6, smoothing: 0.1, label: 'Hand radius' },
+  stir: { default: 1, min: 0, max: 2, smoothing: 0.1, label: 'Stir strength' },
+  memory: { default: 2.5, min: 0.3, max: 8, label: 'Field memory (s)' },
   size: { default: 1, min: 0.4, max: 2.5, smoothing: 0.1, label: 'Particle size' },
   sparkle: { default: 0, min: 0, max: 1, label: 'Sparkle' },
   burst: { default: 0, min: 0, max: 1, label: 'Beat burst' },
@@ -111,9 +115,9 @@ export const createParticleGardenExperience = (): Experience<ExperienceContext> 
       const menu = track(createPanelMenu(ctx, { nodeId: NODE_IDS.panel, distance: 0.6, drop: 0.2 }));
       track(bindButton(panel, 'btn-hide', { ...common, onClick: () => menu.hide() }));
       track(bindTabs(panel, ['garden', 'audio', 'session'].map((n) => ({ tab: `tab-${n}`, page: `page-${n}` })), common));
-      const steps: Record<string, number> = { density: 500, turbulence: 0.01, speed: 0.05, radius: 0.01, size: 0.05, reactivity: 0.05 };
+      const steps: Record<string, number> = { density: 500, turbulence: 0.01, speed: 0.05, stir: 0.05, memory: 0.1, size: 0.05, reactivity: 0.05 };
       for (const [id, step] of Object.entries(steps)) {
-        const format = id === 'density' ? (v: number) => v.toFixed(0) : undefined;
+        const format = id === 'density' ? (v: number) => v.toFixed(0) : id === 'memory' ? (v: number) => `${v.toFixed(1)} s` : undefined;
         const control = track(bindSlider(panel, id, { ...common, ...controlOptions(params, id), step, format }));
         track(bindUI(params, id, control));
       }
@@ -124,37 +128,84 @@ export const createParticleGardenExperience = (): Experience<ExperienceContext> 
       bindAudioSection(ctx, panel, common);
       bindSessionSection(ctx, panel, common);
 
+      // Hand-stirred flow field + GPU simulation (falls back to stateless particles).
+      const box = {
+        min: [0, 1, 2].map((i) => GARDEN_BOUNDS.center[i]! - GARDEN_BOUNDS.radius[i]! - 0.15) as [number, number, number],
+        max: [0, 1, 2].map((i) => GARDEN_BOUNDS.center[i]! + GARDEN_BOUNDS.radius[i]! + 0.15) as [number, number, number],
+      };
+      const flowField = createFlowField(box, [12, 8, 12]);
+      const layout = createParticleLayout(SIM_PARTICLES, 7, GARDEN_BOUNDS);
+      const sim = createParticleSim(world.renderer, { ...layout, center: GARDEN_BOUNDS.center, radius: GARDEN_BOUNDS.radius, field: flowField });
+      const simulated = sim.error === undefined ? sim : undefined;
+      if (simulated) {
+        field.visible = false;
+        track(world.createTransformEntity(simulated.points));
+        track(simulated);
+      } else {
+        console.info(`[garden] ${sim.error}`);
+      }
+
       // Per frame
       const { gripSpaces } = world.player;
       const hands = ['left', 'right'] as const;
       const handPosition = new Vector3();
+      const previous = { left: new Vector3(), right: new Vector3() };
+      const tracked = { left: false, right: false };
+      const velocity: [number, number, number] = [0, 0, 0];
       let time = 0;
       frame = (dt) => {
         menu.update();
         time += dt * params.get('speed');
-        u.uTime.value = time;
-        u.uTurbulence.value = params.get('turbulence');
-        u.uSize.value = params.get('size');
-        u.uHandRadius.value = params.get('radius');
-        u.uSparkle.value = params.get('sparkle');
-        u.uBurst.value = params.get('burst');
-        field.geometry.setDrawRange(0, Math.round(params.get('density')));
+        const half = (world.renderer.xr.isPresenting ? world.renderer.xr.getBaseLayer() : null) as { framebufferHeight?: number } | null;
+        const viewportHalfHeight = (half?.framebufferHeight ?? world.renderer.domElement.height) / 2;
 
-        // Viewport half-height for physically sized points (per eye in XR).
-        const layer = world.renderer.xr.isPresenting ? world.renderer.xr.getBaseLayer() : null;
-        u.uViewportHalfHeight.value =
-          (layer && 'framebufferHeight' in layer ? layer.framebufferHeight : world.renderer.domElement.height) / 2;
-
-        // Hands: open = repel (-1), pinch / trigger = attract (+1), absent = 0.
+        // Hands: moving hands stir the field; pinch / trigger attracts.
         hands.forEach((hand, i) => {
           const slot = u.uHands.value[i]!;
           if (!world.input.xr.getPrimaryInputSource(hand)) {
             slot.w = 0;
+            tracked[hand] = false;
             return;
           }
           gripSpaces[hand].getWorldPosition(handPosition);
-          slot.set(handPosition.x, handPosition.y, handPosition.z, world.input.xr.getSelectState(hand).active ? 1 : -1);
+          const pinching = world.input.xr.getSelectState(hand).active;
+          slot.set(handPosition.x, handPosition.y, handPosition.z, pinching ? 1 : -1);
+          if (tracked[hand] && dt > 0) {
+            velocity[0] = (handPosition.x - previous[hand].x) / dt;
+            velocity[1] = (handPosition.y - previous[hand].y) / dt;
+            velocity[2] = (handPosition.z - previous[hand].z) / dt;
+            const speed = Math.hypot(...velocity);
+            if (speed > 0.05) stampField(flowField, [handPosition.x, handPosition.y, handPosition.z], velocity.map((v) => v * dt * 6) as [number, number, number], 0.18);
+          }
+          previous[hand].copy(handPosition);
+          tracked[hand] = true;
         });
+        decayField(flowField, dt, params.get('memory'));
+
+        if (simulated) {
+          const su = simulated.simUniforms;
+          su.uTurbulence!.value = params.get('turbulence');
+          su.uStir!.value = params.get('stir');
+          su.uBurst!.value = params.get('burst');
+          (su.uHands!.value as typeof u.uHands.value).forEach((v, i) => v.copy(u.uHands.value[i]!));
+          simulated.step(dt * Math.max(0.05, params.get('speed')));
+          const ru = simulated.renderUniforms;
+          ru.uSize.value = params.get('size');
+          ru.uSparkle.value = params.get('sparkle');
+          ru.uViewportHalfHeight.value = viewportHalfHeight;
+          ru.uColorA.value.copy(u.uColorA.value);
+          ru.uColorB.value.copy(u.uColorB.value);
+          simulated.points.geometry.setDrawRange(0, Math.round(params.get('density')));
+        } else {
+          u.uTime.value = time;
+          u.uTurbulence.value = params.get('turbulence');
+          u.uSize.value = params.get('size');
+          u.uHandRadius.value = 0.3;
+          u.uSparkle.value = params.get('sparkle');
+          u.uBurst.value = params.get('burst');
+          u.uViewportHalfHeight.value = viewportHalfHeight;
+          field.geometry.setDrawRange(0, Math.round(params.get('density')));
+        }
 
         if (fade < 1) {
           fade = Math.min(1, fade + dt / MOOD_FADE_SECONDS);

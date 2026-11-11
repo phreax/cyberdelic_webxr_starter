@@ -23,7 +23,7 @@ describe('garden scene + panel contract', () => {
       'panel', 'btn-hide', 'mode-dot', 'status', 'fps-dot', 'fps', 'btn-vr', 'btn-mr', 'btn-exit',
       'audio-dot', 'audio-status', 'btn-mic', 'btn-capture', 'btn-demo', 'btn-stop',
       ...['garden', 'audio', 'session'].flatMap((n) => [`tab-${n}`, `page-${n}`]),
-      ...['density', 'turbulence', 'speed', 'radius', 'size', 'reactivity'].flatMap((id) => [id, `${id}-fill`, `${id}-value`]),
+      ...['density', 'turbulence', 'speed', 'stir', 'memory', 'size', 'reactivity'].flatMap((id) => [id, `${id}-fill`, `${id}-value`]),
       ...['lagoon', 'ember', 'aurora'].map((m) => `mood-${m}`),
     ];
     assert({

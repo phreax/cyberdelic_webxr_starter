@@ -53,7 +53,7 @@ performance HUD or OVR Metrics Tool while the orb animates.
 - [ ] Reactivity 0: sculpture looks the same with and without audio.
 - [ ] Presets: each eases in and is highlighted; changing a control clears the highlight.
 - [ ] OSC (optional): `npm run osc-bridge`, enable `osc: true`, bind an address, send from a tool.
-- [ ] Garden (?example=garden): open hand repels, pinch attracts; touching a ring fades to its mood; Demo beat bursts.
+- [ ] Garden (?example=garden): moving a hand leaves currents that persist and fade (Field memory); pinch draws particles in; touching a ring fades to its mood; Demo beat bursts; console shows no fallback message on Quest.
 - [ ] Snake (?example=snake): smooth shading (no facets); demo loop crawls endlessly; Square + twist on a loop has no seam or jump.
 - [ ] Snake list: + Add snake → edit mode with Draw; draw a stroke (trigger / pinch, not while pointing at a window); Done; select rows; Delete selects a neighbour.
 - [ ] Snake edit: only curve + vertices visible; Move tool drags vertices; Closed loop toggle works even for two-point paths; Add / Delete point.
