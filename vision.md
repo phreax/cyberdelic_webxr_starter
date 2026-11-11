@@ -25,11 +25,19 @@ experience.
 2. Beautiful, reusable spatial UI (Cyberdelic teal/orange theme, frosted glass).
 3. Standardized hand, controller and haptic interactions.
 4. Audio input + analysis driving parameters (volume, bass/mid/high, spectrum, onset, beat).
-5. OSC in/out via a Node UDP ↔ WebSocket bridge.
+5. OSC base structure (Node UDP ↔ WebSocket bridge, client, parameter binding API) — not wired into examples in the MVP.
 6. Simple custom GLSL shaders and generative visuals.
 7. Desktop development without a headset (IWER emulation).
 8. Stable **72 FPS on Quest 3S** for the reference scene.
 9. Approachable codebase for contributors of mixed experience.
+
+## Examples
+
+1. **Reactive Sculpture** (MVP) — organic generative sculpture; grab/rotate/scale, UI shader params, audio-reactive deformation, VR + MR.
+2. **Particle Garden** — hand-driven attraction/repulsion, organic flows, audio-reactive color/movement, interaction zones.
+3. **Snake Creator in Space** — draw and edit a curve in space (open or closed loop), pick shape/color/texture/animation from a spatial menu, render a GPU-bent snake flowing along it in real time. Reuses shader-lab (Karleido) snake render setup and materials.
+
+Spatial Synth is removed for now. No example uses OSC in the MVP.
 
 ## Non-goals (MVP)
 
@@ -98,7 +106,7 @@ No barrel `index.ts` files (IWSDK convention). Tests are colocated (`*.test.ts`)
 
 The 15 acceptance criteria in PRD §15, notably: runs in Quest Browser; desktop
 emulation; VR + passthrough MR; readable interactive UI via controllers and hands;
-grab/rotate/scale; haptics; audio and OSC drive the same parameters as UI; custom
+grab/rotate/scale; haptics; audio drives the same parameters as UI (OSC binds via the same API, unused by examples); custom
 GLSL with minimal boilerplate; 72 FPS on Quest 3S; new experience without touching
 framework internals; new contributor productive in ~15 minutes.
 
@@ -107,3 +115,5 @@ framework internals; new contributor productive in ~15 minutes.
 - Minimum IWSDK version policy (currently pinned `1.1.0-rc.2` — a release candidate).
 - Whether to keep `@meta-quest/metavr` (dev-only device CLI; collects usage data).
 - Hosting target for production deploys (static HTTPS host TBD).
+- Snake Creator: licensing of code ported from shader-lab-app (private) into this MIT repo.
+- Snake Creator: exact closed-loop behaviour (endless crawl vs. full ring).
