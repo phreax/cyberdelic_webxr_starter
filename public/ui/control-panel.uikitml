@@ -49,6 +49,7 @@
   .tab {
     flex-grow: 1;
     justify-content: center;
+    text-align: center;
     padding-top: 12px;
     padding-bottom: 12px;
     border-radius: 12px;
@@ -129,6 +130,7 @@
   .button {
     flex-grow: 1;
     justify-content: center;
+    text-align: center;
     padding-top: 14px;
     padding-bottom: 14px;
     border-radius: 14px;
@@ -165,7 +167,7 @@
     <div class="column">
       <div class="row">
         <span class="label">Displace</span>
-        <span id="displace-value" class="value">0.12</span>
+        <span id="displace-value" class="value">0.06</span>
       </div>
       <div id="displace" class="track">
         <div id="displace-fill" class="fill"></div>

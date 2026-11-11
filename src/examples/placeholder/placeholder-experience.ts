@@ -9,7 +9,7 @@ import type { OrbUniforms } from './orb-material.js';
 /** Scene node ids authored in public/scenes/main.iwsdk.scene.json. */
 export const NODE_IDS = { orb: 'cyber-orb', panel: 'control-panel' } as const;
 
-const DEFAULTS = { speed: 1, displace: 0.12, hue: 0, pulse: false } as const;
+const DEFAULTS = { speed: 1, displace: 0.06, hue: 0, pulse: false } as const;
 
 /**
  * Phase 1/2 placeholder: a grabbable, scalable noise orb driven by a themed control panel.

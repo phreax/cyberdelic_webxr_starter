@@ -1,14 +1,26 @@
 {
-  "version": "iwsdk.scene.v1",
-  "units": "meters",
+  "authoring": {
+    "views": [
+      {
+        "fov": 60,
+        "id": "hero",
+        "position": [
+          0,
+          1.6,
+          0.6
+        ],
+        "projection": "perspective",
+        "role": "hero",
+        "target": [
+          -0.1,
+          1.3,
+          -0.9
+        ]
+      }
+    ]
+  },
   "components": {
     "com.iwsdk.components.IBLGradient": {
-      "sky": [
-        0.55,
-        0.9,
-        0.86,
-        1
-      ],
       "equator": [
         0.12,
         0.2,
@@ -21,38 +33,52 @@
         0.06,
         1
       ],
-      "intensity": 0.4
+      "intensity": 0.4,
+      "sky": [
+        0.55,
+        0.9,
+        0.86,
+        1
+      ]
     }
   },
   "environment": {
-    "toneMapping": "aces",
     "exposure": 1,
-    "shadows": false
+    "shadows": false,
+    "toneMapping": "aces"
   },
-  "resources": {},
   "nodes": [
     {
+      "content": {
+        "asset": "cyber-orb",
+        "type": "asset"
+      },
       "id": "cyber-orb",
       "name": "Cyber Orb",
-      "content": {
-        "type": "asset",
-        "asset": "cyber-orb"
-      },
       "transform": {
         "position": [
           0.22,
-          1.35,
-          -1.0
-        ]
+          0.5613,
+          -1
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "scale": 1
       }
     },
     {
+      "components": {
+        "RayInteractable": {}
+      },
+      "content": {
+        "asset": "control-panel",
+        "type": "asset"
+      },
       "id": "control-panel",
       "name": "Control Panel",
-      "content": {
-        "type": "asset",
-        "asset": "control-panel"
-      },
       "transform": {
         "position": [
           -0.42,
@@ -65,51 +91,31 @@
           0
         ],
         "scale": 0.1
-      },
-      "components": {
-        "RayInteractable": {}
       }
     },
     {
-      "id": "fill-light",
-      "name": "Fill Light",
       "components": {
         "HemisphereLight": {
-          "skyColor": [
-            0.7,
-            1,
-            0.95,
-            1
-          ],
           "groundColor": [
             0.1,
             0.08,
             0.05,
             1
           ],
-          "intensity": 1
+          "intensity": 1,
+          "skyColor": [
+            0.7,
+            1,
+            0.95,
+            1
+          ]
         }
-      }
+      },
+      "id": "fill-light",
+      "name": "Fill Light"
     }
   ],
-  "authoring": {
-    "views": [
-      {
-        "id": "hero",
-        "role": "hero",
-        "projection": "perspective",
-        "position": [
-          0,
-          1.6,
-          0.6
-        ],
-        "target": [
-          -0.1,
-          1.3,
-          -0.9
-        ],
-        "fov": 60
-      }
-    ]
-  }
+  "resources": {},
+  "units": "meters",
+  "version": "iwsdk.scene.v1"
 }

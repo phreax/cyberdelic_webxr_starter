@@ -1,4 +1,4 @@
-import { AdditiveBlending, Color, ShaderMaterial } from '@iwsdk/core';
+import { AdditiveBlending, Color, NormalBlending, ShaderMaterial } from '@iwsdk/core';
 import { SIMPLEX_3D_GLSL } from '../../shaders/noise/simplex3d.glsl.js';
 
 /**
@@ -8,7 +8,9 @@ import { SIMPLEX_3D_GLSL } from '../../shaders/noise/simplex3d.glsl.js';
 export const createOrbUniforms = () => ({
   uTime: { value: 0 },
   uHue: { value: 0 },
-  uDisplace: { value: 0.12 },
+  uDisplace: { value: 0.06 },
+  /** Opacity facing the viewer; edges stay brighter (fresnel), like glass. */
+  uOpacity: { value: 0.3 },
   uPulse: { value: 0 },
   uPrimary: { value: new Color('#00D9C7') },
   uSecondary: { value: new Color('#FF9500') },
@@ -20,6 +22,9 @@ export const createOrbMaterial = (uniforms: OrbUniforms = createOrbUniforms()): 
   new ShaderMaterial({
     name: 'cyber-orb',
     uniforms,
+    transparent: true,
+    depthWrite: false,
+    blending: NormalBlending,
     vertexShader: /* glsl */ `
       uniform float uTime;
       uniform float uDisplace;
@@ -29,7 +34,7 @@ export const createOrbMaterial = (uniforms: OrbUniforms = createOrbUniforms()): 
       varying float vNoise;
       ${SIMPLEX_3D_GLSL}
       void main() {
-        float n = snoise(normal * 1.6 + vec3(0.0, uTime * 0.35, uTime * 0.2));
+        float n = snoise(normal * 1.1 + vec3(0.0, uTime * 0.35, uTime * 0.2));
         float beat = uPulse * (0.5 + 0.5 * sin(uTime * 4.0));
         vec3 displaced = position + normal * (n * uDisplace + beat * 0.04);
         vNoise = n;
@@ -44,6 +49,7 @@ export const createOrbMaterial = (uniforms: OrbUniforms = createOrbUniforms()): 
       uniform float uHue;
       uniform vec3 uPrimary;
       uniform vec3 uSecondary;
+      uniform float uOpacity;
       varying vec3 vNormalW;
       varying vec3 vViewDir;
       varying float vNoise;
@@ -55,8 +61,9 @@ export const createOrbMaterial = (uniforms: OrbUniforms = createOrbUniforms()): 
       void main() {
         float fresnel = pow(1.0 - max(dot(normalize(vNormalW), normalize(vViewDir)), 0.0), 2.5);
         vec3 base = mix(uPrimary, uSecondary, smoothstep(-0.4, 0.8, vNoise));
-        vec3 color = hueShift(base, uHue * 6.2831853) * (0.35 + 0.65 * fresnel) + fresnel * 0.35;
-        gl_FragColor = vec4(color, 1.0);
+        vec3 color = hueShift(base, uHue * 6.2831853) * (0.55 + 0.45 * fresnel) + fresnel * 0.3;
+        float alpha = clamp(uOpacity + fresnel * (1.0 - uOpacity), 0.0, 1.0);
+        gl_FragColor = vec4(color, alpha);
         #include <colorspace_fragment>
       }
     `,
