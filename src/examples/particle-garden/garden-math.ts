@@ -43,10 +43,6 @@ export const createParticleLayout = (count: number, seed: number, { center, radi
   return { homes, seeds };
 };
 
-/** Mood palettes for interaction zones: [colour A, colour B]. */
-export const GARDEN_MOODS = {
-  Lagoon: ['#00D9C7', '#2E7BFF'],
-  Ember: ['#FF9500', '#FF3D6E'],
-  Aurora: ['#A879FF', '#3DFFB0'],
-} as const;
-export type GardenMood = keyof typeof GARDEN_MOODS;
+/** Garden moods: shared palettes, one per interaction zone. */
+export const GARDEN_MOODS = ['Ember', 'Cyberdelic', 'Ethereal Garden', 'Rainbow'] as const;
+export type GardenMood = (typeof GARDEN_MOODS)[number];

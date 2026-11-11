@@ -2,7 +2,6 @@ import {
   AdditiveBlending,
   BufferAttribute,
   BufferGeometry,
-  Color,
   Data3DTexture,
   DataTexture,
   DataUtils,
@@ -170,8 +169,9 @@ export const createParticleSim = (
     uTime: { value: 0 },
     uSize: { value: 1 },
     uSparkle: { value: 0 },
-    uColorA: { value: new Color('#00D9C7') },
-    uColorB: { value: new Color('#2E7BFF') },
+    uPaletteFrom: { value: null as DataTexture | null },
+    uPaletteTo: { value: null as DataTexture | null },
+    uMoodMix: { value: 1 },
     uViewportHalfHeight: { value: 540 },
   };
   const material = new ShaderMaterial({
@@ -205,15 +205,17 @@ export const createParticleSim = (
       }
     `,
     fragmentShader: /* glsl */ `
-      uniform vec3 uColorA;
-      uniform vec3 uColorB;
+      uniform sampler2D uPaletteFrom;
+      uniform sampler2D uPaletteTo;
+      uniform float uMoodMix;
       varying float vMix;
       varying float vGlow;
       void main() {
         vec2 c = gl_PointCoord - 0.5;
         float a = smoothstep(0.5, 0.0, length(c));
         if (a <= 0.01) discard;
-        vec3 color = mix(uColorA, uColorB, smoothstep(0.2, 0.8, vMix)) * vGlow;
+        vec2 paletteUv = vec2(vMix, 0.5);
+        vec3 color = mix(texture2D(uPaletteFrom, paletteUv).rgb, texture2D(uPaletteTo, paletteUv).rgb, uMoodMix) * vGlow;
         gl_FragColor = vec4(color * a, a);
         #include <colorspace_fragment>
       }

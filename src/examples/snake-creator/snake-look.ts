@@ -47,7 +47,7 @@ export type SnakeLook = {
 export const DEFAULT_LOOK: Readonly<SnakeLook> = {
   thickness: 0.02, length: 0.35, headTaper: 0.1, tailTaper: 0.5, headShape: 0.6, body: 'tube', sphereDensity: 0.5, sphereSize: 1, profile: 0, twist: 0,
   pattern: 'rings', scale: 1, width: 0.5, spread: 0.05, transparent: false, backgroundOffset: 0.5,
-  backgroundBrightness: 0, iridescence: 0.5, metallic: 0.2, roughness: 0.35, speed: 0.15, reverse: false,
+  backgroundBrightness: 0, iridescence: 0.1, metallic: 0.2, roughness: 0.35, speed: 0.15, reverse: false,
 };
 
 

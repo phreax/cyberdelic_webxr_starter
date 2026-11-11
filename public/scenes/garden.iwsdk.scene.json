@@ -49,26 +49,6 @@
       }
     },
     {
-      "id": "zone-lagoon",
-      "name": "Zone Lagoon",
-      "content": {
-        "type": "asset",
-        "asset": "garden-zone"
-      },
-      "transform": {
-        "position": [
-          -0.35,
-          1.05,
-          -0.55
-        ],
-        "rotationDeg": [
-          70,
-          0,
-          0
-        ]
-      }
-    },
-    {
       "id": "zone-ember",
       "name": "Zone Ember",
       "content": {
@@ -77,9 +57,9 @@
       },
       "transform": {
         "position": [
-          0.0,
-          1.0,
-          -0.5
+          -0.45,
+          1.06,
+          -0.56
         ],
         "rotationDeg": [
           70,
@@ -89,17 +69,57 @@
       }
     },
     {
-      "id": "zone-aurora",
-      "name": "Zone Aurora",
+      "id": "zone-cyberdelic",
+      "name": "Zone Cyberdelic",
       "content": {
         "type": "asset",
         "asset": "garden-zone"
       },
       "transform": {
         "position": [
-          0.35,
-          1.05,
-          -0.55
+          -0.15,
+          1.02,
+          -0.52
+        ],
+        "rotationDeg": [
+          70,
+          0,
+          0
+        ]
+      }
+    },
+    {
+      "id": "zone-ethereal-garden",
+      "name": "Zone Ethereal Garden",
+      "content": {
+        "type": "asset",
+        "asset": "garden-zone"
+      },
+      "transform": {
+        "position": [
+          0.15,
+          1.02,
+          -0.52
+        ],
+        "rotationDeg": [
+          70,
+          0,
+          0
+        ]
+      }
+    },
+    {
+      "id": "zone-rainbow",
+      "name": "Zone Rainbow",
+      "content": {
+        "type": "asset",
+        "asset": "garden-zone"
+      },
+      "transform": {
+        "position": [
+          0.45,
+          1.06,
+          -0.56
         ],
         "rotationDeg": [
           70,

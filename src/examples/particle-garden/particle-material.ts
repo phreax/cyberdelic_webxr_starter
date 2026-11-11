@@ -1,4 +1,4 @@
-import { AdditiveBlending, Color, ShaderMaterial, Vector4 } from '@iwsdk/core';
+import { AdditiveBlending, ShaderMaterial, Vector4, type DataTexture } from '@iwsdk/core';
 import { SIMPLEX_3D_GLSL } from '../../shaders/noise/simplex3d.glsl.js';
 
 /**
@@ -15,8 +15,10 @@ export const createGardenUniforms = () => ({
   uHandRadius: { value: 0.3 },
   /** xyz = hand position, w = +1 attract, -1 repel, 0 = no hand. */
   uHands: { value: [new Vector4(), new Vector4()] },
-  uColorA: { value: new Color('#00D9C7') },
-  uColorB: { value: new Color('#2E7BFF') },
+  /** Mood cross-fade: two baked palettes (see garden-palette.ts) and the mix between them. */
+  uPaletteFrom: { value: null as DataTexture | null },
+  uPaletteTo: { value: null as DataTexture | null },
+  uMoodMix: { value: 1 },
   uCenter: { value: [0, 1.3, -1.2] as [number, number, number] },
   uHeight: { value: 1.2 },
   /** Half the render target height in pixels (per eye in XR), for physically sized points. */
@@ -87,15 +89,17 @@ export const createGardenMaterial = (uniforms: GardenUniforms = createGardenUnif
       }
     `,
     fragmentShader: /* glsl */ `
-      uniform vec3 uColorA;
-      uniform vec3 uColorB;
+      uniform sampler2D uPaletteFrom;
+      uniform sampler2D uPaletteTo;
+      uniform float uMoodMix;
       varying float vMix;
       varying float vGlow;
       void main() {
         vec2 c = gl_PointCoord - 0.5;
         float a = smoothstep(0.5, 0.0, length(c));
         if (a <= 0.01) discard;
-        vec3 color = mix(uColorA, uColorB, smoothstep(0.2, 0.8, vMix)) * vGlow;
+        vec2 paletteUv = vec2(vMix, 0.5);
+        vec3 color = mix(texture2D(uPaletteFrom, paletteUv).rgb, texture2D(uPaletteTo, paletteUv).rgb, uMoodMix) * vGlow;
         gl_FragColor = vec4(color * a, a);
         #include <colorspace_fragment>
       }

@@ -59,7 +59,7 @@ export const SNAKE_PARAMS = {
   transparent: { default: 0, type: 'boolean', label: 'Transparent' },
   backgroundOffset: { default: 0.5, min: 0, max: 1, label: 'Hue offset' },
   backgroundBrightness: { default: 0, min: 0, max: 1.5, label: 'Brightness' },
-  iridescence: { default: 0.5, min: 0, max: 1, label: 'Iridescence' },
+  iridescence: { default: 0.1, min: 0, max: 1, label: 'Iridescence' },
   metallic: { default: 0.2, min: 0, max: 1, label: 'Metallic' },
   roughness: { default: 0.35, min: 0.05, max: 1, label: 'Roughness' },
   speed: { default: 0.15, min: 0, max: 1, label: 'Speed' },

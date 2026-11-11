@@ -138,7 +138,7 @@ export const createSnakeRenderer = () => {
     uGroundColor: { value: new Color(0.03, 0.025, 0.05) },
     uRoughness: { value: 0.35 },
     uMetallic: { value: 0.2 },
-    uIridescence: { value: 0.5 },
+    uIridescence: { value: 0.1 },
     uGratingSpacing: { value: 1650 },
   };
 

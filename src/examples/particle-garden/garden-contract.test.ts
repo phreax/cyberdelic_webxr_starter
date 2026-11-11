@@ -24,7 +24,7 @@ describe('garden scene + panel contract', () => {
       'audio-dot', 'audio-status', 'btn-mic', 'btn-capture', 'btn-demo', 'btn-stop',
       ...['garden', 'audio', 'session'].flatMap((n) => [`tab-${n}`, `page-${n}`]),
       ...['density', 'turbulence', 'speed', 'stir', 'memory', 'size', 'reactivity'].flatMap((id) => [id, `${id}-fill`, `${id}-value`]),
-      ...['lagoon', 'ember', 'aurora'].map((m) => `mood-${m}`),
+      ...['ember', 'cyberdelic', 'ethereal-garden', 'rainbow'].map((m) => `mood-${m}`),
     ];
     assert({
       given: 'the ids the garden experience binds',
@@ -39,7 +39,7 @@ describe('garden scene + panel contract', () => {
       given: 'the garden scene',
       should: 'contain the field and one zone per mood',
       actual: scene.nodes.map((n) => n.id).filter((id) => id === 'particle-garden' || id.startsWith('zone-')),
-      expected: ['particle-garden', 'zone-lagoon', 'zone-ember', 'zone-aurora'],
+      expected: ['particle-garden', 'zone-ember', 'zone-cyberdelic', 'zone-ethereal-garden', 'zone-rainbow'],
     });
   });
 });

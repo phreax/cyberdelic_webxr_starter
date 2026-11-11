@@ -508,7 +508,7 @@
     <div class="column">
       <div class="row">
         <span class="label">Iridescence</span>
-        <span id="iridescence-value" class="value">0.50</span>
+        <span id="iridescence-value" class="value">0.10</span>
       </div>
       <div id="iridescence" class="track">
         <div id="iridescence-fill" class="fill"></div>

@@ -1,4 +1,4 @@
-import { Color, Mesh, MeshStandardMaterial, Points, ShaderMaterial, Vector3, type UIKitMLAsset } from '@iwsdk/core';
+import { Mesh, MeshStandardMaterial, Points, ShaderMaterial, Vector3, type UIKitMLAsset } from '@iwsdk/core';
 import type { AudioSignal } from '../../components/audio/audio-engine.js';
 import { createProximityTrigger } from '../../components/interaction/behaviors.js';
 import { bindButton, bindSlider, bindTabs, requireElement } from '../../components/ui/controls.js';
@@ -14,10 +14,13 @@ import { createFlowField, decayField, stampField } from './flow-field.js';
 import { createParticleLayout } from './garden-math.js';
 import { createParticleSim, SIM_PARTICLES } from './particle-sim.js';
 import { GARDEN_MOODS, type GardenMood } from './garden-math.js';
+import { createMoodPalettes } from './garden-palette.js';
+import { paletteAccent } from '../../shaders/color/palettes.js';
 import type { GardenUniforms } from './particle-material.js';
 
 export const NODE_IDS = { field: 'particle-garden', panel: 'garden-panel' } as const;
-const ZONES: Record<GardenMood, string> = { Lagoon: 'zone-lagoon', Ember: 'zone-ember', Aurora: 'zone-aurora' };
+const slug = (name: string) => name.toLowerCase().replace(/\s+/g, '-');
+const ZONES = Object.fromEntries(GARDEN_MOODS.map((name) => [name, `zone-${slug(name)}`])) as Record<GardenMood, string>;
 
 export const GARDEN_PARAMS = {
   density: { default: 14000, min: 2000, max: SIM_PARTICLES, label: 'Density' },
@@ -61,26 +64,18 @@ export const createParticleGardenExperience = (): Experience<ExperienceContext> 
       const field = points;
       const u = (field.material as ShaderMaterial).uniforms as unknown as GardenUniforms;
 
-      // Moods: colours fade between palettes when a hand enters a zone.
-      const from = { a: new Color(), b: new Color() };
-      const to = { a: new Color(), b: new Color() };
+      // Moods: particles cross-fade between baked palettes when a hand enters a zone.
+      const palettes = track(createMoodPalettes());
       let fade = 1;
-      let mood: GardenMood = 'Lagoon';
+      let mood: GardenMood = 'Cyberdelic';
       const zoneMaterials = new Map<GardenMood, MeshStandardMaterial>();
       const moodButtons = new Map<GardenMood, ReturnType<typeof bindButton>>();
       const setMood = (next: GardenMood, instant = false) => {
         mood = next;
-        from.a.copy(u.uColorA.value);
-        from.b.copy(u.uColorB.value);
-        to.a.set(GARDEN_MOODS[next][0]);
-        to.b.set(GARDEN_MOODS[next][1]);
+        palettes.set(next, instant);
         fade = instant ? 1 : 0;
-        if (instant) {
-          u.uColorA.value.copy(to.a);
-          u.uColorB.value.copy(to.b);
-        }
         zoneMaterials.forEach((material, name) => {
-          material.emissive.set(name === next ? GARDEN_MOODS[name][0] : '#000000');
+          material.emissive.set(name === next ? paletteAccent(name) : '#000000');
           material.emissiveIntensity = name === next ? 0.8 : 0;
         });
         moodButtons.forEach((button, name) => button.setSelected(name === next));
@@ -91,7 +86,7 @@ export const createParticleGardenExperience = (): Experience<ExperienceContext> 
         zone.object3D!.traverse((child) => {
           if (child instanceof Mesh && child.material instanceof MeshStandardMaterial) {
             child.material = child.material.clone(); // per-zone tint
-            child.material.color.set(GARDEN_MOODS[name][0]);
+            child.material.color.set(paletteAccent(name));
             zoneMaterials.set(name, child.material);
           }
         });
@@ -121,10 +116,10 @@ export const createParticleGardenExperience = (): Experience<ExperienceContext> 
         const control = track(bindSlider(panel, id, { ...common, ...controlOptions(params, id), step, format }));
         track(bindUI(params, id, control));
       }
-      for (const name of Object.keys(GARDEN_MOODS) as GardenMood[]) {
-        moodButtons.set(name, track(bindButton(panel, `mood-${name.toLowerCase()}`, { ...common, onClick: () => setMood(name) })));
+      for (const name of GARDEN_MOODS) {
+        moodButtons.set(name, track(bindButton(panel, `mood-${slug(name)}`, { ...common, onClick: () => setMood(name) })));
       }
-      setMood('Lagoon', true);
+      setMood('Cyberdelic', true);
       bindAudioSection(ctx, panel, common);
       bindSessionSection(ctx, panel, common);
 
@@ -193,8 +188,9 @@ export const createParticleGardenExperience = (): Experience<ExperienceContext> 
           ru.uSize.value = params.get('size');
           ru.uSparkle.value = params.get('sparkle');
           ru.uViewportHalfHeight.value = viewportHalfHeight;
-          ru.uColorA.value.copy(u.uColorA.value);
-          ru.uColorB.value.copy(u.uColorB.value);
+          ru.uPaletteFrom.value = palettes.from;
+          ru.uPaletteTo.value = palettes.to;
+          ru.uMoodMix.value = fade;
           simulated.points.geometry.setDrawRange(0, Math.round(params.get('density')));
         } else {
           u.uTime.value = time;
@@ -204,14 +200,13 @@ export const createParticleGardenExperience = (): Experience<ExperienceContext> 
           u.uSparkle.value = params.get('sparkle');
           u.uBurst.value = params.get('burst');
           u.uViewportHalfHeight.value = viewportHalfHeight;
+          u.uPaletteFrom.value = palettes.from;
+          u.uPaletteTo.value = palettes.to;
+          u.uMoodMix.value = fade;
           field.geometry.setDrawRange(0, Math.round(params.get('density')));
         }
 
-        if (fade < 1) {
-          fade = Math.min(1, fade + dt / MOOD_FADE_SECONDS);
-          u.uColorA.value.lerpColors(from.a, to.a, fade);
-          u.uColorB.value.lerpColors(from.b, to.b, fade);
-        }
+        if (fade < 1) fade = Math.min(1, fade + dt / MOOD_FADE_SECONDS);
       };
     },
     update(dt) {

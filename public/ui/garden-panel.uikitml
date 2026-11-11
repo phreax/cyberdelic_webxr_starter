@@ -351,9 +351,12 @@
       </div>
     </div>
     <div class="row">
-      <div id="mood-lagoon" class="small-button">Lagoon</div>
       <div id="mood-ember" class="small-button">Ember</div>
-      <div id="mood-aurora" class="small-button">Aurora</div>
+      <div id="mood-cyberdelic" class="small-button">Cyberdelic</div>
+    </div>
+    <div class="row">
+      <div id="mood-ethereal-garden" class="small-button">Ethereal Garden</div>
+      <div id="mood-rainbow" class="small-button">Rainbow</div>
     </div>
   </div>
 
