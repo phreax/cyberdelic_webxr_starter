@@ -96,20 +96,19 @@
     "views": [
       {
         "id": "hero",
-        "name": "Hero",
-        "camera": {
-          "position": [
-            0,
-            1.6,
-            0.6
-          ],
-          "lookAt": [
-            -0.1,
-            1.3,
-            -0.9
-          ],
-          "fov": 60
-        }
+        "role": "hero",
+        "projection": "perspective",
+        "position": [
+          0,
+          1.6,
+          0.6
+        ],
+        "target": [
+          -0.1,
+          1.3,
+          -0.9
+        ],
+        "fov": 60
       }
     ]
   }
