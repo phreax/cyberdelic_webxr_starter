@@ -46,7 +46,7 @@ performance HUD or OVR Metrics Tool while the orb animates.
 - [ ] Emulated MR: passthrough (transparent background), same interactions.
 - [ ] Quest: hand pinch operates the panel; haptics on click, slider release, grab and release.
 - [ ] Menu: drag the bar under the panel to move it; panel keeps facing you.
-- [ ] Menu: Hide button, M (desktop), left controller Menu button and wrist button (hands) hide/show it; it reappears in front of you in XR.
+- [ ] Menu: Hide button, M (desktop), left Menu or Y button, and touching the wrist button (hands) hide/show it; it reappears in front of you in XR.
 - [ ] Audio tab: Demo beat drives growth (bass), flow (mid), glow (high) and beat pulse; meters + spectrum move.
 - [ ] Audio tab: Mic asks permission; denying shows a red status and the scene keeps running.
 - [ ] Audio tab: Capture on desktop Chrome (share a tab with audio); shows *unsupported* on Quest.

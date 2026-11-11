@@ -6,6 +6,7 @@ import {
   type World,
 } from '@iwsdk/core';
 import { createAudioEngine, type AudioEngine, type AudioEngineOptions } from '../../components/audio/audio-engine.js';
+import { createInteractionSounds, type InteractionSounds } from '../../components/audio/interaction-sounds.js';
 import { createOscClient, type OscClient, type OscClientOptions } from '../../components/osc/osc-client.js';
 import { createParameterStore, type ParameterStore } from '../parameters/store.js';
 import { createHaptics, type Hand, type Haptics, type HapticPatternName } from '../../components/interaction/haptics.js';
@@ -26,6 +27,10 @@ export type ExperienceContext = {
   audio?: AudioEngine;
   /** Present when `osc` is enabled in the config. */
   osc?: OscClient;
+  /** Synthesised UI / interaction sounds (click, select, grab, release). */
+  sounds: InteractionSounds;
+  /** Run `fn(dt, time)` every frame before the experience's update. Returns a remover (auto-removed on dispose). */
+  onFrame(fn: (dt: number, time: number) => void): () => void;
   haptics: Haptics & {
     /** Play on the controller whose trigger or grip is held, else the right one. */
     playActive(pattern: HapticPatternName): void;
@@ -46,6 +51,9 @@ export type ExperienceConfig = {
   haptics?: boolean;
   audio?: boolean | AudioEngineOptions;
   osc?: boolean | OscClientOptions;
+  /** Scene JSON to load before init (e.g. './scenes/garden.iwsdk.scene.json'). Default: the one in iwsdk.config.json. */
+  level?: string;
+  sounds?: boolean;
   scene: Experience<ExperienceContext>;
 };
 
@@ -83,7 +91,13 @@ export const createExperience = async (world: World, config: ExperienceConfig) =
   // Themed background in VR and the browser. IWSDK clears it during passthrough AR sessions and restores it after.
   world.scene.background = new Color(theme.colors.background);
 
+  if (config.level) await world.loadLevel(config.level);
+
   const params = createParameterStore();
+  const sounds = disposables.add(createInteractionSounds());
+  sounds.setEnabled(config.sounds ?? true);
+  const frameCallbacks = new Set<(dt: number, time: number) => void>();
+  disposables.add(() => frameCallbacks.clear());
   const audio = config.audio ? disposables.add(createAudioEngine(config.audio === true ? {} : config.audio)) : undefined;
   const osc = config.osc ? disposables.add(createOscClient(config.osc === true ? {} : config.osc)) : undefined;
 
@@ -93,6 +107,11 @@ export const createExperience = async (world: World, config: ExperienceConfig) =
     params,
     audio,
     osc,
+    sounds,
+    onFrame(fn) {
+      frameCallbacks.add(fn);
+      return () => frameCallbacks.delete(fn);
+    },
     haptics: { ...haptics, playActive: (pattern) => haptics.play(activeHand(), pattern) },
     track: (item) => disposables.add(item),
     xr: {
@@ -123,6 +142,7 @@ export const createExperience = async (world: World, config: ExperienceConfig) =
       const dt = clampDelta(delta);
       audio?.update(dt);
       params.update(dt);
+      frameCallbacks.forEach((fn) => fn(dt, time));
       lifecycle.tick(delta, time);
     }
   }

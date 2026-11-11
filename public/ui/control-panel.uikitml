@@ -445,6 +445,6 @@
       <span id="fps" class="muted">-- fps</span>
     </div>
     <span id="xr-info" class="muted">Checking XR support...</span>
-    <span class="muted">Menu: drag the bar below to move. Show or hide with M, the left Menu button, or the wrist button.</span>
+    <span class="muted">Menu: drag the bar below to move. Show or hide: M, left Menu or Y button, or touch the wrist button.</span>
   </div>
 </div>

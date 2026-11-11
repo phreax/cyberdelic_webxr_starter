@@ -13,15 +13,19 @@ import {
   VisibilityState,
   type Entity,
   type Object3D,
+  type UIKitMLAsset,
 } from '@iwsdk/core';
 import type { ExperienceContext } from '../../core/xr/experience.js';
 import { makeManipulable } from '../interaction/manipulable.js';
+import { createProximityState } from '../interaction/triggers.js';
+import { requireElement } from './controls.js';
 import { summonPose, yawToward, type SummonOptions } from './panel-placement.js';
 
 /**
  * Standard XR menu behaviour for a placed UIKitML panel:
  * - Move: grab the bar under the panel (ray / pinch / mouse); the panel follows and keeps facing you.
- * - Hide / show: left controller Menu (≡) button, a wrist button when using hands, or a keyboard key.
+ * - Hide / show: left controller Menu (≡) or Y button, touching the wrist button with the other
+ *   index finger (or pointing + pinching at it), or a keyboard key.
  * - When shown again, the panel appears in front of you at a comfortable distance.
  */
 export type PanelMenuOptions = SummonOptions & {
@@ -31,6 +35,8 @@ export type PanelMenuOptions = SummonOptions & {
   key?: string;
   /** Gap between panel bottom edge and the grab bar, metres. */
   barGap?: number;
+  /** Id of the panel's root UIKit element (hidden with display: none). */
+  rootElementId?: string;
 };
 
 export type PanelMenu = {
@@ -49,9 +55,12 @@ const setParentLocal = (object: Object3D, worldPosition: Vector3) => {
 
 export const createPanelMenu = (ctx: ExperienceContext, options: PanelMenuOptions): PanelMenu => {
   const { world, theme, haptics } = ctx;
-  const { nodeId, key = 'KeyM', barGap = 0.03 } = options;
+  const { nodeId, key = 'KeyM', barGap = 0.03, rootElementId = 'panel' } = options;
   const panelEntity: Entity = world.requireSceneEntity(nodeId);
   const panel = panelEntity.object3D!;
+  // Hide through UIKit's own layout state: toggling Object3D.visible is not observed by UIKit's
+  // renderer, so a panel hidden that way never comes back.
+  const panelRoot = requireElement(world.requireSceneObject<UIKitMLAsset>(nodeId), rootElementId);
 
   // Grab bar: pill below the panel, like Quest system windows.
   panel.updateWorldMatrix(true, true);
@@ -76,6 +85,9 @@ export const createPanelMenu = (ctx: ExperienceContext, options: PanelMenuOption
   const wristEntity = world.createTransformEntity(wrist, { parent: world.playerSpaceEntities.gripSpaces.left });
   wristEntity.addComponent(RayInteractable);
 
+  const fingertip = new Vector3();
+  const wristWorld = new Vector3();
+  const wristTouch = createProximityState({ radius: 0.025, hysteresis: 0.02 });
   const head = new Vector3();
   const forward = new Vector3();
   const panelWorld = new Vector3();
@@ -111,7 +123,7 @@ export const createPanelMenu = (ctx: ExperienceContext, options: PanelMenuOption
   };
 
   const apply = () => {
-    panel.visible = visible;
+    panelRoot.setProperties({ display: visible ? 'flex' : 'none' });
     bar.visible = visible;
     setInteractive(panelEntity, visible);
     setInteractive(barEntity, visible);
@@ -142,15 +154,26 @@ export const createPanelMenu = (ctx: ExperienceContext, options: PanelMenuOption
 
       // Toggle inputs: keyboard, left controller menu button, wrist button (hands only).
       if (world.input.keyboard.getKeyDown(key)) menu.toggle();
-      if (world.input.xr.gamepads.left?.getButtonDown(InputComponent.Menu)) {
+      const left = world.input.xr.gamepads.left;
+      if (left?.getButtonDown(InputComponent.Menu) || left?.getButtonDown(InputComponent.Y_Button)) {
         menu.toggle();
         haptics.play('left', 'click');
       }
       const handsActive = immersive && world.input.xr.isPrimary('hand', 'left');
       wrist.visible = handsActive;
       setInteractive(wristEntity, handsActive);
+      // Wrist button: touch it with the right index fingertip, or point at it and pinch.
+      let touched = false;
+      if (handsActive) {
+        world.player.indexTipSpaces.right.getWorldPosition(fingertip);
+        wrist.getWorldPosition(wristWorld);
+        touched = wristTouch.update(fingertip.distanceTo(wristWorld)) === 'enter';
+      }
       const wristPressed = handsActive && wristEntity.hasComponent(Pressed);
-      if (wristPressed && !wristWasPressed) menu.toggle();
+      if (touched || (wristPressed && !wristWasPressed)) {
+        menu.toggle();
+        ctx.sounds.play('click');
+      }
       wristWasPressed = wristPressed;
       wristMaterial.opacity = wristEntity.hasComponent(Hovered) ? 1 : 0.85;
 
