@@ -28,3 +28,10 @@ Levers if a device drops frames: `SphereGeometry` segments in
 |---|---|---|
 | Field | 1 draw, 16k points default (2k–24k via Density, drawRange, no rebuild) | Vertex: 3 simplex per particle; stateless (no simulation buffers). |
 | Fragment | additive soft sprite, 6–14 mm, capped at 64 px | Overdraw is the main cost: lower Density or Particle size first. |
+
+## Snake Creator budget
+
+| Item | Cost | Notes |
+|---|---|---|
+| Snake | 1 draw, 192 × 24 grid (~9k triangles), MeshStandardMaterial | Vertex shader bends the fixed grid; curve is a 256 × 3 float texture rewritten only when the path changes. |
+| Path edits | CPU resample (≤ 48 anchors × 64 steps) only while an anchor moves | |

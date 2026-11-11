@@ -17,7 +17,7 @@ npm run build      # production bundle in dist/
 
 Requires Node `>=20.19 <21`, `>=22.12 <23`, or `>=24`.
 
-Examples: `?example=sculpture` (default) · `?example=garden` (Particle Garden) · `?example=playground` (all components).
+Examples: `?example=sculpture` (default) · `?example=garden` (Particle Garden) · `?example=snake` (Snake Creator) · `?example=playground` (all components).
 
 Docs: [components](./docs/components.md) · [testing](./docs/testing.md) · [create an experience](./docs/creating-experiences.md) · [audio](./docs/audio.md) · [OSC](./docs/osc.md) · [performance](./docs/performance.md)
 

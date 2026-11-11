@@ -39,4 +39,7 @@ export default defineAssets({
   'particle-garden': createParticleGarden(),
   'garden-zone': createGardenZone(),
   'garden-panel': uikitml('garden-panel.uikitml', 'Garden Panel'),
+
+  // Snake Creator (?example=snake)
+  'snake-panel': uikitml('snake-panel.uikitml', 'Snake Panel'),
 });

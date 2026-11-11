@@ -1,0 +1,532 @@
+<style>
+  .panel {
+    flex-direction: column;
+    width: 420px;
+    gap: 18px;
+    padding-top: 26px;
+    padding-bottom: 26px;
+    padding-left: 26px;
+    padding-right: 26px;
+    border-radius: 22px;
+    border-width: 2px;
+    border-color: #00d9c740;
+    background-color: #152322d9;
+  }
+  .eyebrow {
+    color: #ff9500;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 2px;
+  }
+  .title {
+    color: #f1f7f5;
+    font-size: 30px;
+    font-weight: 700;
+  }
+  .muted {
+    color: #9baeab;
+    font-size: 16px;
+  }
+  .label {
+    color: #f1f7f5;
+    font-size: 18px;
+  }
+  .value {
+    color: #00d9c7;
+    font-size: 18px;
+    font-weight: 700;
+  }
+  .tabs {
+    flex-direction: row;
+    gap: 8px;
+  }
+  .tab {
+    flex-grow: 1;
+    justify-content: center;
+    text-align: center;
+    padding-top: 12px;
+    padding-bottom: 12px;
+    border-radius: 12px;
+    border-width: 2px;
+    border-color: #00d9c7;
+    color: #f1f7f5;
+    font-size: 18px;
+    font-weight: 700;
+  }
+  .page {
+    flex-direction: column;
+    gap: 20px;
+  }
+  .row {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .column {
+    flex-direction: column;
+    gap: 10px;
+  }
+  .track {
+    height: 30px;
+    border-radius: 15px;
+    border-width: 2px;
+    border-color: #00d9c7;
+    background-color: #071514;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    padding-left: 5px;
+    padding-right: 5px;
+  }
+  .fill {
+    height: 100%;
+    border-radius: 10px;
+    background-color: #00d9c7;
+  }
+  .knob {
+    width: 84px;
+    height: 84px;
+    border-radius: 42px;
+    border-width: 2px;
+    border-color: #00d9c7;
+    background-color: #071514;
+  }
+  .knob-value {
+    width: 64px;
+    color: #00d9c7;
+    font-size: 18px;
+    font-weight: 700;
+  }
+  .knob-indicator {
+    width: 100%;
+    height: 100%;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 8px;
+  }
+  .knob-dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 7px;
+    background-color: #ff9500;
+  }
+  .toggle {
+    flex-direction: row;
+    align-items: center;
+    width: 72px;
+    height: 38px;
+    border-radius: 19px;
+    border-width: 2px;
+    border-color: #00d9c7;
+    padding-left: 5px;
+    padding-right: 5px;
+  }
+  .toggle-thumb {
+    width: 26px;
+    height: 26px;
+    border-radius: 13px;
+    background-color: #9baeab;
+  }
+  .icon-button {
+    align-self: flex-start;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 16px;
+    padding-right: 16px;
+    border-radius: 12px;
+    border-width: 2px;
+    border-color: #00d9c7;
+    color: #9baeab;
+    font-size: 15px;
+    font-weight: 700;
+  }
+  .button {
+    flex-grow: 1;
+    justify-content: center;
+    text-align: center;
+    padding-top: 14px;
+    padding-bottom: 14px;
+    border-radius: 14px;
+    border-width: 2px;
+    border-color: #00d9c7;
+    color: #f1f7f5;
+    font-size: 18px;
+    font-weight: 700;
+  }
+  .grid {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .preset {
+    width: 179px;
+    flex-direction: column;
+    gap: 4px;
+    padding-top: 14px;
+    padding-bottom: 14px;
+    padding-left: 16px;
+    padding-right: 16px;
+    border-radius: 14px;
+    border-width: 2px;
+    border-color: #00d9c7;
+  }
+  .preset-name {
+    color: #f1f7f5;
+    font-size: 19px;
+    font-weight: 700;
+  }
+  .meter-row {
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+  }
+  .meter-label {
+    width: 56px;
+    color: #9baeab;
+    font-size: 15px;
+  }
+  .meter {
+    flex-grow: 1;
+    height: 12px;
+    border-radius: 6px;
+    background-color: #071514;
+  }
+  .meter-fill {
+    height: 100%;
+    width: 0%;
+    border-radius: 6px;
+    background-color: #00d9c7;
+  }
+  .spectrum {
+    flex-direction: row;
+    align-items: flex-end;
+    gap: 4px;
+    height: 60px;
+    padding-top: 6px;
+    padding-bottom: 6px;
+    padding-left: 8px;
+    padding-right: 8px;
+    border-radius: 10px;
+    background-color: #071514;
+  }
+  .spectrum-bar {
+    flex-grow: 1;
+    height: 2px;
+    border-radius: 2px;
+    background-color: #ff9500;
+  }
+  .status {
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+  }
+  .status-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 6px;
+    background-color: #9baeab;
+  }
+  .small-button {
+    flex-grow: 1;
+    justify-content: center;
+    text-align: center;
+    padding-top: 12px;
+    padding-bottom: 12px;
+    border-radius: 12px;
+    border-width: 2px;
+    border-color: #00d9c7;
+    color: #f1f7f5;
+    font-size: 16px;
+    font-weight: 700;
+  }
+  .dropdown {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 12px;
+    padding-bottom: 12px;
+    padding-left: 16px;
+    padding-right: 16px;
+    border-radius: 12px;
+    border-width: 2px;
+    border-color: #00d9c7;
+    color: #f1f7f5;
+    font-size: 17px;
+  }
+  .dropdown-list {
+    flex-direction: column;
+    gap: 6px;
+  }
+  .option {
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 16px;
+    padding-right: 16px;
+    border-radius: 10px;
+    border-width: 2px;
+    border-color: #00d9c7;
+    color: #f1f7f5;
+    font-size: 16px;
+  }
+  .swatch {
+    width: 40px;
+    height: 40px;
+    border-radius: 20px;
+    border-width: 3px;
+    border-color: #00d9c7;
+  }
+  .preview {
+    width: 64px;
+    height: 40px;
+    border-radius: 10px;
+  }
+  .readout {
+    color: #ff9500;
+    font-size: 34px;
+    font-weight: 700;
+  }
+  .log {
+    color: #dbe7e5;
+    font-size: 15px;
+  }
+</style>
+
+<!--
+  Snake Creator panel. 1px = 1 mm at node scale 0.1.
+  Element ids are the contract used by src/examples/snake-creator/snake-experience.ts.
+-->
+<div id="panel" class="panel">
+  <div class="row">
+    <div class="column">
+      <span class="eyebrow">CYBERDELIC XR</span>
+      <span class="title">Snake Creator</span>
+      <div class="status">
+        <div id="mode-dot" class="status-dot"></div>
+        <span id="status" class="muted">Desktop preview</span>
+      </div>
+    </div>
+    <div id="btn-hide" class="icon-button">Hide</div>
+  </div>
+
+  <div class="tabs">
+    <div id="tab-draw" class="tab">Draw</div>
+    <div id="tab-shape" class="tab">Shape</div>
+    <div id="tab-look" class="tab">Look</div>
+    <div id="tab-motion" class="tab">Motion</div>
+    <div id="tab-session" class="tab">XR</div>
+  </div>
+
+  <div id="page-draw" class="page">
+    <div class="row">
+      <div id="tool-draw" class="small-button">Draw</div>
+      <div id="tool-edit" class="small-button">Edit</div>
+      <div id="tool-view" class="small-button">View</div>
+    </div>
+    <span id="draw-hint" class="muted">Draw: hold trigger or pinch with your right hand and move it through the air.</span>
+    <div class="row">
+      <span class="label">Closed loop</span>
+      <div id="closed" class="toggle">
+        <div id="closed-thumb" class="toggle-thumb"></div>
+      </div>
+    </div>
+    <div class="row">
+      <div id="btn-add" class="small-button">Add point</div>
+      <div id="btn-delete" class="small-button">Delete point</div>
+    </div>
+    <div class="row">
+      <div id="btn-demo-loop" class="small-button">Demo loop</div>
+      <div id="btn-demo-wave" class="small-button">Demo wave</div>
+      <div id="btn-clear" class="small-button">Clear</div>
+    </div>
+    <span id="path-info" class="log">No path</span>
+  </div>
+
+  <div id="page-shape" class="page">
+    <div class="column">
+      <div class="row">
+        <span class="label">Thickness</span>
+        <span id="thickness-value" class="value">0.020</span>
+      </div>
+      <div id="thickness" class="track">
+        <div id="thickness-fill" class="fill"></div>
+      </div>
+    </div>
+    <div class="column">
+      <div class="row">
+        <span class="label">Length</span>
+        <span id="length-value" class="value">0.35</span>
+      </div>
+      <div id="length" class="track">
+        <div id="length-fill" class="fill"></div>
+      </div>
+    </div>
+    <div class="column">
+      <div class="row">
+        <span class="label">Head taper</span>
+        <span id="headTaper-value" class="value">0.10</span>
+      </div>
+      <div id="headTaper" class="track">
+        <div id="headTaper-fill" class="fill"></div>
+      </div>
+    </div>
+    <div class="column">
+      <div class="row">
+        <span class="label">Tail taper</span>
+        <span id="tailTaper-value" class="value">0.50</span>
+      </div>
+      <div id="tailTaper" class="track">
+        <div id="tailTaper-fill" class="fill"></div>
+      </div>
+    </div>
+    <div class="column">
+      <div class="row">
+        <span class="label">Head shape</span>
+        <span id="headShape-value" class="value">0.60</span>
+      </div>
+      <div id="headShape" class="track">
+        <div id="headShape-fill" class="fill"></div>
+      </div>
+    </div>
+    <div class="row">
+      <div id="profile-round" class="small-button">Round</div>
+      <div id="profile-square" class="small-button">Square</div>
+      <div id="profile-hex" class="small-button">Hex</div>
+    </div>
+    <div class="column">
+      <div class="row">
+        <span class="label">Twist</span>
+        <span id="twist-value" class="value">0.00</span>
+      </div>
+      <div id="twist" class="track">
+        <div id="twist-fill" class="fill"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="page-look" class="page">
+    <div class="row">
+      <div id="pattern-solid" class="small-button">Solid</div>
+      <div id="pattern-rings" class="small-button">Rings</div>
+      <div id="pattern-hilbert" class="small-button">Hilbert</div>
+    </div>
+    <div class="column">
+      <div class="row">
+        <span class="label">Colour</span>
+        <div id="fg-preview" class="preview"></div>
+      </div>
+      <div class="row">
+        <div id="fg-swatch-0" class="swatch"></div>
+        <div id="fg-swatch-1" class="swatch"></div>
+        <div id="fg-swatch-2" class="swatch"></div>
+        <div id="fg-swatch-3" class="swatch"></div>
+        <div id="fg-swatch-4" class="swatch"></div>
+      </div>
+    <div class="column">
+      <div class="row">
+        <span class="label">Hue</span>
+        <span id="fg-hue-value" class="value">0</span>
+      </div>
+      <div id="fg-hue" class="track">
+        <div id="fg-hue-fill" class="fill"></div>
+      </div>
+    </div>
+    </div>
+    <div class="column">
+      <span class="label">Background</span>
+      <div class="row">
+        <div id="bg-swatch-0" class="swatch"></div>
+        <div id="bg-swatch-1" class="swatch"></div>
+        <div id="bg-swatch-2" class="swatch"></div>
+        <div id="bg-swatch-3" class="swatch"></div>
+        <div id="bg-swatch-4" class="swatch"></div>
+      </div>
+    </div>
+    <div class="row">
+      <span class="label">Gradient along body</span>
+      <div id="gradient" class="toggle">
+        <div id="gradient-thumb" class="toggle-thumb"></div>
+      </div>
+    </div>
+    <div class="row">
+      <div id="palette-cyberdelic" class="small-button">Cyberdelic</div>
+      <div id="palette-ocean" class="small-button">Ocean</div>
+      <div id="palette-ember" class="small-button">Ember</div>
+      <div id="palette-aurora" class="small-button">Aurora</div>
+    </div>
+    <div class="column">
+      <div class="row">
+        <span class="label">Pattern scale</span>
+        <span id="scale-value" class="value">1.00</span>
+      </div>
+      <div id="scale" class="track">
+        <div id="scale-fill" class="fill"></div>
+      </div>
+    </div>
+    <div class="column">
+      <div class="row">
+        <span class="label">Pattern width</span>
+        <span id="width-value" class="value">0.50</span>
+      </div>
+      <div id="width" class="track">
+        <div id="width-fill" class="fill"></div>
+      </div>
+    </div>
+    <div class="column">
+      <div class="row">
+        <span class="label">Metallic</span>
+        <span id="metallic-value" class="value">0.10</span>
+      </div>
+      <div id="metallic" class="track">
+        <div id="metallic-fill" class="fill"></div>
+      </div>
+    </div>
+    <div class="column">
+      <div class="row">
+        <span class="label">Roughness</span>
+        <span id="roughness-value" class="value">0.40</span>
+      </div>
+      <div id="roughness" class="track">
+        <div id="roughness-fill" class="fill"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="page-motion" class="page">
+    <div class="column">
+      <div class="row">
+        <span class="label">Speed</span>
+        <span id="speed-value" class="value">0.15</span>
+      </div>
+      <div id="speed" class="track">
+        <div id="speed-fill" class="fill"></div>
+      </div>
+    </div>
+    <div class="row">
+      <span class="label">Reverse</span>
+      <div id="reverse" class="toggle">
+        <div id="reverse-thumb" class="toggle-thumb"></div>
+      </div>
+    </div>
+    <div class="row">
+      <span class="label">Animate Hilbert trail</span>
+      <div id="hilbertAnimate" class="toggle">
+        <div id="hilbertAnimate-thumb" class="toggle-thumb"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="page-session" class="page">
+    <div class="row">
+      <div id="btn-vr" class="button">Enter VR</div>
+      <div id="btn-mr" class="button">Enter MR</div>
+    </div>
+    <div class="row">
+      <div id="btn-exit" class="button">Exit to browser</div>
+    </div>
+    <div class="status">
+      <div id="fps-dot" class="status-dot"></div>
+      <span id="fps" class="muted">-- fps</span>
+    </div>
+    <span class="muted">Menu: drag the bar below to move. Show or hide: M, left Menu or Y button, or touch the wrist button.</span>
+  </div>
+</div>

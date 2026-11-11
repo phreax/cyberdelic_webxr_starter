@@ -1,5 +1,6 @@
 import type { ExperienceConfig } from '../core/xr/experience.js';
 import { createParticleGardenExperience } from './particle-garden/garden-experience.js';
+import { createSnakeExperience } from './snake-creator/snake-experience.js';
 import { createPlaygroundExperience } from './playground/playground-experience.js';
 import { createReactiveSculptureExperience } from './reactive-sculpture/reactive-sculpture-experience.js';
 
@@ -14,6 +15,10 @@ export const EXAMPLES = {
   garden: {
     title: 'Particle Garden',
     config: () => ({ level: scene('garden.iwsdk.scene.json'), audio: true, scene: createParticleGardenExperience() }),
+  },
+  snake: {
+    title: 'Snake Creator',
+    config: () => ({ level: scene('snake.iwsdk.scene.json'), scene: createSnakeExperience() }),
   },
   playground: {
     title: 'Developer Playground',
