@@ -35,6 +35,7 @@ export const SCULPTURE_PARAMS = {
   flow: { default: 0.4, min: 0, max: 2, smoothing: 0.3, label: 'Flow' },
   hue: { default: 0, min: 0, max: 1, smoothing: 0.4, label: 'Hue' },
   glow: { default: 0.35, min: 0, max: 1, smoothing: 0.15, label: 'Glow' },
+  alpha: { default: 1, min: 0.1, max: 1, smoothing: 0.15, label: 'Alpha' },
   pulse: { default: 0, min: 0, max: 1, label: 'Beat pulse' },
   spin: { default: 1, type: 'boolean', label: 'Auto spin' },
   reactivity: { default: 0.6, min: 0, max: 1, smoothing: 0.1, label: 'Audio reactivity' },
@@ -67,12 +68,15 @@ export const createReactiveSculptureExperience = (): Experience<ExperienceContex
       const entity = world.requireSceneEntity(NODE_IDS.sculpture);
       const object = entity.object3D!;
       let uniforms: SculptureUniforms | undefined;
+      let material: ShaderMaterial | undefined;
       object.traverse((child) => {
         if (child instanceof Mesh && child.material instanceof ShaderMaterial && child.material.name === 'reactive-sculpture') {
+          material = child.material;
           uniforms = child.material.uniforms as unknown as SculptureUniforms;
         }
       });
-      if (!uniforms) throw new Error('Reactive sculpture material not found');
+      if (!uniforms || !material) throw new Error('Reactive sculpture material not found');
+      const sculptureMaterial = material;
       uniforms.uPrimary.value.set(theme.colors.primary);
       uniforms.uSecondary.value.set(theme.colors.secondary);
       uniforms.uDeep.value.set(theme.colors.background);
@@ -99,7 +103,7 @@ export const createReactiveSculptureExperience = (): Experience<ExperienceContex
       );
 
       // Shape: two-way bound to the store, so presets / OSC move the controls too.
-      const sliders = { growth: 0.01, complexity: 0.05, flow: 0.05, glow: 0.01 } as const;
+      const sliders = { growth: 0.01, complexity: 0.05, flow: 0.05, glow: 0.01, alpha: 0.01 } as const;
       for (const [id, step] of Object.entries(sliders)) {
         const control = track(bindSlider(panel, id, { ...common, ...controlOptions(params, id), step }));
         track(bindUI(params, id, control));
@@ -211,6 +215,14 @@ export const createReactiveSculptureExperience = (): Experience<ExperienceContex
         u.uHue.value = params.get('hue');
         u.uGlow.value = params.get('glow');
         u.uPulse.value = params.get('pulse');
+        u.uAlpha.value = params.get('alpha');
+        // Opaque path at full alpha (depth-correct, no blending cost); translucent below it.
+        const translucent = u.uAlpha.value < 0.999;
+        if (sculptureMaterial.transparent !== translucent) {
+          sculptureMaterial.transparent = translucent;
+          sculptureMaterial.depthWrite = !translucent;
+          sculptureMaterial.needsUpdate = true;
+        }
         if (params.get('spin') >= 0.5 && !entity.hasComponent(Grabbed)) object.rotateY(dt * SPIN_SPEED);
 
         // Widgets, throttled: only while the Audio tab is open and a source is active.

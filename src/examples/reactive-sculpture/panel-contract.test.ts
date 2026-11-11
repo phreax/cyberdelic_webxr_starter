@@ -10,7 +10,7 @@ const usedIds = () => {
   const code = source('./reactive-sculpture-experience.ts');
   const literal = [...code.matchAll(/(?:requireElement|bindButton|bindSlider|bindKnob|bindToggle)\(panel, '([^']+)'/g)].map((m) => m[1]!);
   const derived = [
-    ...['growth', 'complexity', 'flow', 'glow', 'reactivity'].flatMap((id) => [id, `${id}-fill`, `${id}-value`]),
+    ...['growth', 'complexity', 'flow', 'glow', 'alpha', 'reactivity'].flatMap((id) => [id, `${id}-fill`, `${id}-value`]),
     ...['twist', 'hue'].flatMap((id) => [id, `${id}-indicator`, `${id}-value`]),
     ...['spin', 'haptics'].flatMap((id) => [id, `${id}-thumb`]),
     ...['shape', 'audio', 'presets', 'session'].flatMap((name) => [`tab-${name}`, `page-${name}`]),

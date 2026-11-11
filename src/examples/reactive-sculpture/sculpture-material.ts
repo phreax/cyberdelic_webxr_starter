@@ -15,6 +15,8 @@ export const createSculptureUniforms = () => ({
   uHue: { value: 0 },
   uGlow: { value: 0.35 },
   uPulse: { value: 0 },
+  /** Facing opacity; silhouette edges stay more opaque (fresnel), like glass. */
+  uAlpha: { value: 1 },
   uPrimary: { value: new Color('#00D9C7') },
   uSecondary: { value: new Color('#FF9500') },
   uDeep: { value: new Color('#071514') },
@@ -81,6 +83,7 @@ export const createSculptureMaterial = (uniforms: SculptureUniforms = createScul
       uniform float uHue;
       uniform float uGlow;
       uniform float uPulse;
+      uniform float uAlpha;
       uniform vec3 uPrimary;
       uniform vec3 uSecondary;
       uniform vec3 uDeep;
@@ -109,7 +112,8 @@ export const createSculptureMaterial = (uniforms: SculptureUniforms = createScul
         color += iridescent * fresnel * 0.9;
         color += spec * 0.6;
         color += hueShift(uSecondary, uHue * 6.2831853) * pow(vRidge, 3.0) * (uGlow * 1.2 + uPulse * 0.8);
-        gl_FragColor = vec4(color, 1.0);
+        float alpha = clamp(uAlpha + fresnel * (1.0 - uAlpha) * 0.7, 0.0, 1.0);
+        gl_FragColor = vec4(color, alpha);
         #include <colorspace_fragment>
       }
     `,
