@@ -1,5 +1,4 @@
 import {
-  Box3,
   CapsuleGeometry,
   CylinderGeometry,
   Grabbed,
@@ -62,13 +61,16 @@ export const createPanelMenu = (ctx: ExperienceContext, options: PanelMenuOption
   // renderer, so a panel hidden that way never comes back.
   const panelRoot = requireElement(world.requireSceneObject<UIKitMLAsset>(nodeId), rootElementId);
 
-  // Grab bar: pill below the panel, like Quest system windows.
-  panel.updateWorldMatrix(true, true);
-  const bounds = new Box3().setFromObject(panel);
-  const panelCenter = bounds.isEmpty() ? panel.getWorldPosition(new Vector3()) : bounds.getCenter(new Vector3());
-  const halfHeight = bounds.isEmpty() ? 0.3 : (bounds.max.y - bounds.min.y) / 2;
-  // Bar position relative to the panel origin, in world units (panel stays upright).
-  const barOffsetY = panelCenter.y - panel.getWorldPosition(new Vector3()).y - halfHeight - barGap;
+  // Grab bar: pill below the panel, like Quest system windows. Its offset follows the root
+  // element's live layout height (tabs change it), not a one-off bounding box.
+  const UIKIT_PIXEL_SIZE = 0.01; // metres per UIKit unit (uikit default)
+  const rootSize = (panelRoot as unknown as { size?: { value?: [number, number] } }).size;
+  const panelScale = new Vector3();
+  const barOffsetY = () => {
+    const height = rootSize?.value?.[1] ?? 60;
+    panel.getWorldScale(panelScale);
+    return -(height * UIKIT_PIXEL_SIZE * panelScale.y) / 2 - barGap;
+  };
 
   const barMaterial = new MeshBasicMaterial({ color: theme.colors.primary, transparent: true, opacity: 0.45 });
   const bar = new Mesh(new CapsuleGeometry(0.009, 0.11, 4, 12), barMaterial);
@@ -98,7 +100,7 @@ export const createPanelMenu = (ctx: ExperienceContext, options: PanelMenuOption
 
   const placeBarUnderPanel = () => {
     panel.getWorldPosition(barWorld);
-    barWorld.y += barOffsetY;
+    barWorld.y += barOffsetY();
     setParentLocal(bar, barWorld);
     bar.rotation.set(0, panel.rotation.y, Math.PI / 2, 'YXZ');
   };
@@ -183,7 +185,7 @@ export const createPanelMenu = (ctx: ExperienceContext, options: PanelMenuOption
       const grabbed = barEntity.hasComponent(Grabbed);
       if (grabbed) {
         bar.getWorldPosition(barWorld);
-        barWorld.y -= barOffsetY;
+        barWorld.y -= barOffsetY();
         setParentLocal(panel, barWorld);
         facePanelToHead();
         bar.rotation.set(0, panel.rotation.y, Math.PI / 2, 'YXZ');
