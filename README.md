@@ -17,6 +17,8 @@ npm run build      # production bundle in dist/
 
 Requires Node `>=20.19 <21`, `>=22.12 <23`, or `>=24`.
 
+See [`docs/testing.md`](./docs/testing.md) for desktop emulation, Quest and the macOS 13 note.
+
 **On Quest:** run `npm run dev:status`, open one of the network URLs on a headset on
 the same Wi-Fi, accept the local certificate warning. See
 [Testing your experience](https://iwsdk.dev/guides/02-testing-experience.html).

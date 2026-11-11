@@ -1,0 +1,216 @@
+<!--
+  Cyberdelic control panel. 1px = 1 mm at the authored node scale of 0.1.
+  Plain divs keep the Cyberdelic tokens in every color scheme; the runtime
+  re-applies theme tokens (src/themes/cyberdelic.ts) and control states.
+  Element ids are the contract used by src/examples/placeholder/*.ts.
+-->
+<style>
+  .panel {
+    flex-direction: column;
+    width: 420px;
+    gap: 18px;
+    padding-top: 26px;
+    padding-bottom: 26px;
+    padding-left: 26px;
+    padding-right: 26px;
+    border-radius: 22px;
+    border-width: 2px;
+    border-color: #00d9c740;
+    background-color: #152322d9;
+  }
+  .eyebrow {
+    color: #ff9500;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 2px;
+  }
+  .title {
+    color: #f1f7f5;
+    font-size: 30px;
+    font-weight: 700;
+  }
+  .muted {
+    color: #9baeab;
+    font-size: 16px;
+  }
+  .label {
+    color: #f1f7f5;
+    font-size: 18px;
+  }
+  .value {
+    color: #00d9c7;
+    font-size: 18px;
+    font-weight: 700;
+  }
+  .tabs {
+    flex-direction: row;
+    gap: 8px;
+  }
+  .tab {
+    flex-grow: 1;
+    justify-content: center;
+    padding-top: 12px;
+    padding-bottom: 12px;
+    border-radius: 12px;
+    border-width: 2px;
+    border-color: #00d9c7;
+    color: #f1f7f5;
+    font-size: 18px;
+    font-weight: 700;
+  }
+  .page {
+    flex-direction: column;
+    gap: 20px;
+  }
+  .row {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .column {
+    flex-direction: column;
+    gap: 10px;
+  }
+  .track {
+    height: 30px;
+    border-radius: 15px;
+    border-width: 2px;
+    border-color: #00d9c7;
+    background-color: #071514;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    padding-left: 5px;
+    padding-right: 5px;
+  }
+  .fill {
+    height: 100%;
+    border-radius: 10px;
+    background-color: #00d9c7;
+  }
+  .knob {
+    width: 84px;
+    height: 84px;
+    border-radius: 42px;
+    border-width: 2px;
+    border-color: #00d9c7;
+    background-color: #071514;
+  }
+  .knob-indicator {
+    width: 100%;
+    height: 100%;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 8px;
+  }
+  .knob-dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 7px;
+    background-color: #ff9500;
+  }
+  .toggle {
+    flex-direction: row;
+    align-items: center;
+    width: 72px;
+    height: 38px;
+    border-radius: 19px;
+    border-width: 2px;
+    border-color: #00d9c7;
+    padding-left: 5px;
+    padding-right: 5px;
+  }
+  .toggle-thumb {
+    width: 26px;
+    height: 26px;
+    border-radius: 13px;
+    background-color: #9baeab;
+  }
+  .button {
+    flex-grow: 1;
+    justify-content: center;
+    padding-top: 14px;
+    padding-bottom: 14px;
+    border-radius: 14px;
+    border-width: 2px;
+    border-color: #00d9c7;
+    color: #f1f7f5;
+    font-size: 18px;
+    font-weight: 700;
+  }
+</style>
+<div id="panel" class="panel">
+  <div class="column">
+    <span class="eyebrow">CYBERDELIC XR</span>
+    <span class="title">Orb Controls</span>
+    <span id="status" class="muted">Desktop preview</span>
+  </div>
+
+  <div class="tabs">
+    <div id="tab-visual" class="tab">Visual</div>
+    <div id="tab-session" class="tab">Session</div>
+  </div>
+
+  <div id="page-visual" class="page">
+    <div class="column">
+      <div class="row">
+        <span class="label">Speed</span>
+        <span id="speed-value" class="value">1.00</span>
+      </div>
+      <div id="speed" class="track">
+        <div id="speed-fill" class="fill"></div>
+      </div>
+    </div>
+
+    <div class="column">
+      <div class="row">
+        <span class="label">Displace</span>
+        <span id="displace-value" class="value">0.12</span>
+      </div>
+      <div id="displace" class="track">
+        <div id="displace-fill" class="fill"></div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="row">
+        <div id="hue" class="knob">
+          <div id="hue-indicator" class="knob-indicator">
+            <div class="knob-dot"></div>
+          </div>
+        </div>
+        <div class="column">
+          <span class="label">Hue</span>
+          <span id="hue-value" class="value">0.00</span>
+        </div>
+      </div>
+      <div class="column">
+        <span class="label">Pulse</span>
+        <div id="pulse" class="toggle">
+          <div id="pulse-thumb" class="toggle-thumb"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div id="btn-reset" class="button">Reset</div>
+    </div>
+  </div>
+
+  <div id="page-session" class="page">
+    <div class="row">
+      <div id="btn-vr" class="button">Enter VR</div>
+      <div id="btn-mr" class="button">Enter MR</div>
+    </div>
+    <div class="row">
+      <div id="btn-exit" class="button">Exit to browser</div>
+    </div>
+    <div class="row">
+      <span class="label">Haptics</span>
+      <div id="haptics" class="toggle">
+        <div id="haptics-thumb" class="toggle-thumb"></div>
+      </div>
+    </div>
+    <span id="xr-info" class="muted">Checking XR support...</span>
+  </div>
+</div>

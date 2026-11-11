@@ -1,0 +1,48 @@
+# Testing your experience
+
+## 1. Unit tests (no browser)
+
+```sh
+npm test          # Vitest + Riteway, pure logic (lifecycle, XR mode, theme, controls, haptics)
+npm run check     # typecheck + tests
+npm run build     # production bundle; also validates every public/ui/*.uikitml
+```
+
+## 2. Desktop with XR emulation (IWER)
+
+```sh
+npm run dev
+```
+
+Opens the managed IWSDK browser at `https://localhost:8081` with **IWER**, IWSDK's
+browser XR emulator (emulates a Quest 3 in a living room). You get:
+
+- **Desktop preview**: mouse clicks the control panel (canvas pointer events).
+- **Emulated XR**: click *Session → Enter VR / Enter MR* on the panel, then use the
+  IWER controls to move the head, controllers and hands
+  ([IWER controls](https://iwsdk.dev/guides/02-testing-experience.html#iwer-controls)).
+
+> **macOS 13 note:** the managed browser uses Playwright's Chromium, which no longer
+> runs on macOS 13 (Ventura). Use `npm run dev:runtime` (plain Vite with the IWSDK
+> plugin) and open `https://localhost:8081` in your own Chrome instead (not yet verified),
+> or upgrade macOS.
+
+## 3. On Quest 3 / 3S
+
+1. Put the computer and headset on the same Wi-Fi.
+2. `npm run dev` (or `npm run dev:runtime`), then `npm run dev:status` and pick a URL from `runtimeUrls.network`.
+3. Open it in Quest Browser and accept the local certificate warning (WebXR needs HTTPS).
+4. Use the panel: *Enter VR* / *Enter MR*. Grab the orb with squeeze or pinch; use a second hand to scale.
+
+USB alternative: `adb reverse tcp:8081 tcp:8081` and open `https://localhost:8081`.
+
+Performance check: target **72 FPS on Quest 3S**. Use the Meta Quest Developer Hub
+performance HUD or OVR Metrics Tool while the orb animates.
+
+## Phase 1/2 manual checklist
+
+- [ ] Desktop: orb animates, panel readable, tabs switch, sliders/knob/toggle respond to the mouse.
+- [ ] Emulated VR: dark background; controller ray hovers/presses controls; orb grab + two-hand scale.
+- [ ] Emulated MR: passthrough (transparent background), same interactions.
+- [ ] Quest: hand pinch operates the panel; haptics on click, slider release, grab and release.
+- [ ] Quest 3S: stable 72 FPS.
