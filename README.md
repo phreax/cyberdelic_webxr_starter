@@ -17,7 +17,9 @@ npm run build      # production bundle in dist/
 
 Requires Node `>=20.19 <21`, `>=22.12 <23`, or `>=24`.
 
-Docs: [testing](./docs/testing.md) · [create an experience](./docs/creating-experiences.md) · [audio](./docs/audio.md) · [OSC](./docs/osc.md) · [performance](./docs/performance.md)
+Examples: `?example=sculpture` (default) · `?example=playground` (all components).
+
+Docs: [components](./docs/components.md) · [testing](./docs/testing.md) · [create an experience](./docs/creating-experiences.md) · [audio](./docs/audio.md) · [OSC](./docs/osc.md) · [performance](./docs/performance.md)
 
 **On Quest:** run `npm run dev:status`, open one of the network URLs on a headset on
 the same Wi-Fi, accept the local certificate warning. See

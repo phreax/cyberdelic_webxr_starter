@@ -14,6 +14,7 @@ import {
   type StatusLevel,
   type UIElement,
 } from '../../components/ui/controls.js';
+import { bindPresetSelector } from '../../components/ui/controls-advanced.js';
 import { createPanelMenu } from '../../components/ui/panel-menu.js';
 import { bindAudio, bindUI, controlOptions, toggleOptions } from '../../core/parameters/bindings.js';
 import type { ParameterDefinition } from '../../core/parameters/store.js';
@@ -21,7 +22,7 @@ import type { ExperienceContext } from '../../core/xr/experience.js';
 import type { Experience } from '../../core/xr/lifecycle.js';
 import { panelStyle } from '../../themes/cyberdelic.js';
 import { createFpsMeter } from '../../utils/fps-meter.js';
-import { activePreset, applyPreset, SCULPTURE_PRESETS, type SculpturePresetName } from './presets.js';
+import { SCULPTURE_PRESETS } from './presets.js';
 import type { SculptureUniforms } from './sculpture-material.js';
 
 /** Scene node ids authored in public/scenes/main.iwsdk.scene.json. */
@@ -126,17 +127,8 @@ export const createReactiveSculptureExperience = (): Experience<ExperienceContex
         }),
       );
 
-      // Presets: selected state follows the live values.
-      const presetButtons = (Object.keys(SCULPTURE_PRESETS) as SculpturePresetName[]).map((name) => ({
-        name,
-        button: track(bindButton(panel, `preset-${name.toLowerCase()}`, { ...common, onClick: () => applyPreset(params, SCULPTURE_PRESETS[name]) })),
-      }));
-      const refreshPresets = () => {
-        const active = activePreset(params.snapshot(), SCULPTURE_PRESETS);
-        presetButtons.forEach(({ name, button }) => button.setSelected(name === active));
-      };
-      for (const id of Object.keys(SCULPTURE_PARAMS)) track(params.subscribe(id, refreshPresets));
-      refreshPresets();
+      // Presets: shared PresetSelector, selected state follows the live values.
+      track(bindPresetSelector(panel, 'preset', { ...common, params, presets: SCULPTURE_PRESETS }));
 
       // Audio sources + widgets.
       const setAudioStatus = bindStatus(panel, { dot: 'audio-dot', text: 'audio-status' }, theme);

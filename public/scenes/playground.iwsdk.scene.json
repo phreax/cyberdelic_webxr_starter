@@ -1,0 +1,267 @@
+{
+  "version": "iwsdk.scene.v1",
+  "units": "meters",
+  "components": {
+    "com.iwsdk.components.IBLGradient": {
+      "sky": [
+        0.55,
+        0.9,
+        0.86,
+        1
+      ],
+      "equator": [
+        0.12,
+        0.2,
+        0.2,
+        1
+      ],
+      "ground": [
+        0.03,
+        0.06,
+        0.06,
+        1
+      ],
+      "intensity": 0.5
+    }
+  },
+  "environment": {
+    "toneMapping": "aces",
+    "exposure": 1,
+    "shadows": false
+  },
+  "resources": {},
+  "nodes": [
+    {
+      "id": "playground-panel",
+      "name": "Playground Panel",
+      "content": {
+        "type": "asset",
+        "asset": "playground-panel"
+      },
+      "transform": {
+        "position": [
+          -0.5,
+          1.3,
+          -0.8
+        ],
+        "rotationDeg": [
+          0,
+          32.01,
+          0
+        ],
+        "scale": 0.1
+      },
+      "components": {
+        "RayInteractable": {}
+      }
+    },
+    {
+      "id": "toolbar",
+      "name": "Toolbar",
+      "content": {
+        "type": "asset",
+        "asset": "toolbar"
+      },
+      "transform": {
+        "position": [
+          0.15,
+          0.98,
+          -0.55
+        ],
+        "rotationDeg": [
+          -35,
+          0,
+          0
+        ],
+        "scale": 0.1
+      },
+      "components": {
+        "RayInteractable": {}
+      }
+    },
+    {
+      "id": "rotatable-cube",
+      "name": "Rotatable Cube",
+      "content": {
+        "type": "asset",
+        "asset": "playground-cube"
+      },
+      "transform": {
+        "position": [
+          0.0,
+          1.3,
+          -0.85
+        ]
+      }
+    },
+    {
+      "id": "scalable-gem",
+      "name": "Scalable Gem",
+      "content": {
+        "type": "asset",
+        "asset": "playground-gem"
+      },
+      "transform": {
+        "position": [
+          0.3,
+          1.3,
+          -0.9
+        ]
+      }
+    },
+    {
+      "id": "drag-rail",
+      "name": "Drag Rail",
+      "content": {
+        "type": "asset",
+        "asset": "playground-rail"
+      },
+      "transform": {
+        "position": [
+          0.15,
+          1.1,
+          -0.65
+        ]
+      }
+    },
+    {
+      "id": "draggable-knob",
+      "name": "Draggable Knob",
+      "content": {
+        "type": "asset",
+        "asset": "playground-slider"
+      },
+      "transform": {
+        "position": [
+          0.15,
+          1.1,
+          -0.65
+        ]
+      }
+    },
+    {
+      "id": "proximity-ring",
+      "name": "Proximity Ring",
+      "content": {
+        "type": "asset",
+        "asset": "playground-bell"
+      },
+      "transform": {
+        "position": [
+          0.55,
+          1.15,
+          -0.6
+        ],
+        "rotationDeg": [
+          0,
+          -40,
+          0
+        ]
+      }
+    },
+    {
+      "id": "gaze-orb",
+      "name": "Gaze Orb",
+      "content": {
+        "type": "asset",
+        "asset": "playground-gaze-orb"
+      },
+      "transform": {
+        "position": [
+          0.15,
+          1.7,
+          -1.4
+        ]
+      }
+    },
+    {
+      "id": "press-button",
+      "name": "Press Button",
+      "content": {
+        "type": "asset",
+        "asset": "playground-button"
+      },
+      "transform": {
+        "position": [
+          0.5,
+          1.0,
+          -0.5
+        ],
+        "rotationDeg": [
+          20,
+          0,
+          0
+        ]
+      }
+    },
+    {
+      "id": "key-light",
+      "name": "Key Light",
+      "transform": {
+        "position": [
+          -1,
+          3,
+          1
+        ],
+        "rotationDeg": [
+          -60,
+          -20,
+          0
+        ]
+      },
+      "components": {
+        "DirectionalLight": {
+          "color": [
+            1,
+            0.97,
+            0.92,
+            1
+          ],
+          "intensity": 1.6,
+          "castShadow": false
+        }
+      }
+    },
+    {
+      "id": "fill-light",
+      "name": "Fill Light",
+      "components": {
+        "HemisphereLight": {
+          "skyColor": [
+            0.7,
+            1,
+            0.95,
+            1
+          ],
+          "groundColor": [
+            0.1,
+            0.08,
+            0.05,
+            1
+          ],
+          "intensity": 0.8
+        }
+      }
+    }
+  ],
+  "authoring": {
+    "views": [
+      {
+        "id": "hero",
+        "role": "hero",
+        "projection": "perspective",
+        "position": [
+          0,
+          1.6,
+          0.5
+        ],
+        "target": [
+          0,
+          1.2,
+          -0.8
+        ],
+        "fov": 60
+      }
+    ]
+  }
+}

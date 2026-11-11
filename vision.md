@@ -115,5 +115,9 @@ framework internals; new contributor productive in ~15 minutes.
 - Minimum IWSDK version policy (currently pinned `1.1.0-rc.2` — a release candidate).
 - Whether to keep `@meta-quest/metavr` (dev-only device CLI; collects usage data).
 - Hosting target for production deploys (static HTTPS host TBD).
-- Snake Creator: licensing of code ported from shader-lab-app (private) into this MIT repo.
-- Snake Creator: exact closed-loop behaviour (endless crawl vs. full ring).
+
+## Decisions log
+
+- 2026-11-11: Snake Creator ports the shader-lab-app snake renderer under MIT (owner approved).
+- 2026-11-11: Closed snake loops crawl endlessly (no entry/exit).
+- 2026-11-11: Each example has its own scene file, selected with `?example=<id>`.

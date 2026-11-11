@@ -1,4 +1,13 @@
 import { AssetType, defineAssets } from '@iwsdk/core';
+import {
+  createPlaygroundBell,
+  createPlaygroundButton,
+  createPlaygroundCube,
+  createPlaygroundGazeOrb,
+  createPlaygroundGem,
+  createPlaygroundRail,
+  createPlaygroundSlider,
+} from './scene-assets/playground.scene-asset.js';
 import { createReactiveSculpture } from './scene-assets/reactive-sculpture.scene-asset.js';
 
 const publicAssetUrl = (filePath: string): string =>
@@ -13,4 +22,15 @@ const uikitml = (fileName: string, name: string) => ({
 export default defineAssets({
   'reactive-sculpture': createReactiveSculpture(),
   'control-panel': uikitml('control-panel.uikitml', 'Control Panel'),
+
+  // Playground (?example=playground)
+  'playground-panel': uikitml('playground-panel.uikitml', 'Playground Panel'),
+  toolbar: uikitml('toolbar.uikitml', 'Toolbar'),
+  'playground-cube': createPlaygroundCube(),
+  'playground-gem': createPlaygroundGem(),
+  'playground-slider': createPlaygroundSlider(),
+  'playground-rail': createPlaygroundRail(),
+  'playground-bell': createPlaygroundBell(),
+  'playground-gaze-orb': createPlaygroundGazeOrb(),
+  'playground-button': createPlaygroundButton(),
 });

@@ -78,7 +78,7 @@ export const createOscClient = ({ url = defaultUrl(), autoConnect = true, reconn
       lastMessageAt = performance.now();
       for (const { address, args } of decodeOscPacket(event.data)) {
         handlers.forEach(({ pattern, handler }) => {
-          if (matchAddress(pattern, address)) handler(args, address);
+          if (pattern === '' || matchAddress(pattern, address)) handler(args, address);
         });
       }
     };
@@ -102,6 +102,12 @@ export const createOscClient = ({ url = defaultUrl(), autoConnect = true, reconn
     /** Subscribe to an address or OSC pattern (`*`, `?`, `[..]`, `{a,b}`). Returns unsubscribe. */
     on(pattern: string, handler: OscHandler) {
       const entry = { pattern, handler };
+      handlers.add(entry);
+      return () => handlers.delete(entry);
+    },
+    /** Every incoming message (monitoring / logging). */
+    onAny(handler: OscHandler) {
+      const entry = { pattern: '', handler };
       handlers.add(entry);
       return () => handlers.delete(entry);
     },

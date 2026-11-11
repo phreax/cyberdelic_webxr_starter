@@ -41,7 +41,7 @@
       "grabbing": true,
       "physics": false,
       "sceneUnderstanding": false,
-      "environmentRaycast": false,
+      "environmentRaycast": true,
       "spatialUI": {
         "kit": "horizon",
         "preferredColorScheme": "dark"
