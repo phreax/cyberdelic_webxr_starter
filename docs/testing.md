@@ -53,4 +53,6 @@ performance HUD or OVR Metrics Tool while the orb animates.
 - [ ] Reactivity 0: sculpture looks the same with and without audio.
 - [ ] Presets: each eases in and is highlighted; changing a control clears the highlight.
 - [ ] OSC (optional): `npm run osc-bridge`, enable `osc: true`, bind an address, send from a tool.
+- [ ] Garden (?example=garden): open hand repels, pinch attracts; touching a ring fades to its mood; Demo beat bursts.
+- [ ] Playground (?example=playground): every control, trigger, toolbar button, hum sound, surface placement (MR), OSC tab.
 - [ ] Quest 3S: stable 72 FPS (see docs/performance.md).

@@ -4,7 +4,7 @@ Open the **Developer Playground** to try everything: `https://localhost:8081/?ex
 
 ## Examples
 
-`?example=sculpture` (default) · `?example=playground`. Register new ones in `src/examples/registry.ts`
+`?example=sculpture` (default) · `?example=garden` · `?example=playground`. Register new ones in `src/examples/registry.ts`
 (each can load its own scene with `level`).
 
 ## UI (`src/components/ui/`)

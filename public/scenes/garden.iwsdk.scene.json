@@ -1,0 +1,153 @@
+{
+  "version": "iwsdk.scene.v1",
+  "units": "meters",
+  "components": {},
+  "environment": {
+    "toneMapping": "aces",
+    "exposure": 1,
+    "shadows": false
+  },
+  "resources": {},
+  "nodes": [
+    {
+      "id": "particle-garden",
+      "name": "Particle Garden",
+      "content": {
+        "type": "asset",
+        "asset": "particle-garden"
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    {
+      "id": "garden-panel",
+      "name": "Garden Panel",
+      "content": {
+        "type": "asset",
+        "asset": "garden-panel"
+      },
+      "transform": {
+        "position": [
+          -0.75,
+          1.25,
+          -0.55
+        ],
+        "rotationDeg": [
+          0,
+          53.75,
+          0
+        ],
+        "scale": 0.1
+      },
+      "components": {
+        "RayInteractable": {}
+      }
+    },
+    {
+      "id": "zone-lagoon",
+      "name": "Zone Lagoon",
+      "content": {
+        "type": "asset",
+        "asset": "garden-zone"
+      },
+      "transform": {
+        "position": [
+          -0.35,
+          1.05,
+          -0.55
+        ],
+        "rotationDeg": [
+          70,
+          0,
+          0
+        ]
+      }
+    },
+    {
+      "id": "zone-ember",
+      "name": "Zone Ember",
+      "content": {
+        "type": "asset",
+        "asset": "garden-zone"
+      },
+      "transform": {
+        "position": [
+          0.0,
+          1.0,
+          -0.5
+        ],
+        "rotationDeg": [
+          70,
+          0,
+          0
+        ]
+      }
+    },
+    {
+      "id": "zone-aurora",
+      "name": "Zone Aurora",
+      "content": {
+        "type": "asset",
+        "asset": "garden-zone"
+      },
+      "transform": {
+        "position": [
+          0.35,
+          1.05,
+          -0.55
+        ],
+        "rotationDeg": [
+          70,
+          0,
+          0
+        ]
+      }
+    },
+    {
+      "id": "fill-light",
+      "name": "Fill Light",
+      "components": {
+        "HemisphereLight": {
+          "skyColor": [
+            0.7,
+            1,
+            0.95,
+            1
+          ],
+          "groundColor": [
+            0.1,
+            0.08,
+            0.05,
+            1
+          ],
+          "intensity": 1
+        }
+      }
+    }
+  ],
+  "authoring": {
+    "views": [
+      {
+        "id": "hero",
+        "role": "hero",
+        "projection": "perspective",
+        "position": [
+          0,
+          1.6,
+          0.6
+        ],
+        "target": [
+          0,
+          1.2,
+          -1.0
+        ],
+        "fov": 65
+      }
+    ]
+  }
+}

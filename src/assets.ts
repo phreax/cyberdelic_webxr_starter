@@ -8,6 +8,7 @@ import {
   createPlaygroundRail,
   createPlaygroundSlider,
 } from './scene-assets/playground.scene-asset.js';
+import { createGardenZone, createParticleGarden } from './scene-assets/particle-garden.scene-asset.js';
 import { createReactiveSculpture } from './scene-assets/reactive-sculpture.scene-asset.js';
 
 const publicAssetUrl = (filePath: string): string =>
@@ -33,4 +34,9 @@ export default defineAssets({
   'playground-bell': createPlaygroundBell(),
   'playground-gaze-orb': createPlaygroundGazeOrb(),
   'playground-button': createPlaygroundButton(),
+
+  // Particle Garden (?example=garden)
+  'particle-garden': createParticleGarden(),
+  'garden-zone': createGardenZone(),
+  'garden-panel': uikitml('garden-panel.uikitml', 'Garden Panel'),
 });

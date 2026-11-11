@@ -21,3 +21,10 @@ Levers if a device drops frames: `SphereGeometry` segments in
 2. Enter MR, audio = Demo beat, preset *Ember* (highest complexity), sculpture filling ~30° of view.
 3. Read the panel's FPS indicator (Session tab, 1 s average) or OVR Metrics Tool for 60 s.
 4. Pass: ≥ 72 FPS average, no sustained drops.
+
+## Particle Garden budget
+
+| Item | Cost | Notes |
+|---|---|---|
+| Field | 1 draw, 16k points default (2k–24k via Density, drawRange, no rebuild) | Vertex: 3 simplex per particle; stateless (no simulation buffers). |
+| Fragment | additive soft sprite, 6–14 mm, capped at 64 px | Overdraw is the main cost: lower Density or Particle size first. |
