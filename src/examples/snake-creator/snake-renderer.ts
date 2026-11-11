@@ -1,12 +1,12 @@
 import {
   BufferAttribute,
   BufferGeometry,
-  Color,
   DataTexture,
+  DoubleSide,
   FloatType,
   LinearFilter,
   Mesh,
-  MeshStandardMaterial,
+  MeshPhysicalMaterial,
   NearestFilter,
   RGBAFormat,
   SRGBColorSpace,
@@ -16,27 +16,10 @@ import { CURVE_ROWS, CURVE_SAMPLES, type Curve } from './curve.js';
 import type { Crawl } from './crawl.js';
 import { buildGradientData, GRADIENT_SIZE } from './gradient.js';
 import { PATTERN_INDEX, patternCells, SNAKE_FRAGMENT_COMMON, SNAKE_VERTEX_COMMON, type SnakePattern } from './snake-glsl.js';
+import { effectiveTwist, gradientRepeats, type SnakeLook } from './snake-look.js';
 
-/** Everything the menu controls. Lengths in metres; `length` is a fraction of the path. */
-export type SnakeLook = {
-  thickness: number;
-  length: number;
-  headTaper: number;
-  tailTaper: number;
-  headShape: number;
-  profile: 0 | 4 | 6;
-  twist: number;
-  pattern: SnakePattern;
-  scale: number;
-  width: number;
-  foreground: string;
-  background: string;
-  gradient: boolean;
-  metallic: number;
-  roughness: number;
-  hilbertAnimate: boolean;
-  hilbertLength: number;
-};
+export type { SnakeLook } from './snake-look.js';
+export { DEFAULT_LOOK } from './snake-look.js';
 
 /** Medium quality from shader-lab: 192 rings along × 24 around (~9k triangles). */
 const ALONG = 192;
@@ -64,6 +47,9 @@ export const createSnakeGeometry = (along = ALONG, around = AROUND): BufferGeome
   }
   const geometry = new BufferGeometry();
   geometry.setAttribute('position', new BufferAttribute(positions, 3));
+  // Placeholder normals: without a normal attribute three.js forces FLAT_SHADED and ignores the
+  // smooth normals computed in snakeDeform(). The shader overwrites them.
+  geometry.setAttribute('normal', new BufferAttribute(new Float32Array(rows * columns * 3), 3));
   geometry.setIndex(indices);
   return geometry;
 };
@@ -96,33 +82,44 @@ export const createSnakeRenderer = () => {
     uSnakeProfile: { value: 0 },
     uSnakeTwist: { value: 0 },
     uSnakeTwistPhase: { value: 0 },
-    uSnakeForeground: { value: new Color() },
-    uSnakeBackground: { value: new Color() },
     uSnakePattern: { value: 0 },
+    uSnakeBackgroundMode: { value: 0 },
+    uSnakeBackgroundOffset: { value: 0.5 },
+    uSnakeBackgroundBrightness: { value: 0.35 },
     uSnakeRepeats: { value: 4 },
     uSnakeCellLength: { value: 0.1 },
     uSnakeWidth: { value: 0.5 },
     uSnakeBodyLength: { value: 1 },
     uSnakeGradient: { value: gradientTexture },
-    uSnakeGradientMode: { value: 0 },
     uSnakeGradientRepeats: { value: 1 },
     uSnakeHilbertRound: { value: 1 },
-    uSnakeHilbertAnimate: { value: 0 },
-    uSnakeHilbertPhase: { value: 0 },
-    uSnakeHilbertLength: { value: 0.25 },
-    uSnakeHilbertScale: { value: 8 },
   };
 
-  const material = new MeshStandardMaterial({ color: 0xffffff, roughness: 0.4, metalness: 0.1 });
+  const material = new MeshPhysicalMaterial({
+    color: 0xffffff,
+    roughness: 0.35,
+    metalness: 0.1,
+    iridescence: 0.4,
+    iridescenceIOR: 1.6,
+    iridescenceThicknessRange: [180, 620],
+    clearcoat: 0.6,
+    clearcoatRoughness: 0.08,
+    // Cut-out patterns show the inside of the tube.
+    side: DoubleSide,
+  });
   material.onBeforeCompile = (shader: WebGLProgramParametersWithUniforms) => {
     Object.assign(shader.uniforms, uniforms);
     let vertex = injectAfter(shader.vertexShader, '#include <common>', SNAKE_VERTEX_COMMON);
     vertex = injectAfter(vertex, '#include <beginnormal_vertex>', 'vec3 snakeP, snakeN;\nsnakeDeform(position, snakeP, snakeN);\nobjectNormal = snakeN;');
     shader.vertexShader = injectAfter(vertex, '#include <begin_vertex>', 'transformed = snakeP;');
     const fragment = injectAfter(shader.fragmentShader, '#include <common>', SNAKE_FRAGMENT_COMMON);
-    shader.fragmentShader = injectAfter(fragment, '#include <color_fragment>', 'diffuseColor.rgb *= snakeBodyColor(vSnakeBody, uSnakeForeground);');
+    shader.fragmentShader = injectAfter(
+      fragment,
+      '#include <color_fragment>',
+      'vec4 snakeColor = snakeBodyColor(vSnakeBody);\nif (snakeColor.a < 0.5) discard;\ndiffuseColor.rgb *= snakeColor.rgb;',
+    );
   };
-  material.customProgramCacheKey = () => 'cyberdelic-snake-v1';
+  material.customProgramCacheKey = () => 'cyberdelic-snake-v2';
 
   const mesh = new Mesh(createSnakeGeometry(), material);
   mesh.name = 'snake';
@@ -152,7 +149,8 @@ export const createSnakeRenderer = () => {
       gradientTexture.needsUpdate = true;
     },
     /** Per frame: settings + where the body is. Never touches geometry. */
-    apply(look: SnakeLook, crawl: Crawl, hilbertPhase: number) {
+    apply(look: SnakeLook, crawl: Crawl) {
+      const closed = uniforms.uSnakeClosed.value > 0.5;
       uniforms.uSnakeHead.value = crawl.head;
       uniforms.uSnakeTail.value = crawl.tail;
       uniforms.uSnakeThickness.value = look.thickness;
@@ -160,22 +158,23 @@ export const createSnakeRenderer = () => {
       uniforms.uSnakeTailTaper.value = look.tailTaper;
       uniforms.uSnakeHeadShape.value = look.headShape;
       uniforms.uSnakeProfile.value = look.profile;
-      uniforms.uSnakeTwist.value = look.profile > 0 ? look.twist : 0;
+      // Whole turns on loops, so the frame meets itself and lap wraps never jump.
+      uniforms.uSnakeTwist.value = look.profile > 0 ? Math.max(0, effectiveTwist(look.twist, closed)) : 0;
       uniforms.uSnakeTwistPhase.value = 0;
-      uniforms.uSnakeForeground.value.set(look.foreground);
-      uniforms.uSnakeBackground.value.set(look.background);
       uniforms.uSnakePattern.value = PATTERN_INDEX[look.pattern];
       const cells = patternCells(look.pattern, look.scale, look.thickness);
       uniforms.uSnakeRepeats.value = cells.repeats;
       uniforms.uSnakeCellLength.value = cells.cellLength;
       uniforms.uSnakeWidth.value = look.width;
       uniforms.uSnakeBodyLength.value = Math.abs(crawl.head - crawl.tail) * curveLength;
-      uniforms.uSnakeGradientMode.value = look.gradient ? 1 : 0;
-      uniforms.uSnakeHilbertAnimate.value = look.hilbertAnimate ? 1 : 0;
-      uniforms.uSnakeHilbertLength.value = look.hilbertLength;
-      uniforms.uSnakeHilbertPhase.value = hilbertPhase;
+      uniforms.uSnakeGradientRepeats.value = gradientRepeats(look.spread);
+      uniforms.uSnakeBackgroundMode.value = look.background ? 1 : 0;
+      uniforms.uSnakeBackgroundOffset.value = look.backgroundOffset;
+      uniforms.uSnakeBackgroundBrightness.value = look.backgroundBrightness;
       material.metalness = look.metallic;
       material.roughness = look.roughness;
+      material.iridescence = look.iridescence;
+      material.clearcoat = look.gloss;
     },
     dispose() {
       mesh.geometry.dispose();

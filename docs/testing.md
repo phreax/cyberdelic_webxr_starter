@@ -54,7 +54,11 @@ performance HUD or OVR Metrics Tool while the orb animates.
 - [ ] Presets: each eases in and is highlighted; changing a control clears the highlight.
 - [ ] OSC (optional): `npm run osc-bridge`, enable `osc: true`, bind an address, send from a tool.
 - [ ] Garden (?example=garden): open hand repels, pinch attracts; touching a ring fades to its mood; Demo beat bursts.
-- [ ] Snake (?example=snake): demo loop crawls endlessly; Draw tool records a stroke with trigger/pinch (not when pointing at the menu); ending near the start makes a closed loop; Edit tool handles reshape the path; Add/Delete point; Shape/Look/Motion controls apply live.
+- [ ] Snake (?example=snake): smooth shading (no facets); demo loop crawls endlessly; Square + twist on a loop has no seam or jump.
+- [ ] Snake list: + Add snake → edit mode with Draw; draw a stroke (trigger / pinch, not while pointing at a window); Done; select rows; Delete selects a neighbour.
+- [ ] Snake edit: only curve + vertices visible; Move tool drags vertices; Closed loop toggle works even for two-point paths; Add / Delete point.
+- [ ] Snake settings: changes apply only to the selected snake; Background off = see-through gaps, on = offset gradient colour with brightness; iridescence and gloss visible.
+- [ ] Snake objects: grab to move / rotate, two hands to resize uniformly; grabbing selects the snake.
 - [ ] Playground (?example=playground): every control, trigger, toolbar button, hum sound, surface placement (MR), OSC tab.
 - [ ] Demos row: switching between all four examples works on desktop and inside an XR session (no exit), and back again without duplicated behaviour (e.g. single haptic pulse on grab).
 - [ ] Quest 3S: stable 72 FPS (see docs/performance.md).

@@ -41,5 +41,7 @@ export default defineAssets({
   'garden-panel': uikitml('garden-panel.uikitml', 'Garden Panel'),
 
   // Snake Creator (?example=snake)
-  'snake-panel': uikitml('snake-panel.uikitml', 'Snake Panel'),
+  'snake-list': uikitml('snake-list.uikitml', 'Snake List'),
+  'snake-edit': uikitml('snake-edit.uikitml', 'Snake Edit'),
+  'snake-params': uikitml('snake-params.uikitml', 'Snake Settings'),
 });

@@ -121,3 +121,33 @@ export const evaluateSegment = (path: readonly Anchor[], segment: number, t: num
     add(scale(to.inHandle, 3 * u * t * t), scale(to.point, t * t * t)),
   );
 };
+
+/**
+ * Recompute the end anchors' handles after opening or closing a path, so the seam (closed) or the
+ * ends (open) stay smooth. Two anchors close into an oval instead of a there-and-back line.
+ */
+export const refitEndHandles = (path: readonly Anchor[], closed: boolean): Anchor[] => {
+  const n = path.length;
+  if (n < 2) return [...path];
+  if (closed && n === 2) {
+    const [a, b] = [path[0]!.point, path[1]!.point];
+    const d = sub(b, a);
+    const span = length(d);
+    const up = Math.abs(d.y) < 0.99 * span ? { x: 0, y: 1, z: 0 } : { x: 0, y: 0, z: 1 };
+    const cross = { x: d.y * up.z - d.z * up.y, y: d.z * up.x - d.x * up.z, z: d.x * up.y - d.y * up.x };
+    // Bezier semicircle: handle length 4/3 of the radius.
+    const side = scale(cross, (0.667 * span) / (length(cross) || 1));
+    return [
+      { point: { ...a }, inHandle: sub(a, side), outHandle: add(a, side) },
+      { point: { ...b }, inHandle: add(b, side), outHandle: sub(b, side) },
+    ];
+  }
+  const smooth = (i: number): Anchor => {
+    const anchor = path[i]!;
+    const previous = closed ? path[(i - 1 + n) % n]!.point : (path[i - 1]?.point ?? anchor.point);
+    const next = closed ? path[(i + 1) % n]!.point : (path[i + 1]?.point ?? anchor.point);
+    const tangent = scale(sub(next, previous), 1 / 6);
+    return { point: { ...anchor.point }, inHandle: sub(anchor.point, tangent), outHandle: add(anchor.point, tangent) };
+  };
+  return path.map((anchor, i) => (i === 0 || i === n - 1 ? smooth(i) : anchor));
+};

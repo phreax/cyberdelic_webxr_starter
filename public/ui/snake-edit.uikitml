@@ -1,0 +1,367 @@
+<style>
+  .panel {
+    flex-direction: column;
+    width: 420px;
+    gap: 18px;
+    padding-top: 26px;
+    padding-bottom: 26px;
+    padding-left: 26px;
+    padding-right: 26px;
+    border-radius: 22px;
+    border-width: 2px;
+    border-color: #00d9c740;
+    background-color: #152322d9;
+  }
+  .eyebrow {
+    color: #ff9500;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 2px;
+  }
+  .title {
+    color: #f1f7f5;
+    font-size: 30px;
+    font-weight: 700;
+  }
+  .muted {
+    color: #9baeab;
+    font-size: 16px;
+  }
+  .label {
+    color: #f1f7f5;
+    font-size: 18px;
+  }
+  .value {
+    color: #00d9c7;
+    font-size: 18px;
+    font-weight: 700;
+  }
+  .tabs {
+    flex-direction: row;
+    gap: 8px;
+  }
+  .tab {
+    flex-grow: 1;
+    justify-content: center;
+    text-align: center;
+    padding-top: 12px;
+    padding-bottom: 12px;
+    border-radius: 12px;
+    border-width: 2px;
+    border-color: #00d9c7;
+    color: #f1f7f5;
+    font-size: 18px;
+    font-weight: 700;
+  }
+  .page {
+    flex-direction: column;
+    gap: 20px;
+  }
+  .row {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .column {
+    flex-direction: column;
+    gap: 10px;
+  }
+  .track {
+    height: 30px;
+    border-radius: 15px;
+    border-width: 2px;
+    border-color: #00d9c7;
+    background-color: #071514;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    padding-left: 5px;
+    padding-right: 5px;
+  }
+  .fill {
+    height: 100%;
+    border-radius: 10px;
+    background-color: #00d9c7;
+  }
+  .knob {
+    width: 84px;
+    height: 84px;
+    border-radius: 42px;
+    border-width: 2px;
+    border-color: #00d9c7;
+    background-color: #071514;
+  }
+  .knob-value {
+    width: 64px;
+    color: #00d9c7;
+    font-size: 18px;
+    font-weight: 700;
+  }
+  .knob-indicator {
+    width: 100%;
+    height: 100%;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 8px;
+  }
+  .knob-dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 7px;
+    background-color: #ff9500;
+  }
+  .toggle {
+    flex-direction: row;
+    align-items: center;
+    width: 72px;
+    height: 38px;
+    border-radius: 19px;
+    border-width: 2px;
+    border-color: #00d9c7;
+    padding-left: 5px;
+    padding-right: 5px;
+  }
+  .toggle-thumb {
+    width: 26px;
+    height: 26px;
+    border-radius: 13px;
+    background-color: #9baeab;
+  }
+  .icon-button {
+    align-self: flex-start;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 16px;
+    padding-right: 16px;
+    border-radius: 12px;
+    border-width: 2px;
+    border-color: #00d9c7;
+    color: #9baeab;
+    font-size: 15px;
+    font-weight: 700;
+  }
+  .button {
+    flex-grow: 1;
+    justify-content: center;
+    text-align: center;
+    padding-top: 14px;
+    padding-bottom: 14px;
+    border-radius: 14px;
+    border-width: 2px;
+    border-color: #00d9c7;
+    color: #f1f7f5;
+    font-size: 18px;
+    font-weight: 700;
+  }
+  .grid {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .preset {
+    width: 179px;
+    flex-direction: column;
+    gap: 4px;
+    padding-top: 14px;
+    padding-bottom: 14px;
+    padding-left: 16px;
+    padding-right: 16px;
+    border-radius: 14px;
+    border-width: 2px;
+    border-color: #00d9c7;
+  }
+  .preset-name {
+    color: #f1f7f5;
+    font-size: 19px;
+    font-weight: 700;
+  }
+  .meter-row {
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+  }
+  .meter-label {
+    width: 56px;
+    color: #9baeab;
+    font-size: 15px;
+  }
+  .meter {
+    flex-grow: 1;
+    height: 12px;
+    border-radius: 6px;
+    background-color: #071514;
+  }
+  .meter-fill {
+    height: 100%;
+    width: 0%;
+    border-radius: 6px;
+    background-color: #00d9c7;
+  }
+  .spectrum {
+    flex-direction: row;
+    align-items: flex-end;
+    gap: 4px;
+    height: 60px;
+    padding-top: 6px;
+    padding-bottom: 6px;
+    padding-left: 8px;
+    padding-right: 8px;
+    border-radius: 10px;
+    background-color: #071514;
+  }
+  .spectrum-bar {
+    flex-grow: 1;
+    height: 2px;
+    border-radius: 2px;
+    background-color: #ff9500;
+  }
+  .status {
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+  }
+  .status-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 6px;
+    background-color: #9baeab;
+  }
+  .small-button {
+    flex-grow: 1;
+    justify-content: center;
+    text-align: center;
+    padding-top: 12px;
+    padding-bottom: 12px;
+    border-radius: 12px;
+    border-width: 2px;
+    border-color: #00d9c7;
+    color: #f1f7f5;
+    font-size: 16px;
+    font-weight: 700;
+  }
+  .dropdown {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 12px;
+    padding-bottom: 12px;
+    padding-left: 16px;
+    padding-right: 16px;
+    border-radius: 12px;
+    border-width: 2px;
+    border-color: #00d9c7;
+    color: #f1f7f5;
+    font-size: 17px;
+  }
+  .dropdown-list {
+    flex-direction: column;
+    gap: 6px;
+  }
+  .option {
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 16px;
+    padding-right: 16px;
+    border-radius: 10px;
+    border-width: 2px;
+    border-color: #00d9c7;
+    color: #f1f7f5;
+    font-size: 16px;
+  }
+  .swatch {
+    width: 40px;
+    height: 40px;
+    border-radius: 20px;
+    border-width: 3px;
+    border-color: #00d9c7;
+  }
+  .preview {
+    width: 64px;
+    height: 40px;
+    border-radius: 10px;
+  }
+  .readout {
+    color: #ff9500;
+    font-size: 34px;
+    font-weight: 700;
+  }
+  .log {
+    color: #dbe7e5;
+    font-size: 15px;
+  }
+  .demos {
+    flex-direction: row;
+    align-items: center;
+    gap: 6px;
+  }
+  .demos-label {
+    color: #9baeab;
+    font-size: 13px;
+    margin-right: 4px;
+  }
+  .demo-chip {
+    padding-top: 7px;
+    padding-bottom: 7px;
+    padding-left: 10px;
+    padding-right: 10px;
+    border-radius: 10px;
+    border-width: 2px;
+    border-color: #00d9c7;
+    color: #f1f7f5;
+    font-size: 13px;
+    font-weight: 700;
+  }
+  .list-row {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 12px;
+    padding-bottom: 12px;
+    padding-left: 16px;
+    padding-right: 16px;
+    border-radius: 12px;
+    border-width: 2px;
+    border-color: #00d9c7;
+  }
+  .list-name {
+    color: #f1f7f5;
+    font-size: 18px;
+    font-weight: 700;
+  }
+  .narrow {
+    width: 340px;
+  }
+</style>
+
+<!--
+  Snake Creator: edit toolbar (only visible in edit mode).
+-->
+<div id="panel" class="panel narrow">
+  <div class="row">
+    <div class="column">
+      <span class="eyebrow">SNAKE EDIT</span>
+      <span id="edit-name" class="title">Snake</span>
+    </div>
+    <div id="btn-done" class="icon-button">Done</div>
+  </div>
+  <div class="row">
+      <div id="tool-draw" class="small-button">Draw</div>
+      <div id="tool-move" class="small-button">Move</div>
+  </div>
+  <span id="edit-hint" class="muted">Draw: hold trigger or pinch with your right hand and move through the air.</span>
+    <div class="row">
+      <span class="label">Closed loop</span>
+      <div id="closed" class="toggle">
+        <div id="closed-thumb" class="toggle-thumb"></div>
+      </div>
+    </div>
+  <div class="row">
+    <div id="btn-add-point" class="small-button">Add point</div>
+    <div id="btn-delete-point" class="small-button">Delete point</div>
+  </div>
+  <div class="row">
+    <div id="btn-demo-loop" class="small-button">Demo loop</div>
+    <div id="btn-demo-wave" class="small-button">Demo wave</div>
+  </div>
+  <span id="path-info" class="log">No path</span>
+</div>

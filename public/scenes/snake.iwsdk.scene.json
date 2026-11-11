@@ -32,21 +32,69 @@
   "resources": {},
   "nodes": [
     {
-      "id": "snake-panel",
-      "name": "Snake Panel",
+      "id": "snake-list",
+      "name": "Snake List",
       "content": {
         "type": "asset",
-        "asset": "snake-panel"
+        "asset": "snake-list"
       },
       "transform": {
         "position": [
-          -0.7,
+          -0.72,
           1.25,
           -0.6
         ],
         "rotationDeg": [
           0,
-          49.4,
+          50.19,
+          0
+        ],
+        "scale": 0.1
+      },
+      "components": {
+        "RayInteractable": {}
+      }
+    },
+    {
+      "id": "snake-params",
+      "name": "Snake Params",
+      "content": {
+        "type": "asset",
+        "asset": "snake-params"
+      },
+      "transform": {
+        "position": [
+          0.72,
+          1.25,
+          -0.6
+        ],
+        "rotationDeg": [
+          0,
+          -50.19,
+          0
+        ],
+        "scale": 0.1
+      },
+      "components": {
+        "RayInteractable": {}
+      }
+    },
+    {
+      "id": "snake-edit",
+      "name": "Snake Edit",
+      "content": {
+        "type": "asset",
+        "asset": "snake-edit"
+      },
+      "transform": {
+        "position": [
+          0,
+          0.92,
+          -0.55
+        ],
+        "rotationDeg": [
+          -30,
+          0,
           0
         ],
         "scale": 0.1
@@ -118,10 +166,10 @@
         ],
         "target": [
           0,
-          1.3,
+          1.25,
           -1.0
         ],
-        "fov": 60
+        "fov": 65
       }
     ]
   }

@@ -1,0 +1,413 @@
+<style>
+  .panel {
+    flex-direction: column;
+    width: 420px;
+    gap: 18px;
+    padding-top: 26px;
+    padding-bottom: 26px;
+    padding-left: 26px;
+    padding-right: 26px;
+    border-radius: 22px;
+    border-width: 2px;
+    border-color: #00d9c740;
+    background-color: #152322d9;
+  }
+  .eyebrow {
+    color: #ff9500;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 2px;
+  }
+  .title {
+    color: #f1f7f5;
+    font-size: 30px;
+    font-weight: 700;
+  }
+  .muted {
+    color: #9baeab;
+    font-size: 16px;
+  }
+  .label {
+    color: #f1f7f5;
+    font-size: 18px;
+  }
+  .value {
+    color: #00d9c7;
+    font-size: 18px;
+    font-weight: 700;
+  }
+  .tabs {
+    flex-direction: row;
+    gap: 8px;
+  }
+  .tab {
+    flex-grow: 1;
+    justify-content: center;
+    text-align: center;
+    padding-top: 12px;
+    padding-bottom: 12px;
+    border-radius: 12px;
+    border-width: 2px;
+    border-color: #00d9c7;
+    color: #f1f7f5;
+    font-size: 18px;
+    font-weight: 700;
+  }
+  .page {
+    flex-direction: column;
+    gap: 20px;
+  }
+  .row {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .column {
+    flex-direction: column;
+    gap: 10px;
+  }
+  .track {
+    height: 30px;
+    border-radius: 15px;
+    border-width: 2px;
+    border-color: #00d9c7;
+    background-color: #071514;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    padding-left: 5px;
+    padding-right: 5px;
+  }
+  .fill {
+    height: 100%;
+    border-radius: 10px;
+    background-color: #00d9c7;
+  }
+  .knob {
+    width: 84px;
+    height: 84px;
+    border-radius: 42px;
+    border-width: 2px;
+    border-color: #00d9c7;
+    background-color: #071514;
+  }
+  .knob-value {
+    width: 64px;
+    color: #00d9c7;
+    font-size: 18px;
+    font-weight: 700;
+  }
+  .knob-indicator {
+    width: 100%;
+    height: 100%;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 8px;
+  }
+  .knob-dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 7px;
+    background-color: #ff9500;
+  }
+  .toggle {
+    flex-direction: row;
+    align-items: center;
+    width: 72px;
+    height: 38px;
+    border-radius: 19px;
+    border-width: 2px;
+    border-color: #00d9c7;
+    padding-left: 5px;
+    padding-right: 5px;
+  }
+  .toggle-thumb {
+    width: 26px;
+    height: 26px;
+    border-radius: 13px;
+    background-color: #9baeab;
+  }
+  .icon-button {
+    align-self: flex-start;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 16px;
+    padding-right: 16px;
+    border-radius: 12px;
+    border-width: 2px;
+    border-color: #00d9c7;
+    color: #9baeab;
+    font-size: 15px;
+    font-weight: 700;
+  }
+  .button {
+    flex-grow: 1;
+    justify-content: center;
+    text-align: center;
+    padding-top: 14px;
+    padding-bottom: 14px;
+    border-radius: 14px;
+    border-width: 2px;
+    border-color: #00d9c7;
+    color: #f1f7f5;
+    font-size: 18px;
+    font-weight: 700;
+  }
+  .grid {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .preset {
+    width: 179px;
+    flex-direction: column;
+    gap: 4px;
+    padding-top: 14px;
+    padding-bottom: 14px;
+    padding-left: 16px;
+    padding-right: 16px;
+    border-radius: 14px;
+    border-width: 2px;
+    border-color: #00d9c7;
+  }
+  .preset-name {
+    color: #f1f7f5;
+    font-size: 19px;
+    font-weight: 700;
+  }
+  .meter-row {
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+  }
+  .meter-label {
+    width: 56px;
+    color: #9baeab;
+    font-size: 15px;
+  }
+  .meter {
+    flex-grow: 1;
+    height: 12px;
+    border-radius: 6px;
+    background-color: #071514;
+  }
+  .meter-fill {
+    height: 100%;
+    width: 0%;
+    border-radius: 6px;
+    background-color: #00d9c7;
+  }
+  .spectrum {
+    flex-direction: row;
+    align-items: flex-end;
+    gap: 4px;
+    height: 60px;
+    padding-top: 6px;
+    padding-bottom: 6px;
+    padding-left: 8px;
+    padding-right: 8px;
+    border-radius: 10px;
+    background-color: #071514;
+  }
+  .spectrum-bar {
+    flex-grow: 1;
+    height: 2px;
+    border-radius: 2px;
+    background-color: #ff9500;
+  }
+  .status {
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+  }
+  .status-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 6px;
+    background-color: #9baeab;
+  }
+  .small-button {
+    flex-grow: 1;
+    justify-content: center;
+    text-align: center;
+    padding-top: 12px;
+    padding-bottom: 12px;
+    border-radius: 12px;
+    border-width: 2px;
+    border-color: #00d9c7;
+    color: #f1f7f5;
+    font-size: 16px;
+    font-weight: 700;
+  }
+  .dropdown {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 12px;
+    padding-bottom: 12px;
+    padding-left: 16px;
+    padding-right: 16px;
+    border-radius: 12px;
+    border-width: 2px;
+    border-color: #00d9c7;
+    color: #f1f7f5;
+    font-size: 17px;
+  }
+  .dropdown-list {
+    flex-direction: column;
+    gap: 6px;
+  }
+  .option {
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 16px;
+    padding-right: 16px;
+    border-radius: 10px;
+    border-width: 2px;
+    border-color: #00d9c7;
+    color: #f1f7f5;
+    font-size: 16px;
+  }
+  .swatch {
+    width: 40px;
+    height: 40px;
+    border-radius: 20px;
+    border-width: 3px;
+    border-color: #00d9c7;
+  }
+  .preview {
+    width: 64px;
+    height: 40px;
+    border-radius: 10px;
+  }
+  .readout {
+    color: #ff9500;
+    font-size: 34px;
+    font-weight: 700;
+  }
+  .log {
+    color: #dbe7e5;
+    font-size: 15px;
+  }
+  .demos {
+    flex-direction: row;
+    align-items: center;
+    gap: 6px;
+  }
+  .demos-label {
+    color: #9baeab;
+    font-size: 13px;
+    margin-right: 4px;
+  }
+  .demo-chip {
+    padding-top: 7px;
+    padding-bottom: 7px;
+    padding-left: 10px;
+    padding-right: 10px;
+    border-radius: 10px;
+    border-width: 2px;
+    border-color: #00d9c7;
+    color: #f1f7f5;
+    font-size: 13px;
+    font-weight: 700;
+  }
+  .list-row {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 12px;
+    padding-bottom: 12px;
+    padding-left: 16px;
+    padding-right: 16px;
+    border-radius: 12px;
+    border-width: 2px;
+    border-color: #00d9c7;
+  }
+  .list-name {
+    color: #f1f7f5;
+    font-size: 18px;
+    font-weight: 700;
+  }
+  .narrow {
+    width: 340px;
+  }
+</style>
+
+<!--
+  Snake Creator: list window (select / add / delete snakes, enter edit mode, session).
+  Element ids are the contract used by src/examples/snake-creator/snake-experience.ts.
+-->
+<div id="panel" class="panel">
+  <div class="row">
+    <div class="column">
+      <span class="eyebrow">CYBERDELIC XR</span>
+      <span class="title">Snakes</span>
+      <div class="status">
+        <div id="mode-dot" class="status-dot"></div>
+        <span id="status" class="muted">Desktop preview</span>
+      </div>
+    </div>
+    <div id="btn-hide" class="icon-button">Hide</div>
+  </div>
+  <div class="demos">
+    <span class="demos-label">Demos</span>
+    <div id="example-sculpture" class="demo-chip">Sculpture</div>
+    <div id="example-garden" class="demo-chip">Garden</div>
+    <div id="example-snake" class="demo-chip">Snake</div>
+    <div id="example-playground" class="demo-chip">Playground</div>
+  </div>
+
+  <div class="column">
+    <div id="snake-row-0" class="list-row">
+      <span id="snake-row-0-name" class="list-name">Snake</span>
+      <span id="snake-row-0-info" class="muted"> </span>
+    </div>
+    <div id="snake-row-1" class="list-row">
+      <span id="snake-row-1-name" class="list-name">Snake</span>
+      <span id="snake-row-1-info" class="muted"> </span>
+    </div>
+    <div id="snake-row-2" class="list-row">
+      <span id="snake-row-2-name" class="list-name">Snake</span>
+      <span id="snake-row-2-info" class="muted"> </span>
+    </div>
+    <div id="snake-row-3" class="list-row">
+      <span id="snake-row-3-name" class="list-name">Snake</span>
+      <span id="snake-row-3-info" class="muted"> </span>
+    </div>
+    <div id="snake-row-4" class="list-row">
+      <span id="snake-row-4-name" class="list-name">Snake</span>
+      <span id="snake-row-4-info" class="muted"> </span>
+    </div>
+    <div id="snake-row-5" class="list-row">
+      <span id="snake-row-5-name" class="list-name">Snake</span>
+      <span id="snake-row-5-info" class="muted"> </span>
+    </div>
+    <div id="snake-row-6" class="list-row">
+      <span id="snake-row-6-name" class="list-name">Snake</span>
+      <span id="snake-row-6-info" class="muted"> </span>
+    </div>
+    <div id="snake-row-7" class="list-row">
+      <span id="snake-row-7-name" class="list-name">Snake</span>
+      <span id="snake-row-7-info" class="muted"> </span>
+    </div>
+    <span id="list-empty" class="muted">No snakes yet. Add one and draw it in the air.</span>
+  </div>
+  <div class="row">
+    <div id="btn-add" class="small-button">+ Add snake</div>
+    <div id="btn-delete" class="small-button">Delete</div>
+  </div>
+  <div class="row">
+    <div id="btn-edit" class="button">Edit path</div>
+  </div>
+  <span class="muted">Grab a snake to move it, use both hands to resize it.</span>
+
+  <div class="row">
+    <div id="btn-vr" class="small-button">Enter VR</div>
+    <div id="btn-mr" class="small-button">Enter MR</div>
+    <div id="btn-exit" class="small-button">Exit</div>
+  </div>
+  <div class="status">
+    <div id="fps-dot" class="status-dot"></div>
+    <span id="fps" class="muted">-- fps</span>
+  </div>
+</div>

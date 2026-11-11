@@ -36,6 +36,12 @@ export type PanelMenuOptions = SummonOptions & {
   barGap?: number;
   /** Id of the panel's root UIKit element (hidden with display: none). */
   rootElementId?: string;
+  /** Own toggle inputs (key, Menu/Y button, wrist button). Off for secondary windows. */
+  inputs?: boolean;
+  /** Re-place in front of the viewer when shown in XR. */
+  summonOnShow?: boolean;
+  /** Called whenever the window is shown or hidden (e.g. to toggle a window group). */
+  onVisibilityChange?: (visible: boolean) => void;
 };
 
 export type PanelMenu = {
@@ -54,7 +60,7 @@ const setParentLocal = (object: Object3D, worldPosition: Vector3) => {
 
 export const createPanelMenu = (ctx: ExperienceContext, options: PanelMenuOptions): PanelMenu => {
   const { world, theme, haptics } = ctx;
-  const { nodeId, key = 'KeyM', barGap = 0.03, rootElementId = 'panel' } = options;
+  const { nodeId, key = 'KeyM', barGap = 0.03, rootElementId = 'panel', inputs = true, summonOnShow = true, onVisibilityChange } = options;
   const panelEntity: Entity = world.requireSceneEntity(nodeId);
   const panel = panelEntity.object3D!;
   // Hide through UIKit's own layout state: toggling Object3D.visible is not observed by UIKit's
@@ -138,14 +144,16 @@ export const createPanelMenu = (ctx: ExperienceContext, options: PanelMenuOption
     show() {
       if (visible) return;
       visible = true;
-      if (world.visibilityState.peek() !== VisibilityState.NonImmersive) summon();
+      if (summonOnShow && world.visibilityState.peek() !== VisibilityState.NonImmersive) summon();
       placeBarUnderPanel();
       apply();
+      onVisibilityChange?.(true);
     },
     hide() {
       if (!visible) return;
       visible = false;
       apply();
+      onVisibilityChange?.(false);
     },
     toggle() {
       if (visible) menu.hide();
@@ -155,13 +163,17 @@ export const createPanelMenu = (ctx: ExperienceContext, options: PanelMenuOption
       const immersive = world.visibilityState.peek() !== VisibilityState.NonImmersive;
 
       // Toggle inputs: keyboard, left controller menu button, wrist button (hands only).
-      if (world.input.keyboard.getKeyDown(key)) menu.toggle();
-      const left = world.input.xr.gamepads.left;
+      if (!inputs) {
+        wrist.visible = false;
+        setInteractive(wristEntity, false);
+      }
+      if (inputs && world.input.keyboard.getKeyDown(key)) menu.toggle();
+      const left = inputs ? world.input.xr.gamepads.left : undefined;
       if (left?.getButtonDown(InputComponent.Menu) || left?.getButtonDown(InputComponent.Y_Button)) {
         menu.toggle();
         haptics.play('left', 'click');
       }
-      const handsActive = immersive && world.input.xr.isPrimary('hand', 'left');
+      const handsActive = inputs && immersive && world.input.xr.isPrimary('hand', 'left');
       wrist.visible = handsActive;
       setInteractive(wristEntity, handsActive);
       // Wrist button: touch it with the right index fingertip, or point at it and pinch.

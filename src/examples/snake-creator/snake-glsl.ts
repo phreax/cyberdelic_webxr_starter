@@ -135,21 +135,18 @@ void snakeDeform(vec3 local, out vec3 snakePosition, out vec3 snakeNormal) {
 `;
 
 export const SNAKE_FRAGMENT_COMMON = /* glsl */ `
-uniform vec3 uSnakeForeground;
-uniform vec3 uSnakeBackground;
 uniform int uSnakePattern;
+// 0 = cut out the gaps (see-through), 1 = fill them with the gradient at an offset.
+uniform int uSnakeBackgroundMode;
+uniform float uSnakeBackgroundOffset;
+uniform float uSnakeBackgroundBrightness;
 uniform float uSnakeRepeats;
 uniform float uSnakeCellLength;
 uniform float uSnakeWidth;
 uniform float uSnakeBodyLength;
 uniform sampler2D uSnakeGradient;
-uniform int uSnakeGradientMode;
 uniform float uSnakeGradientRepeats;
 uniform int uSnakeHilbertRound;
-uniform int uSnakeHilbertAnimate;
-uniform float uSnakeHilbertPhase;
-uniform float uSnakeHilbertLength;
-uniform float uSnakeHilbertScale;
 varying vec2 vSnakeBody;
 
 const int SNAKE_HILBERT_SIZE = ${HILBERT_SIZE};
@@ -204,18 +201,9 @@ vec2 snakeSegment(vec2 p, vec2 a, vec2 b) {
   return vec2(length(p - mix(a, b, t)), t);
 }
 
-float snakeHilbertTrail(float position, float edge) {
-  if (uSnakeHilbertAnimate == 0 || uSnakeHilbertLength >= 1.0) return 1.0;
-  if (uSnakeHilbertLength <= 0.0) return 0.0;
-  float span = float(SNAKE_HILBERT_SIZE * SNAKE_HILBERT_SIZE);
-  float offset = abs(fract(position / span * uSnakeHilbertScale - uSnakeHilbertPhase + 0.5 * uSnakeHilbertLength + 0.5) - 0.5);
-  return 1.0 - smoothstep(0.5 * uSnakeHilbertLength - edge * uSnakeHilbertScale / span,
-    0.5 * uSnakeHilbertLength + edge * uSnakeHilbertScale / span, offset);
-}
-
 float snakeHilbertStroke(float distanceToLine, float position, float edge) {
   float halfWidth = 0.4 * uSnakeWidth;
-  return (1.0 - smoothstep(halfWidth - edge, halfWidth + edge, distanceToLine)) * snakeHilbertTrail(position, edge);
+  return 1.0 - smoothstep(halfWidth - edge, halfWidth + edge, distanceToLine);
 }
 
 vec2 snakeHilbert(vec2 cell) {
@@ -261,24 +249,25 @@ float snakeRings(vec2 cell) {
   return 1.0 - smoothstep(0.5 * uSnakeWidth - edge, 0.5 * uSnakeWidth + edge, offset);
 }
 
-vec3 snakeForeground(vec2 body, vec3 solid) {
-  if (uSnakeGradientMode == 0) return solid;
-  float t = body.x / max(uSnakeBodyLength, 1.0e-4);
-  return texture(uSnakeGradient, vec2(fract(t * uSnakeGradientRepeats), 0.5)).rgb;
+float snakeGradientT(vec2 body) {
+  return body.x / max(uSnakeBodyLength, 1.0e-4) * uSnakeGradientRepeats;
 }
 
-vec3 snakeBodyColor(vec2 body, vec3 foreground) {
+// rgb = colour, a = pattern coverage (0 in the gaps between rings / Hilbert lines).
+vec4 snakeBodyColor(vec2 body) {
   // Along the body in cells, around it in whole repeats (seamless wrap).
   vec2 cell = vec2(body.x / uSnakeCellLength, body.y * uSnakeRepeats);
   float coverage;
-  vec3 color = snakeForeground(body, foreground);
   if (uSnakePattern == ${PATTERN_INDEX.hilbert}) coverage = snakeHilbert(cell).x;
   else if (uSnakePattern == ${PATTERN_INDEX.solid}) coverage = 1.0;
   else coverage = snakeRings(cell);
-  return mix(uSnakeBackground, color, coverage);
+  float t = snakeGradientT(body);
+  vec3 foreground = texture(uSnakeGradient, vec2(fract(t), 0.5)).rgb;
+  if (uSnakeBackgroundMode == 0) return vec4(foreground, coverage);
+  vec3 background = texture(uSnakeGradient, vec2(fract(t + uSnakeBackgroundOffset), 0.5)).rgb * uSnakeBackgroundBrightness;
+  return vec4(mix(background, foreground, coverage), 1.0);
 }
 `;
-
 /** Cells around the body; whole repeats keep the wrap seamless; cells stay square on the body. */
 const BASE_REPEATS: Record<SnakePattern, number> = { rings: 4, hilbert: 1, solid: 1 };
 export const patternCells = (pattern: SnakePattern, scale: number, radius: number) => {

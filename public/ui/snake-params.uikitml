@@ -311,64 +311,43 @@
     font-size: 13px;
     font-weight: 700;
   }
+  .list-row {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 12px;
+    padding-bottom: 12px;
+    padding-left: 16px;
+    padding-right: 16px;
+    border-radius: 12px;
+    border-width: 2px;
+    border-color: #00d9c7;
+  }
+  .list-name {
+    color: #f1f7f5;
+    font-size: 18px;
+    font-weight: 700;
+  }
+  .narrow {
+    width: 340px;
+  }
 </style>
 
 <!--
-  Snake Creator panel. 1px = 1 mm at node scale 0.1.
-  Element ids are the contract used by src/examples/snake-creator/snake-experience.ts.
+  Snake Creator: settings window for the selected snake.
 -->
 <div id="panel" class="panel">
   <div class="row">
     <div class="column">
-      <span class="eyebrow">CYBERDELIC XR</span>
-      <span class="title">Snake Creator</span>
-      <div class="status">
-        <div id="mode-dot" class="status-dot"></div>
-        <span id="status" class="muted">Desktop preview</span>
-      </div>
+      <span class="eyebrow">SNAKE SETTINGS</span>
+      <span id="params-name" class="title">Snake</span>
     </div>
-    <div id="btn-hide" class="icon-button">Hide</div>
   </div>
-
-  <div class="demos">
-    <span class="demos-label">Demos</span>
-    <div id="example-sculpture" class="demo-chip">Sculpture</div>
-    <div id="example-garden" class="demo-chip">Garden</div>
-    <div id="example-snake" class="demo-chip">Snake</div>
-    <div id="example-playground" class="demo-chip">Playground</div>
-  </div>
-
   <div class="tabs">
-    <div id="tab-draw" class="tab">Draw</div>
     <div id="tab-shape" class="tab">Shape</div>
-    <div id="tab-look" class="tab">Look</div>
+    <div id="tab-pattern" class="tab">Pattern</div>
+    <div id="tab-material" class="tab">Material</div>
     <div id="tab-motion" class="tab">Motion</div>
-    <div id="tab-session" class="tab">XR</div>
-  </div>
-
-  <div id="page-draw" class="page">
-    <div class="row">
-      <div id="tool-draw" class="small-button">Draw</div>
-      <div id="tool-edit" class="small-button">Edit</div>
-      <div id="tool-view" class="small-button">View</div>
-    </div>
-    <span id="draw-hint" class="muted">Draw: hold trigger or pinch with your right hand and move it through the air.</span>
-    <div class="row">
-      <span class="label">Closed loop</span>
-      <div id="closed" class="toggle">
-        <div id="closed-thumb" class="toggle-thumb"></div>
-      </div>
-    </div>
-    <div class="row">
-      <div id="btn-add" class="small-button">Add point</div>
-      <div id="btn-delete" class="small-button">Delete point</div>
-    </div>
-    <div class="row">
-      <div id="btn-demo-loop" class="small-button">Demo loop</div>
-      <div id="btn-demo-wave" class="small-button">Demo wave</div>
-      <div id="btn-clear" class="small-button">Clear</div>
-    </div>
-    <span id="path-info" class="log">No path</span>
   </div>
 
   <div id="page-shape" class="page">
@@ -420,11 +399,10 @@
     <div class="row">
       <div id="profile-round" class="small-button">Round</div>
       <div id="profile-square" class="small-button">Square</div>
-      <div id="profile-hex" class="small-button">Hex</div>
     </div>
     <div class="column">
       <div class="row">
-        <span class="label">Twist</span>
+        <span class="label">Twist (square)</span>
         <span id="twist-value" class="value">0.00</span>
       </div>
       <div id="twist" class="track">
@@ -433,55 +411,26 @@
     </div>
   </div>
 
-  <div id="page-look" class="page">
+  <div id="page-pattern" class="page">
     <div class="row">
       <div id="pattern-solid" class="small-button">Solid</div>
       <div id="pattern-rings" class="small-button">Rings</div>
       <div id="pattern-hilbert" class="small-button">Hilbert</div>
-    </div>
-    <div class="column">
-      <div class="row">
-        <span class="label">Colour</span>
-        <div id="fg-preview" class="preview"></div>
-      </div>
-      <div class="row">
-        <div id="fg-swatch-0" class="swatch"></div>
-        <div id="fg-swatch-1" class="swatch"></div>
-        <div id="fg-swatch-2" class="swatch"></div>
-        <div id="fg-swatch-3" class="swatch"></div>
-        <div id="fg-swatch-4" class="swatch"></div>
-      </div>
-    <div class="column">
-      <div class="row">
-        <span class="label">Hue</span>
-        <span id="fg-hue-value" class="value">0</span>
-      </div>
-      <div id="fg-hue" class="track">
-        <div id="fg-hue-fill" class="fill"></div>
-      </div>
-    </div>
-    </div>
-    <div class="column">
-      <span class="label">Background</span>
-      <div class="row">
-        <div id="bg-swatch-0" class="swatch"></div>
-        <div id="bg-swatch-1" class="swatch"></div>
-        <div id="bg-swatch-2" class="swatch"></div>
-        <div id="bg-swatch-3" class="swatch"></div>
-        <div id="bg-swatch-4" class="swatch"></div>
-      </div>
-    </div>
-    <div class="row">
-      <span class="label">Gradient along body</span>
-      <div id="gradient" class="toggle">
-        <div id="gradient-thumb" class="toggle-thumb"></div>
-      </div>
     </div>
     <div class="row">
       <div id="palette-cyberdelic" class="small-button">Cyberdelic</div>
       <div id="palette-ocean" class="small-button">Ocean</div>
       <div id="palette-ember" class="small-button">Ember</div>
       <div id="palette-aurora" class="small-button">Aurora</div>
+    </div>
+    <div class="column">
+      <div class="row">
+        <span class="label">Gradient spread</span>
+        <span id="spread-value" class="value">0.05</span>
+      </div>
+      <div id="spread" class="track">
+        <div id="spread-fill" class="fill"></div>
+      </div>
     </div>
     <div class="column">
       <div class="row">
@@ -501,6 +450,53 @@
         <div id="width-fill" class="fill"></div>
       </div>
     </div>
+    <div class="row">
+      <span class="label">Background</span>
+      <div id="background" class="toggle">
+        <div id="background-thumb" class="toggle-thumb"></div>
+      </div>
+    </div>
+    <div id="bg-settings" class="column">
+    <div class="column">
+      <div class="row">
+        <span class="label">Hue offset</span>
+        <span id="backgroundOffset-value" class="value">0.50</span>
+      </div>
+      <div id="backgroundOffset" class="track">
+        <div id="backgroundOffset-fill" class="fill"></div>
+      </div>
+    </div>
+    <div class="column">
+      <div class="row">
+        <span class="label">Brightness</span>
+        <span id="backgroundBrightness-value" class="value">0.35</span>
+      </div>
+      <div id="backgroundBrightness" class="track">
+        <div id="backgroundBrightness-fill" class="fill"></div>
+      </div>
+    </div>
+    </div>
+  </div>
+
+  <div id="page-material" class="page">
+    <div class="column">
+      <div class="row">
+        <span class="label">Iridescence</span>
+        <span id="iridescence-value" class="value">0.40</span>
+      </div>
+      <div id="iridescence" class="track">
+        <div id="iridescence-fill" class="fill"></div>
+      </div>
+    </div>
+    <div class="column">
+      <div class="row">
+        <span class="label">Gloss</span>
+        <span id="gloss-value" class="value">0.60</span>
+      </div>
+      <div id="gloss" class="track">
+        <div id="gloss-fill" class="fill"></div>
+      </div>
+    </div>
     <div class="column">
       <div class="row">
         <span class="label">Metallic</span>
@@ -513,7 +509,7 @@
     <div class="column">
       <div class="row">
         <span class="label">Roughness</span>
-        <span id="roughness-value" class="value">0.40</span>
+        <span id="roughness-value" class="value">0.35</span>
       </div>
       <div id="roughness" class="track">
         <div id="roughness-fill" class="fill"></div>
@@ -537,26 +533,5 @@
         <div id="reverse-thumb" class="toggle-thumb"></div>
       </div>
     </div>
-    <div class="row">
-      <span class="label">Animate Hilbert trail</span>
-      <div id="hilbertAnimate" class="toggle">
-        <div id="hilbertAnimate-thumb" class="toggle-thumb"></div>
-      </div>
-    </div>
-  </div>
-
-  <div id="page-session" class="page">
-    <div class="row">
-      <div id="btn-vr" class="button">Enter VR</div>
-      <div id="btn-mr" class="button">Enter MR</div>
-    </div>
-    <div class="row">
-      <div id="btn-exit" class="button">Exit to browser</div>
-    </div>
-    <div class="status">
-      <div id="fps-dot" class="status-dot"></div>
-      <span id="fps" class="muted">-- fps</span>
-    </div>
-    <span class="muted">Menu: drag the bar below to move. Show or hide: M, left Menu or Y button, or touch the wrist button.</span>
   </div>
 </div>

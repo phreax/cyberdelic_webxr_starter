@@ -71,3 +71,22 @@ describe('stroke helpers', () => {
     });
   });
 });
+
+import { refitEndHandles } from './path.js';
+
+describe('refitEndHandles()', () => {
+  test('closing smooths the seam', () => {
+    const points = [{ x: 0, y: 0, z: 0 }, { x: 1, y: 0, z: 0 }, { x: 1, y: 1, z: 0 }, { x: 0, y: 1, z: 0 }];
+    const closed = refitEndHandles(fitPathFromStroke(points), true);
+    const last = closed[3]!;
+    const first = closed[0]!;
+    // Smooth through the seam: last.outHandle and first.inHandle point along the closing segment.
+    const outDir = { x: last.outHandle.x - last.point.x, y: last.outHandle.y - last.point.y };
+    assert({
+      given: 'an open square path closed into a loop',
+      should: 'give the end anchors handles that continue through the closing segment',
+      actual: [outDir.y < 0, first.inHandle.y < first.point.y || first.inHandle.x < first.point.x],
+      expected: [true, true],
+    });
+  });
+});

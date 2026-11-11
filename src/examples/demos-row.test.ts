@@ -3,7 +3,7 @@ import { describe, test } from 'vitest';
 import { assert } from 'riteway/vitest';
 
 const EXAMPLE_IDS = ['sculpture', 'garden', 'snake', 'playground'];
-const PANELS = ['control-panel', 'garden-panel', 'snake-panel', 'playground-panel'];
+const PANELS = ['control-panel', 'garden-panel', 'snake-list', 'playground-panel'];
 
 describe('Demos row', () => {
   test('every panel offers every example', () => {
