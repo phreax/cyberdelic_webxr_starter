@@ -1,0 +1,15 @@
+{
+  "name": "@cyberdelic/osc-bridge",
+  "version": "0.1.0",
+  "private": true,
+  "description": "OSC UDP <-> WebSocket bridge for Cyberdelic XR (TouchDesigner, Ableton, Python, sensors).",
+  "type": "module",
+  "bin": { "cyberdelic-osc-bridge": "./src/cli.ts" },
+  "scripts": {
+    "start": "node --experimental-strip-types src/cli.ts"
+  },
+  "dependencies": {
+    "osc-js": "^2.4.1"
+  },
+  "license": "MIT"
+}

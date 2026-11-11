@@ -39,7 +39,7 @@ USB alternative: `adb reverse tcp:8081 tcp:8081` and open `https://localhost:808
 Performance check: target **72 FPS on Quest 3S**. Use the Meta Quest Developer Hub
 performance HUD or OVR Metrics Tool while the orb animates.
 
-## Phase 1/2 manual checklist
+## Manual checklist
 
 - [ ] Desktop: orb animates, panel readable, tabs switch, sliders/knob/toggle respond to the mouse.
 - [ ] Emulated VR: dark background; controller ray hovers/presses controls; orb grab + two-hand scale.
@@ -47,4 +47,10 @@ performance HUD or OVR Metrics Tool while the orb animates.
 - [ ] Quest: hand pinch operates the panel; haptics on click, slider release, grab and release.
 - [ ] Menu: drag the bar under the panel to move it; panel keeps facing you.
 - [ ] Menu: Hide button, M (desktop), left controller Menu button and wrist button (hands) hide/show it; it reappears in front of you in XR.
-- [ ] Quest 3S: stable 72 FPS.
+- [ ] Audio tab: Demo beat drives growth (bass), flow (mid), glow (high) and beat pulse; meters + spectrum move.
+- [ ] Audio tab: Mic asks permission; denying shows a red status and the scene keeps running.
+- [ ] Audio tab: Capture on desktop Chrome (share a tab with audio); shows *unsupported* on Quest.
+- [ ] Reactivity 0: sculpture looks the same with and without audio.
+- [ ] Presets: each eases in and is highlighted; changing a control clears the highlight.
+- [ ] OSC (optional): `npm run osc-bridge`, enable `osc: true`, bind an address, send from a tool.
+- [ ] Quest 3S: stable 72 FPS (see docs/performance.md).

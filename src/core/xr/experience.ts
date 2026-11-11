@@ -5,9 +5,12 @@ import {
   VisibilityState,
   type World,
 } from '@iwsdk/core';
+import { createAudioEngine, type AudioEngine, type AudioEngineOptions } from '../../components/audio/audio-engine.js';
+import { createOscClient, type OscClient, type OscClientOptions } from '../../components/osc/osc-client.js';
+import { createParameterStore, type ParameterStore } from '../parameters/store.js';
 import { createHaptics, type Hand, type Haptics, type HapticPatternName } from '../../components/interaction/haptics.js';
 import { cyberdelicTheme, type Theme } from '../../themes/cyberdelic.js';
-import { createDisposables, createLifecycle, type Disposable, type Experience } from './lifecycle.js';
+import { clampDelta, createDisposables, createLifecycle, type Disposable, type Experience } from './lifecycle.js';
 import { resolveXRMode, type ExperienceMode, type ResolvedXRMode, type XRSupport } from './mode.js';
 
 /**
@@ -17,6 +20,12 @@ import { resolveXRMode, type ExperienceMode, type ResolvedXRMode, type XRSupport
 export type ExperienceContext = {
   world: World;
   theme: Theme;
+  /** Shared parameters: UI, audio and OSC write here; visuals read here (PRD §9). */
+  params: ParameterStore;
+  /** Present when `audio` is enabled in the config. Sources start on a user gesture. */
+  audio?: AudioEngine;
+  /** Present when `osc` is enabled in the config. */
+  osc?: OscClient;
   haptics: Haptics & {
     /** Play on the controller whose trigger or grip is held, else the right one. */
     playActive(pattern: HapticPatternName): void;
@@ -35,6 +44,8 @@ export type ExperienceConfig = {
   mode?: ExperienceMode;
   theme?: Theme;
   haptics?: boolean;
+  audio?: boolean | AudioEngineOptions;
+  osc?: boolean | OscClientOptions;
   scene: Experience<ExperienceContext>;
 };
 
@@ -72,9 +83,16 @@ export const createExperience = async (world: World, config: ExperienceConfig) =
   // Themed background in VR and the browser. IWSDK clears it during passthrough AR sessions and restores it after.
   world.scene.background = new Color(theme.colors.background);
 
+  const params = createParameterStore();
+  const audio = config.audio ? disposables.add(createAudioEngine(config.audio === true ? {} : config.audio)) : undefined;
+  const osc = config.osc ? disposables.add(createOscClient(config.osc === true ? {} : config.osc)) : undefined;
+
   const ctx: ExperienceContext = {
     world,
     theme,
+    params,
+    audio,
+    osc,
     haptics: { ...haptics, playActive: (pattern) => haptics.play(activeHand(), pattern) },
     track: (item) => disposables.add(item),
     xr: {
@@ -101,6 +119,10 @@ export const createExperience = async (world: World, config: ExperienceConfig) =
 
   class ExperienceSystem extends createSystem({}) {
     update(delta: number, time: number): void {
+      // Order per frame: audio analysis → parameters (modulation + smoothing) → experience.
+      const dt = clampDelta(delta);
+      audio?.update(dt);
+      params.update(dt);
       lifecycle.tick(delta, time);
     }
   }

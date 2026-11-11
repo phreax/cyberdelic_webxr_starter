@@ -50,23 +50,17 @@
   "nodes": [
     {
       "content": {
-        "asset": "cyber-orb",
-        "type": "asset"
+        "type": "asset",
+        "asset": "reactive-sculpture"
       },
-      "id": "cyber-orb",
-      "name": "Cyber Orb",
+      "id": "reactive-sculpture",
+      "name": "Reactive Sculpture",
       "transform": {
         "position": [
-          0.22,
-          0.5613,
-          -1
-        ],
-        "rotationDeg": [
-          0,
-          0,
-          0
-        ],
-        "scale": 1
+          0.2,
+          1.35,
+          -1.0
+        ]
       }
     },
     {

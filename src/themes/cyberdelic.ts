@@ -7,6 +7,8 @@ export type Theme = {
     surface: string;
     text: string;
     muted: string;
+    /** Errors / denied states. */
+    danger: string;
   };
   panel: {
     /** Surface opacity: the frosted-glass fallback (UIKit has no backdrop blur). */
@@ -28,6 +30,7 @@ export const cyberdelicTheme: Readonly<Theme> = Object.freeze({
     surface: '#152322',
     text: '#F1F7F5',
     muted: '#9BAEAB',
+    danger: '#FF5A6E',
   }),
   panel: Object.freeze({ opacity: 0.85, radius: 16, borderWidth: 1.5, borderIntensity: 0.25 }),
   animation: Object.freeze({ duration: 180, easing: 'easeOut' as const }),

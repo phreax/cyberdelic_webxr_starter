@@ -10,7 +10,15 @@ import { defineConfig } from 'vite';
 
 export default defineConfig({
   plugins: [iwsdkDev()],
-  server: { host: '0.0.0.0', port: 8081, open: false },
+  server: {
+    host: '0.0.0.0',
+    port: 8081,
+    open: false,
+    // OSC: the page connects to wss://<dev-host>/osc; forwarded to apps/osc-bridge (ws://localhost:8080).
+    proxy: {
+      '/osc': { target: 'ws://localhost:8080', ws: true, rewrite: (path) => path.replace(/^\/osc/, '') },
+    },
+  },
   build: {
     outDir: 'dist',
     sourcemap: process.env.NODE_ENV !== 'production',

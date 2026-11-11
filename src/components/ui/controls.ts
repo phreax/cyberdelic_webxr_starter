@@ -96,10 +96,11 @@ const createInteractive = (element: UIElement, options: BindOptions, onState?: (
 export const bindButton = (
   source: ElementSource,
   id: string,
-  options: BindOptions & { onClick: () => void },
-): Control => {
+  options: BindOptions & { onClick: () => void; selected?: boolean },
+): Control & { setSelected(selected: boolean): void } => {
   const element = requireElement(source, id);
   const interactive = createInteractive(element, options);
+  if (options.selected) interactive.set({ selected: true });
   const off = listen(element, 'click', () => {
     if (interactive.state.disabled) return;
     options.onFeedback?.('press');
@@ -111,6 +112,29 @@ export const bindButton = (
       interactive.dispose();
     },
     setDisabled: (disabled) => interactive.set({ disabled }),
+    setSelected: (selected) => interactive.set({ selected }),
+  };
+};
+
+export type StatusLevel = 'idle' | 'ok' | 'warn' | 'error';
+
+/** StatusIndicator: a dot + text pair. Returns a setter. */
+export const bindStatus = (
+  source: ElementSource,
+  ids: { dot: string; text: string },
+  theme: Theme = cyberdelicTheme,
+): ((level: StatusLevel, text?: string) => void) => {
+  const dot = requireElement(source, ids.dot);
+  const text = requireElement(source, ids.text);
+  const colors: Record<StatusLevel, string> = {
+    idle: theme.colors.muted,
+    ok: theme.colors.primary,
+    warn: theme.colors.secondary,
+    error: theme.colors.danger,
+  };
+  return (level, message) => {
+    dot.setProperties({ backgroundColor: colors[level] });
+    if (message !== undefined) text.setProperties({ text: message });
   };
 };
 

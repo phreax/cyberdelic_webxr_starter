@@ -15,13 +15,15 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
-    "check": "npm run typecheck && npm test"
+    "check": "npm run typecheck && npm test",
+    "osc-bridge": "npm start -w @cyberdelic/osc-bridge"
   },
   "dependencies": {
     "@iwsdk/core": "1.1.0-rc.2",
     "@pmndrs/uikit": "^1.0.74",
     "@pmndrs/uikit-horizon": "^1.0.74",
     "@pmndrs/uikit-lucide": "^1.0.74",
+    "osc-js": "^2.4.1",
     "three": "npm:super-three@0.185.0"
   },
   "devDependencies": {

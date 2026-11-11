@@ -17,9 +17,9 @@ describe('public/scenes/main.iwsdk.scene.json', () => {
   test('placeholder nodes', () => {
     assert({
       given: 'the authored main scene',
-      should: 'place the orb and the control panel the experience looks up',
-      actual: scene.nodes.map((node) => node.id).filter((id) => id === 'cyber-orb' || id === 'control-panel'),
-      expected: ['cyber-orb', 'control-panel'],
+      should: 'place the sculpture and the control panel the experience looks up',
+      actual: scene.nodes.map((node) => node.id).filter((id) => id === 'reactive-sculpture' || id === 'control-panel'),
+      expected: ['reactive-sculpture', 'control-panel'],
     });
   });
 });

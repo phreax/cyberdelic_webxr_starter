@@ -1,9 +1,3 @@
-<!--
-  Cyberdelic control panel. 1px = 1 mm at the authored node scale of 0.1.
-  Plain divs keep the Cyberdelic tokens in every color scheme; the runtime
-  re-applies theme tokens (src/themes/cyberdelic.ts) and control states.
-  Element ids are the contract used by src/examples/placeholder/*.ts.
--->
 <style>
   .panel {
     flex-direction: column;
@@ -153,66 +147,268 @@
     font-size: 18px;
     font-weight: 700;
   }
+  .grid {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .preset {
+    width: 179px;
+    flex-direction: column;
+    gap: 4px;
+    padding-top: 14px;
+    padding-bottom: 14px;
+    padding-left: 16px;
+    padding-right: 16px;
+    border-radius: 14px;
+    border-width: 2px;
+    border-color: #00d9c7;
+  }
+  .preset-name {
+    color: #f1f7f5;
+    font-size: 19px;
+    font-weight: 700;
+  }
+  .meter-row {
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+  }
+  .meter-label {
+    width: 56px;
+    color: #9baeab;
+    font-size: 15px;
+  }
+  .meter {
+    flex-grow: 1;
+    height: 12px;
+    border-radius: 6px;
+    background-color: #071514;
+  }
+  .meter-fill {
+    height: 100%;
+    width: 0%;
+    border-radius: 6px;
+    background-color: #00d9c7;
+  }
+  .spectrum {
+    flex-direction: row;
+    align-items: flex-end;
+    gap: 4px;
+    height: 60px;
+    padding-top: 6px;
+    padding-bottom: 6px;
+    padding-left: 8px;
+    padding-right: 8px;
+    border-radius: 10px;
+    background-color: #071514;
+  }
+  .spectrum-bar {
+    flex-grow: 1;
+    height: 2px;
+    border-radius: 2px;
+    background-color: #ff9500;
+  }
+  .status {
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+  }
+  .status-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 6px;
+    background-color: #9baeab;
+  }
+  .small-button {
+    flex-grow: 1;
+    justify-content: center;
+    text-align: center;
+    padding-top: 12px;
+    padding-bottom: 12px;
+    border-radius: 12px;
+    border-width: 2px;
+    border-color: #00d9c7;
+    color: #f1f7f5;
+    font-size: 16px;
+    font-weight: 700;
+  }
 </style>
+
+<!--
+  Reactive Sculpture panel. 1px = 1 mm at the authored node scale of 0.1.
+  Element ids are the contract used by src/examples/reactive-sculpture/*.ts.
+  Plain divs keep the Cyberdelic tokens; the runtime re-applies theme tokens and control states.
+-->
 <div id="panel" class="panel">
   <div class="row">
     <div class="column">
       <span class="eyebrow">CYBERDELIC XR</span>
-      <span class="title">Orb Controls</span>
-      <span id="status" class="muted">Desktop preview</span>
+      <span class="title">Reactive Sculpture</span>
+      <div class="status">
+        <div id="mode-dot" class="status-dot"></div>
+        <span id="status" class="muted">Desktop preview</span>
+      </div>
     </div>
     <div id="btn-hide" class="icon-button">Hide</div>
   </div>
 
   <div class="tabs">
-    <div id="tab-visual" class="tab">Visual</div>
+    <div id="tab-shape" class="tab">Shape</div>
+    <div id="tab-audio" class="tab">Audio</div>
+    <div id="tab-presets" class="tab">Presets</div>
     <div id="tab-session" class="tab">Session</div>
   </div>
 
-  <div id="page-visual" class="page">
-    <div class="column">
-      <div class="row">
-        <span class="label">Speed</span>
-        <span id="speed-value" class="value">1.00</span>
-      </div>
-      <div id="speed" class="track">
-        <div id="speed-fill" class="fill"></div>
-      </div>
-    </div>
-
-    <div class="column">
-      <div class="row">
-        <span class="label">Displace</span>
-        <span id="displace-value" class="value">0.06</span>
-      </div>
-      <div id="displace" class="track">
-        <div id="displace-fill" class="fill"></div>
-      </div>
-    </div>
-
-    <div class="row">
-      <div class="row">
-        <div id="hue" class="knob">
-          <div id="hue-indicator" class="knob-indicator">
-            <div class="knob-dot"></div>
-          </div>
+  <div id="page-shape" class="page">
+      <div class="column">
+        <div class="row">
+          <span class="label">Growth</span>
+          <span id="growth-value" class="value">0.45</span>
         </div>
-        <div class="column">
-          <span class="label">Hue</span>
-          <span id="hue-value" class="value">0.00</span>
+        <div id="growth" class="track">
+          <div id="growth-fill" class="fill"></div>
         </div>
       </div>
       <div class="column">
-        <span class="label">Pulse</span>
-        <div id="pulse" class="toggle">
-          <div id="pulse-thumb" class="toggle-thumb"></div>
+        <div class="row">
+          <span class="label">Complexity</span>
+          <span id="complexity-value" class="value">1.60</span>
+        </div>
+        <div id="complexity" class="track">
+          <div id="complexity-fill" class="fill"></div>
         </div>
       </div>
-    </div>
-
+      <div class="column">
+        <div class="row">
+          <span class="label">Flow</span>
+          <span id="flow-value" class="value">0.40</span>
+        </div>
+        <div id="flow" class="track">
+          <div id="flow-fill" class="fill"></div>
+        </div>
+      </div>
+      <div class="column">
+        <div class="row">
+          <span class="label">Glow</span>
+          <span id="glow-value" class="value">0.35</span>
+        </div>
+        <div id="glow" class="track">
+          <div id="glow-fill" class="fill"></div>
+        </div>
+      </div>
     <div class="row">
-      <div id="btn-reset" class="button">Reset</div>
+        <div class="row">
+          <div id="twist" class="knob">
+            <div id="twist-indicator" class="knob-indicator">
+              <div class="knob-dot"></div>
+            </div>
+          </div>
+          <div class="column">
+            <span class="label">Twist</span>
+            <span id="twist-value" class="value">0.00</span>
+          </div>
+        </div>
+        <div class="row">
+          <div id="hue" class="knob">
+            <div id="hue-indicator" class="knob-indicator">
+              <div class="knob-dot"></div>
+            </div>
+          </div>
+          <div class="column">
+            <span class="label">Hue</span>
+            <span id="hue-value" class="value">0.00</span>
+          </div>
+        </div>
     </div>
+    <div class="row">
+      <span class="label">Auto spin</span>
+      <div id="spin" class="toggle">
+        <div id="spin-thumb" class="toggle-thumb"></div>
+      </div>
+      <div id="btn-reset" class="small-button">Reset</div>
+    </div>
+  </div>
+
+  <div id="page-audio" class="page">
+    <div class="status">
+      <div id="audio-dot" class="status-dot"></div>
+      <span id="audio-status" class="muted">No audio input</span>
+    </div>
+    <div class="row">
+      <div id="btn-mic" class="small-button">Mic</div>
+      <div id="btn-capture" class="small-button">Capture</div>
+      <div id="btn-demo" class="small-button">Demo</div>
+    </div>
+    <div class="row">
+      <div id="btn-file" class="small-button">File</div>
+      <div id="btn-stop" class="small-button">Stop</div>
+    </div>
+      <div class="meter-row">
+        <span class="meter-label">Vol</span>
+        <div class="meter"><div id="meter-volume" class="meter-fill"></div></div>
+      </div>
+      <div class="meter-row">
+        <span class="meter-label">Bass</span>
+        <div class="meter"><div id="meter-bass" class="meter-fill"></div></div>
+      </div>
+      <div class="meter-row">
+        <span class="meter-label">Mid</span>
+        <div class="meter"><div id="meter-mid" class="meter-fill"></div></div>
+      </div>
+      <div class="meter-row">
+        <span class="meter-label">High</span>
+        <div class="meter"><div id="meter-high" class="meter-fill"></div></div>
+      </div>
+    <div class="spectrum">
+        <div id="spec-0" class="spectrum-bar"></div>
+        <div id="spec-1" class="spectrum-bar"></div>
+        <div id="spec-2" class="spectrum-bar"></div>
+        <div id="spec-3" class="spectrum-bar"></div>
+        <div id="spec-4" class="spectrum-bar"></div>
+        <div id="spec-5" class="spectrum-bar"></div>
+        <div id="spec-6" class="spectrum-bar"></div>
+        <div id="spec-7" class="spectrum-bar"></div>
+        <div id="spec-8" class="spectrum-bar"></div>
+        <div id="spec-9" class="spectrum-bar"></div>
+        <div id="spec-10" class="spectrum-bar"></div>
+        <div id="spec-11" class="spectrum-bar"></div>
+        <div id="spec-12" class="spectrum-bar"></div>
+        <div id="spec-13" class="spectrum-bar"></div>
+        <div id="spec-14" class="spectrum-bar"></div>
+        <div id="spec-15" class="spectrum-bar"></div>
+    </div>
+      <div class="column">
+        <div class="row">
+          <span class="label">Reactivity</span>
+          <span id="reactivity-value" class="value">0.60</span>
+        </div>
+        <div id="reactivity" class="track">
+          <div id="reactivity-fill" class="fill"></div>
+        </div>
+      </div>
+  </div>
+
+  <div id="page-presets" class="page">
+    <div class="grid">
+        <div id="preset-coral" class="preset">
+          <span class="preset-name">Coral</span>
+          <span class="muted">Grown, warm teal</span>
+        </div>
+        <div id="preset-nebula" class="preset">
+          <span class="preset-name">Nebula</span>
+          <span class="muted">Soft, drifting</span>
+        </div>
+        <div id="preset-ember" class="preset">
+          <span class="preset-name">Ember</span>
+          <span class="muted">Busy, hot</span>
+        </div>
+        <div id="preset-void" class="preset">
+          <span class="preset-name">Void</span>
+          <span class="muted">Sharp, quiet</span>
+        </div>
+    </div>
+    <span class="muted">Presets ease in; tweak anything afterwards in Shape.</span>
   </div>
 
   <div id="page-session" class="page">
@@ -228,6 +424,10 @@
       <div id="haptics" class="toggle">
         <div id="haptics-thumb" class="toggle-thumb"></div>
       </div>
+    </div>
+    <div class="status">
+      <div id="fps-dot" class="status-dot"></div>
+      <span id="fps" class="muted">-- fps</span>
     </div>
     <span id="xr-info" class="muted">Checking XR support...</span>
     <span class="muted">Menu: drag the bar below to move. Show or hide with M, the left Menu button, or the wrist button.</span>
