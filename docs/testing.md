@@ -45,4 +45,6 @@ performance HUD or OVR Metrics Tool while the orb animates.
 - [ ] Emulated VR: dark background; controller ray hovers/presses controls; orb grab + two-hand scale.
 - [ ] Emulated MR: passthrough (transparent background), same interactions.
 - [ ] Quest: hand pinch operates the panel; haptics on click, slider release, grab and release.
+- [ ] Menu: drag the bar under the panel to move it; panel keeps facing you.
+- [ ] Menu: Hide button, M (desktop), left controller Menu button and wrist button (hands) hide/show it; it reappears in front of you in XR.
 - [ ] Quest 3S: stable 72 FPS.

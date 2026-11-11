@@ -1,5 +1,6 @@
 import { Mesh, ShaderMaterial, VisibilityState, type UIKitMLAsset } from '@iwsdk/core';
 import { createGrabHapticsSystem, makeManipulable } from '../../components/interaction/manipulable.js';
+import { createPanelMenu, type PanelMenu } from '../../components/ui/panel-menu.js';
 import { bindButton, bindKnob, bindSlider, bindTabs, bindToggle, requireElement, type Feedback } from '../../components/ui/controls.js';
 import type { ExperienceContext } from '../../core/xr/experience.js';
 import { panelStyle } from '../../themes/cyberdelic.js';
@@ -18,6 +19,7 @@ const DEFAULTS = { speed: 1, displace: 0.06, hue: 0, pulse: false } as const;
 export const createPlaceholderExperience = (): Experience<ExperienceContext> => {
   let uniforms: OrbUniforms | undefined;
   let speed: number = DEFAULTS.speed;
+  let menu: PanelMenu | undefined;
 
   return {
     init(ctx) {
@@ -48,6 +50,10 @@ export const createPlaceholderExperience = (): Experience<ExperienceContext> => 
         else if (kind === 'change') haptics.playActive('select');
       };
       const common = { theme, onFeedback: feedback };
+
+      // Menu: grab bar to move, hide with the Hide button / left Menu button / wrist button / M.
+      menu = track(createPanelMenu(ctx, { nodeId: NODE_IDS.panel, distance: 0.6, drop: 0.2 }));
+      track(bindButton(panel, 'btn-hide', { ...common, onClick: () => menu?.hide() }));
 
       const speedSlider = track(
         bindSlider(panel, 'speed', { ...common, min: 0, max: 3, step: 0.05, value: DEFAULTS.speed, onChange: (v) => (speed = v) }),
@@ -130,11 +136,13 @@ export const createPlaceholderExperience = (): Experience<ExperienceContext> => 
     },
 
     update(dt) {
+      menu?.update();
       if (uniforms) uniforms.uTime.value += dt * speed;
     },
 
     dispose() {
       uniforms = undefined;
+      menu = undefined;
     },
   };
 };

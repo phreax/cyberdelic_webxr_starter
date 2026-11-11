@@ -127,6 +127,19 @@
     border-radius: 13px;
     background-color: #9baeab;
   }
+  .icon-button {
+    align-self: flex-start;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 16px;
+    padding-right: 16px;
+    border-radius: 12px;
+    border-width: 2px;
+    border-color: #00d9c7;
+    color: #9baeab;
+    font-size: 15px;
+    font-weight: 700;
+  }
   .button {
     flex-grow: 1;
     justify-content: center;
@@ -142,10 +155,13 @@
   }
 </style>
 <div id="panel" class="panel">
-  <div class="column">
-    <span class="eyebrow">CYBERDELIC XR</span>
-    <span class="title">Orb Controls</span>
-    <span id="status" class="muted">Desktop preview</span>
+  <div class="row">
+    <div class="column">
+      <span class="eyebrow">CYBERDELIC XR</span>
+      <span class="title">Orb Controls</span>
+      <span id="status" class="muted">Desktop preview</span>
+    </div>
+    <div id="btn-hide" class="icon-button">Hide</div>
   </div>
 
   <div class="tabs">
@@ -214,5 +230,6 @@
       </div>
     </div>
     <span id="xr-info" class="muted">Checking XR support...</span>
+    <span class="muted">Menu: drag the bar below to move. Show or hide with M, the left Menu button, or the wrist button.</span>
   </div>
 </div>
