@@ -1,5 +1,6 @@
 import { Vector3 } from '@iwsdk/core';
 import { controlStyle, cyberdelicTheme, type ControlState, type Theme } from '../../themes/cyberdelic.js';
+import { createPressTracker } from './press.js';
 import {
   knobAngleDeg,
   knobValueFromDrag,
@@ -61,10 +62,23 @@ const capture = (event: PointerLike) => {
   if (event.pointerId != null) target?.setPointerCapture?.(event.pointerId);
 };
 
-/** Hover/press/selected/disabled styling shared by every control. */
-const createInteractive = (element: UIElement, options: BindOptions, onState?: (state: ControlState) => void) => {
+const DEBUG_UI = typeof location !== 'undefined' && new URLSearchParams(location.search).get('debug') === 'ui';
+const debug = (label: string, type: string, event?: PointerLike) => {
+  if (DEBUG_UI) console.debug(`[ui] ${label} ${type}`, event?.pointerId ?? '', Math.round(performance.now()));
+};
+
+/**
+ * Hover/press/selected/disabled styling shared by every control, plus activation.
+ *
+ * Activation is our own pointerdown → pointerup pairing on the element instead of the
+ * pointer-events `click`, which is dropped when a press lasts longer than 300 ms — common for
+ * XR trigger presses and hand pinches, and the cause of "buttons don't react on first click".
+ */
+const createInteractive = (element: UIElement, options: BindOptions, onState?: (state: ControlState) => void, label = '') => {
   const theme = options.theme ?? cyberdelicTheme;
   const state: ControlState = { hovered: false, pressed: false, selected: false, disabled: options.disabled ?? false };
+  const activators: Array<() => void> = [];
+  const press = createPressTracker();
   const render = () => {
     element.setProperties({ ...controlStyle(theme, state), cursor: state.disabled ? 'default' : 'pointer' });
     onState?.(state);
@@ -74,21 +88,39 @@ const createInteractive = (element: UIElement, options: BindOptions, onState?: (
     render();
   };
   const offs = [
-    listen(element, 'pointerenter', () => {
+    listen(element, 'pointerenter', (event) => {
+      debug(label, 'enter', event);
       if (state.disabled) return;
       set({ hovered: true });
       options.onFeedback?.('hover');
     }),
-    listen(element, 'pointerleave', () => set({ hovered: false, pressed: false })),
-    listen(element, 'pointerdown', () => {
-      if (!state.disabled) set({ pressed: true });
+    listen(element, 'pointerleave', (event) => {
+      debug(label, 'leave', event);
+      press.cancel();
+      set({ hovered: false, pressed: false });
     }),
-    listen(element, 'pointerup', () => set({ pressed: false })),
+    listen(element, 'pointerdown', (event) => {
+      debug(label, 'down', event);
+      if (state.disabled) return;
+      press.down(event.pointerId ?? -1, performance.now());
+      set({ pressed: true });
+    }),
+    listen(element, 'pointerup', (event) => {
+      const activated = press.up(event.pointerId ?? -1, performance.now()) && !state.disabled;
+      set({ pressed: false });
+      debug(label, activated ? 'up → activate' : 'up', event);
+      if (activated) {
+        event.stopPropagation?.();
+        activators.forEach((fn) => fn());
+      }
+    }),
   ];
   render();
   return {
     state,
     set,
+    /** Called once per completed press (mouse click, trigger press, pinch). */
+    onActivate: (fn: () => void) => void activators.push(fn),
     dispose: () => offs.forEach((off) => off()),
   };
 };
@@ -99,18 +131,14 @@ export const bindButton = (
   options: BindOptions & { onClick: () => void; selected?: boolean },
 ): Control & { setSelected(selected: boolean): void } => {
   const element = requireElement(source, id);
-  const interactive = createInteractive(element, options);
+  const interactive = createInteractive(element, options, undefined, id);
   if (options.selected) interactive.set({ selected: true });
-  const off = listen(element, 'click', () => {
-    if (interactive.state.disabled) return;
+  interactive.onActivate(() => {
     options.onFeedback?.('press');
     options.onClick();
   });
   return {
-    dispose: () => {
-      off();
-      interactive.dispose();
-    },
+    dispose: () => interactive.dispose(),
     setDisabled: (disabled) => interactive.set({ disabled }),
     setSelected: (selected) => interactive.set({ selected }),
   };
@@ -148,14 +176,13 @@ export const bindToggle = (
   const thumb = optionalElement(source, `${id}-thumb`);
   const theme = options.theme ?? cyberdelicTheme;
   let value = options.value ?? false;
-  const interactive = createInteractive(element, options);
+  const interactive = createInteractive(element, options, undefined, id);
   const render = () => {
     interactive.set({ selected: value });
     element.setProperties({ justifyContent: value ? 'flex-end' : 'flex-start' });
     thumb?.setProperties({ backgroundColor: value ? theme.colors.primary : theme.colors.muted });
   };
-  const off = listen(element, 'click', () => {
-    if (interactive.state.disabled) return;
+  interactive.onActivate(() => {
     value = !value;
     render();
     options.onFeedback?.('change');
@@ -170,10 +197,7 @@ export const bindToggle = (
       value = next;
       render();
     },
-    dispose: () => {
-      off();
-      interactive.dispose();
-    },
+    dispose: () => interactive.dispose(),
     setDisabled: (disabled) => interactive.set({ disabled }),
   };
 };
@@ -317,14 +341,14 @@ export const bindTabs = (
   const pages = tabs.map(({ page }) => requireElement(source, page));
   const controls = tabs.map(({ tab }, index) => {
     const element = requireElement(source, tab);
-    const interactive = createInteractive(element, options);
-    const off = listen(element, 'click', () => {
-      if (interactive.state.disabled || index === selected) return;
+    const interactive = createInteractive(element, options, undefined, tab);
+    interactive.onActivate(() => {
+      if (index === selected) return;
       select(index);
       options.onFeedback?.('change');
       options.onChange?.(index);
     });
-    return { interactive, off };
+    return { interactive };
   });
   const select = (index: number) => {
     selected = Math.max(0, Math.min(tabs.length - 1, index));
@@ -337,11 +361,7 @@ export const bindTabs = (
       return selected;
     },
     setValue: select,
-    dispose: () =>
-      controls.forEach(({ interactive, off }) => {
-        off();
-        interactive.dispose();
-      }),
+    dispose: () => controls.forEach(({ interactive }) => interactive.dispose()),
     setDisabled: (disabled) => controls.forEach(({ interactive }) => interactive.set({ disabled })),
   };
 };
