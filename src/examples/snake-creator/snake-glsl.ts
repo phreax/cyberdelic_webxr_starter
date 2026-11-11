@@ -24,6 +24,8 @@ uniform float uSnakeProfile;
 uniform float uSnakeTwist;
 uniform float uSnakeTwistPhase;
 varying vec2 vSnakeBody;
+// Body direction at the vertex (diffraction grooves run along it).
+vec3 gSnakeForward;
 
 const int SNAKE_SAMPLES = ${CURVE_SAMPLES};
 
@@ -119,6 +121,7 @@ void snakeDeform(vec3 local, out vec3 snakePosition, out vec3 snakeNormal) {
   snakeFrame(b, center, forward, frameNormal, binormal);
   vec2 radius = max(vec2(0.0), snakeSection(b));
   snakePosition = center + radius.x * profile.x * frameNormal + radius.y * profile.y * binormal;
+  gSnakeForward = forward;
 
   vec3 sectionNormal = normalize(radius.y * profileNormal.x * frameNormal + radius.x * profileNormal.y * binormal + 1.0e-6 * frameNormal);
   float delta = 1.0 / 128.0;
@@ -136,7 +139,7 @@ void snakeDeform(vec3 local, out vec3 snakePosition, out vec3 snakeNormal) {
 
 export const SNAKE_FRAGMENT_COMMON = /* glsl */ `
 uniform int uSnakePattern;
-// 0 = cut out the gaps (see-through), 1 = fill them with the gradient at an offset.
+// 0 = transparent (gaps cut out), 1 = gaps filled with the gradient at an offset × brightness (0 = black).
 uniform int uSnakeBackgroundMode;
 uniform float uSnakeBackgroundOffset;
 uniform float uSnakeBackgroundBrightness;
@@ -219,7 +222,8 @@ vec2 snakeHilbert(vec2 cell) {
   bool roundCorner = uSnakeHilbertRound == 1 && index > 0
     && index < SNAKE_HILBERT_SIZE * SNAKE_HILBERT_SIZE - 1 && dot(previous, next) == 0.0;
   float trim = roundCorner ? 0.25 : 0.0;
-  float edge = max(1.0e-5, fwidth(grid.x) + fwidth(grid.y));
+  // Derivatives of the continuous cell coordinate: fract() jumps at tile seams would smear lines there.
+  float edge = max(1.0e-5, (fwidth(cell.x) + fwidth(cell.y)) * float(SNAKE_HILBERT_SIZE));
   vec2 nearest = vec2(1.0e5, float(index));
   if (index > 0) {
     vec2 hit = snakeSegment(local, centre + 0.5 * previous, centre + trim * previous);
@@ -274,3 +278,33 @@ export const patternCells = (pattern: SnakePattern, scale: number, radius: numbe
   const repeats = Math.max(1, Math.round(BASE_REPEATS[pattern] / Math.max(0.1, scale)));
   return { repeats, cellLength: (2 * Math.PI * radius) / repeats };
 };
+
+/** Zucconi spectral palette + physically based diffraction grating, from gold_fractal (phreax). */
+export const SNAKE_SPECTRAL_GLSL = /* glsl */ `
+vec3 snakeBump3y(vec3 x, vec3 yoffset) {
+  vec3 y = 1.0 - x * x;
+  return clamp(y - yoffset, vec3(0.0), vec3(1.0));
+}
+vec3 snakeSpectral(float x) {
+  x = fract(x);
+  const vec3 c1 = vec3(3.54585104, 2.93225262, 2.41593945);
+  const vec3 x1 = vec3(0.69549072, 0.49228336, 0.27699880);
+  const vec3 y1 = vec3(0.02312639, 0.15225084, 0.52607955);
+  const vec3 c2 = vec3(3.90307140, 3.21182957, 3.96587128);
+  const vec3 x2 = vec3(0.11748627, 0.86755042, 0.66077860);
+  const vec3 y2 = vec3(0.84897130, 0.88445281, 0.73949448);
+  return snakeBump3y(c1 * (x - x1), y1) + snakeBump3y(c2 * (x - x2), y2);
+}
+vec3 snakeWaveSpectrum(float w) {
+  if (w > 700.0 || w < 400.0) return vec3(0.0);
+  return pow(snakeSpectral((w - 400.0) / 300.0), vec3(2.2));
+}
+// rd: view ray, td: groove direction (along the body), l: light direction, d: groove spacing (nm).
+vec3 snakeDiffraction(vec3 rd, vec3 td, vec3 l, float d) {
+  float u = abs(dot(l, td) - dot(rd, td));
+  if (u == 0.0) return vec3(0.0);
+  vec3 col = vec3(0.0);
+  for (float order = 1.0; order < 4.0; order += 1.0) col += snakeWaveSpectrum(u * d / order);
+  return clamp(col, vec3(0.0), vec3(1.0));
+}
+`;

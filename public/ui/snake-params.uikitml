@@ -418,10 +418,12 @@
       <div id="pattern-hilbert" class="small-button">Hilbert</div>
     </div>
     <div class="row">
+      <div id="palette-ethereal-garden" class="small-button">Ethereal Garden</div>
       <div id="palette-cyberdelic" class="small-button">Cyberdelic</div>
+    </div>
+    <div class="row">
       <div id="palette-ocean" class="small-button">Ocean</div>
-      <div id="palette-ember" class="small-button">Ember</div>
-      <div id="palette-aurora" class="small-button">Aurora</div>
+      <div id="palette-amber" class="small-button">Amber</div>
     </div>
     <div class="column">
       <div class="row">
@@ -451,15 +453,15 @@
       </div>
     </div>
     <div class="row">
-      <span class="label">Background</span>
-      <div id="background" class="toggle">
-        <div id="background-thumb" class="toggle-thumb"></div>
+      <span class="label">Transparent gaps</span>
+      <div id="transparent" class="toggle">
+        <div id="transparent-thumb" class="toggle-thumb"></div>
       </div>
     </div>
     <div id="bg-settings" class="column">
     <div class="column">
       <div class="row">
-        <span class="label">Hue offset</span>
+        <span class="label">Background hue offset</span>
         <span id="backgroundOffset-value" class="value">0.50</span>
       </div>
       <div id="backgroundOffset" class="track">
@@ -468,8 +470,8 @@
     </div>
     <div class="column">
       <div class="row">
-        <span class="label">Brightness</span>
-        <span id="backgroundBrightness-value" class="value">0.35</span>
+        <span class="label">Background brightness</span>
+        <span id="backgroundBrightness-value" class="value">0.00</span>
       </div>
       <div id="backgroundBrightness" class="track">
         <div id="backgroundBrightness-fill" class="fill"></div>
@@ -482,7 +484,7 @@
     <div class="column">
       <div class="row">
         <span class="label">Iridescence</span>
-        <span id="iridescence-value" class="value">0.40</span>
+        <span id="iridescence-value" class="value">0.50</span>
       </div>
       <div id="iridescence" class="track">
         <div id="iridescence-fill" class="fill"></div>
@@ -490,17 +492,8 @@
     </div>
     <div class="column">
       <div class="row">
-        <span class="label">Gloss</span>
-        <span id="gloss-value" class="value">0.60</span>
-      </div>
-      <div id="gloss" class="track">
-        <div id="gloss-fill" class="fill"></div>
-      </div>
-    </div>
-    <div class="column">
-      <div class="row">
         <span class="label">Metallic</span>
-        <span id="metallic-value" class="value">0.10</span>
+        <span id="metallic-value" class="value">0.20</span>
       </div>
       <div id="metallic" class="track">
         <div id="metallic-fill" class="fill"></div>

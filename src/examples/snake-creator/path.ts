@@ -56,8 +56,37 @@ export const simplifyStroke = (points: readonly Point[], epsilon = 0.01): Point[
 };
 
 /**
- * Catmull-Rom handles a third of the way to the neighbours, so the curve passes through every
- * kept point. Closed paths wrap neighbours around; a duplicated end point is dropped.
+ * Smooth handles for an anchor between `previous` and `next`: the tangent follows the neighbours,
+ * and each handle is a third of its own segment's length. Uniform (Catmull-Rom 1/6) handles
+ * overshoot next to short segments, which shows as sharp kinks once the snake is rendered.
+ */
+const smoothHandles = (point: Point, previous: Point, next: Point): Anchor => {
+  const chord = sub(next, previous);
+  const chordLength = length(chord);
+  const dir = chordLength > 1e-9 ? scale(chord, 1 / chordLength) : { x: 0, y: 0, z: 0 };
+  return {
+    point: { ...point },
+    inHandle: sub(point, scale(dir, distance(point, previous) / 3)),
+    outHandle: add(point, scale(dir, distance(next, point) / 3)),
+  };
+};
+
+/** Light Laplacian smoothing of a hand-drawn stroke (end points stay fixed). */
+export const smoothStroke = (points: readonly Point[], iterations = 2): Point[] => {
+  let current = [...points];
+  for (let k = 0; k < iterations; k += 1) {
+    current = current.map((p, i) =>
+      i === 0 || i === current.length - 1
+        ? p
+        : scale(add(add(current[i - 1]!, scale(p, 2)), current[i + 1]!), 0.25),
+    );
+  }
+  return current;
+};
+
+/**
+ * Smooth path through every kept point. Closed paths wrap neighbours around; a duplicated end
+ * point is dropped.
  */
 export const fitPathFromStroke = (points: readonly Point[], { closed = false } = {}): Anchor[] => {
   let source = [...points];
@@ -70,8 +99,7 @@ export const fitPathFromStroke = (points: readonly Point[], { closed = false } =
   return kept.map((point, i) => {
     const previous = closed ? kept[(i - 1 + n) % n]! : (kept[i - 1] ?? point);
     const next = closed ? kept[(i + 1) % n]! : (kept[i + 1] ?? point);
-    const tangent = scale(sub(next, previous), 1 / 6);
-    return { point: { ...point }, inHandle: sub(point, tangent), outHandle: add(point, tangent) };
+    return smoothHandles(point, previous, next);
   });
 };
 
@@ -146,8 +174,7 @@ export const refitEndHandles = (path: readonly Anchor[], closed: boolean): Ancho
     const anchor = path[i]!;
     const previous = closed ? path[(i - 1 + n) % n]!.point : (path[i - 1]?.point ?? anchor.point);
     const next = closed ? path[(i + 1) % n]!.point : (path[i + 1]?.point ?? anchor.point);
-    const tangent = scale(sub(next, previous), 1 / 6);
-    return { point: { ...anchor.point }, inHandle: sub(anchor.point, tangent), outHandle: add(anchor.point, tangent) };
+    return smoothHandles(anchor.point, previous, next);
   };
   return path.map((anchor, i) => (i === 0 || i === n - 1 ? smooth(i) : anchor));
 };

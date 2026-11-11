@@ -6,8 +6,13 @@ const rgb = (hex: string) => {
   return [(value >> 16) & 255, (value >> 8) & 255, value & 255];
 };
 
+/**
+ * Cyclic bake: the last colour blends back into the first, so a gradient repeated along the body
+ * (Spread) has no seam where it wraps.
+ */
 export const buildGradientData = (stops: readonly string[], sharpness = 0): Uint8Array => {
-  const colors = (stops.length >= 2 ? stops : [stops[0] ?? '#ffffff', stops[0] ?? '#ffffff']).map(rgb);
+  const base = (stops.length >= 1 ? stops : ['#ffffff']).map(rgb);
+  const colors = [...base, base[0]!];
   const data = new Uint8Array(GRADIENT_SIZE * 4);
   const transition = 1 - Math.max(0, Math.min(1, sharpness));
   for (let i = 0; i < GRADIENT_SIZE; i += 1) {
@@ -21,10 +26,11 @@ export const buildGradientData = (stops: readonly string[], sharpness = 0): Uint
   return data;
 };
 
+/** Ethereal Garden + Cyberdelic from shader-lab (Karleido) config/palettes.json; Ocean + Amber. */
 export const SNAKE_PALETTES = {
-  Cyberdelic: ['#00D9C7', '#152322', '#FF9500'],
+  'Ethereal Garden': ['#2c1b69', '#6a00ff', '#a64aff', '#00e5ff', '#54ad25', '#d6e316'],
+  Cyberdelic: ['#2c1b69', '#6a00ff', '#a64aff', '#00e5ff'],
   Ocean: ['#03256C', '#2541B2', '#1768AC', '#06BEE1', '#FFFFFF'],
-  Ember: ['#2B0A3D', '#C81D25', '#FF9500', '#FFE066'],
-  Aurora: ['#0B132B', '#3DFFB0', '#A879FF', '#F1F7F5'],
+  Amber: ['#2B0A3D', '#C81D25', '#FF9500', '#FFE066'],
 } as const;
 export type SnakePaletteName = keyof typeof SNAKE_PALETTES;

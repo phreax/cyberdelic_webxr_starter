@@ -11,7 +11,7 @@ const literal = (panel: string) =>
   [...code.matchAll(new RegExp(`(?:requireElement|bindButton|bindSlider|bindToggle)\\(${panel}, ['\`]([^'\`$]+)['\`]`, 'g'))].map((m) => m[1]!);
 
 const PARAMS = ['thickness', 'length', 'headTaper', 'tailTaper', 'headShape', 'twist', 'spread', 'scale', 'width',
-  'backgroundOffset', 'backgroundBrightness', 'iridescence', 'gloss', 'metallic', 'roughness', 'speed'];
+  'backgroundOffset', 'backgroundBrightness', 'iridescence', 'metallic', 'roughness', 'speed'];
 
 describe('snake scene + windows contract', () => {
   test('scene schema', () => {
@@ -43,9 +43,9 @@ describe('snake scene + windows contract', () => {
       ...literal('paramsPanel'),
       ...['shape', 'pattern', 'material', 'motion'].flatMap((n) => [`tab-${n}`, `page-${n}`]),
       ...PARAMS.flatMap((id) => [id, `${id}-fill`, `${id}-value`]),
-      ...['background', 'reverse'].flatMap((id) => [id, `${id}-thumb`]),
+      ...['transparent', 'reverse'].flatMap((id) => [id, `${id}-thumb`]),
       'profile-round', 'profile-square', 'pattern-solid', 'pattern-rings', 'pattern-hilbert',
-      'palette-cyberdelic', 'palette-ocean', 'palette-ember', 'palette-aurora', 'bg-settings',
+      'palette-ethereal-garden', 'palette-cyberdelic', 'palette-ocean', 'palette-amber', 'bg-settings',
     ];
     assert({ given: 'the settings window ids the experience uses', should: 'all exist', actual: needed.filter((id) => !panel.has(id)), expected: [] });
   });
@@ -54,8 +54,8 @@ describe('snake scene + windows contract', () => {
     const panel = ids('snake-params');
     assert({
       given: 'the simplified settings window',
-      should: 'no longer offer hex profile, Hilbert animation or colour pickers',
-      actual: ['profile-hex', 'hilbertAnimate', 'fg-preview', 'bg-swatch-0'].filter((id) => panel.has(id)),
+      should: 'no longer offer hex profile, Hilbert animation, colour pickers or gloss',
+      actual: ['profile-hex', 'hilbertAnimate', 'fg-preview', 'bg-swatch-0', 'gloss'].filter((id) => panel.has(id)),
       expected: [],
     });
   });

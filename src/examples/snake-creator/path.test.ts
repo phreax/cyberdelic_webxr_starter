@@ -90,3 +90,34 @@ describe('refitEndHandles()', () => {
     });
   });
 });
+
+import { smoothStroke } from './path.js';
+import { sampleCurve, CURVE_SAMPLES } from './curve.js';
+
+describe('smoother curves', () => {
+  test('uneven spacing does not overshoot', () => {
+    // A long segment next to a very short one used to make the handles overshoot (kinks).
+    const points = [{ x: 0, y: 0, z: 0 }, { x: 1, y: 0, z: 0 }, { x: 1.02, y: 0.02, z: 0 }, { x: 1.04, y: 1, z: 0 }];
+    const curve = sampleCurve(fitPathFromStroke(points), false)!;
+    let maxX = -Infinity;
+    for (let i = 0; i < CURVE_SAMPLES; i += 1) maxX = Math.max(maxX, curve.data[i * 4]!);
+    assert({
+      given: 'anchors with very uneven spacing',
+      should: 'stay close to the points instead of looping past them',
+      actual: maxX < 1.045, // points reach x = 1.04
+      expected: true,
+    });
+  });
+
+  test('stroke smoothing', () => {
+    const zigzag = Array.from({ length: 40 }, (_, i) => ({ x: i * 0.01, y: i % 2 ? 0.004 : -0.004, z: 0 }));
+    const smoothed = smoothStroke(zigzag, 2);
+    const jitter = (ps: { y: number }[]) => Math.max(...ps.slice(2, -2).map((p) => Math.abs(p.y)));
+    assert({
+      given: 'a jittery hand-drawn stroke',
+      should: 'reduce the jitter but keep both end points',
+      actual: [jitter(smoothed) < jitter(zigzag) * 0.6, smoothed[0], smoothed[smoothed.length - 1]],
+      expected: [true, zigzag[0], zigzag[zigzag.length - 1]],
+    });
+  });
+});

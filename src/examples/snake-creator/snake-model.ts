@@ -38,7 +38,7 @@ export const addSnake = (
     path: init.path ?? [],
     closed: init.closed ?? false,
     look: { ...DEFAULT_LOOK, ...init.look },
-    palette: init.palette ?? 'Cyberdelic',
+    palette: init.palette ?? 'Ethereal Garden',
   };
   return { ...state, snakes: [...state.snakes, snake], selectedId: snake.id, nextNumber: number + 1 };
 };

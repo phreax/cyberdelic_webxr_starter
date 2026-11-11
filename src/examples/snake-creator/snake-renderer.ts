@@ -6,16 +6,17 @@ import {
   FloatType,
   LinearFilter,
   Mesh,
-  MeshPhysicalMaterial,
+  ShaderMaterial,
+  Color,
+  Vector3,
   NearestFilter,
   RGBAFormat,
   SRGBColorSpace,
-  type WebGLProgramParametersWithUniforms,
 } from '@iwsdk/core';
 import { CURVE_ROWS, CURVE_SAMPLES, type Curve } from './curve.js';
 import type { Crawl } from './crawl.js';
 import { buildGradientData, GRADIENT_SIZE } from './gradient.js';
-import { PATTERN_INDEX, patternCells, SNAKE_FRAGMENT_COMMON, SNAKE_VERTEX_COMMON, type SnakePattern } from './snake-glsl.js';
+import { PATTERN_INDEX, patternCells, SNAKE_FRAGMENT_COMMON, SNAKE_SPECTRAL_GLSL, SNAKE_VERTEX_COMMON } from './snake-glsl.js';
 import { effectiveTwist, gradientRepeats, type SnakeLook } from './snake-look.js';
 
 export type { SnakeLook } from './snake-look.js';
@@ -47,16 +48,8 @@ export const createSnakeGeometry = (along = ALONG, around = AROUND): BufferGeome
   }
   const geometry = new BufferGeometry();
   geometry.setAttribute('position', new BufferAttribute(positions, 3));
-  // Placeholder normals: without a normal attribute three.js forces FLAT_SHADED and ignores the
-  // smooth normals computed in snakeDeform(). The shader overwrites them.
-  geometry.setAttribute('normal', new BufferAttribute(new Float32Array(rows * columns * 3), 3));
   geometry.setIndex(indices);
   return geometry;
-};
-
-const injectAfter = (source: string, include: string, code: string) => {
-  if (!source.includes(include)) throw new Error(`Snake shader patch: ${include} not found`);
-  return source.replace(include, `${include}\n${code}`);
 };
 
 export const createSnakeRenderer = () => {
@@ -93,33 +86,89 @@ export const createSnakeRenderer = () => {
     uSnakeGradient: { value: gradientTexture },
     uSnakeGradientRepeats: { value: 1 },
     uSnakeHilbertRound: { value: 1 },
+    // Lighting (world space). Key and fill colours follow gold_fractal's warm / cyan pair.
+    uKeyDirection: { value: new Vector3(-0.4, 0.8, 0.45).normalize() },
+    uKeyColor: { value: new Color(0.953, 0.922, 0.824) },
+    uFillDirection: { value: new Vector3(0.7, 0.25, -0.3).normalize() },
+    uFillColor: { value: new Color(0.757, 0.941, 0.941).multiplyScalar(0.55) },
+    uSkyColor: { value: new Color(0.1, 0.16, 0.17) },
+    uGroundColor: { value: new Color(0.03, 0.025, 0.05) },
+    uRoughness: { value: 0.35 },
+    uMetallic: { value: 0.2 },
+    uIridescence: { value: 0.5 },
+    uGratingSpacing: { value: 1650 },
   };
 
-  const material = new MeshPhysicalMaterial({
-    color: 0xffffff,
-    roughness: 0.35,
-    metalness: 0.1,
-    iridescence: 0.4,
-    iridescenceIOR: 1.6,
-    iridescenceThicknessRange: [180, 620],
-    clearcoat: 0.6,
-    clearcoatRoughness: 0.08,
-    // Cut-out patterns show the inside of the tube.
-    side: DoubleSide,
+  /**
+   * Custom lighting instead of a PBR material: diffuse + Blinn specular (roughness / metallic have a
+   * clear effect), a diffraction-grating term (Iridescence) and no environment / fresnel sheen, so
+   * grazing angles don't turn frosted.
+   */
+  const material = new ShaderMaterial({
+    name: 'cyberdelic-snake',
+    uniforms,
+    side: DoubleSide, // transparent patterns show the inside of the tube
+    vertexShader: /* glsl */ `
+      ${SNAKE_VERTEX_COMMON}
+      varying vec3 vWorldPosition;
+      varying vec3 vWorldNormal;
+      varying vec3 vWorldForward;
+      void main() {
+        vec3 p, n;
+        snakeDeform(position, p, n);
+        vec4 world = modelMatrix * vec4(p, 1.0);
+        vWorldPosition = world.xyz;
+        vWorldNormal = normalize(mat3(modelMatrix) * n);
+        vWorldForward = normalize(mat3(modelMatrix) * gSnakeForward);
+        gl_Position = projectionMatrix * viewMatrix * world;
+      }
+    `,
+    fragmentShader: /* glsl */ `
+      ${SNAKE_FRAGMENT_COMMON}
+      ${SNAKE_SPECTRAL_GLSL}
+      uniform vec3 uKeyDirection;
+      uniform vec3 uKeyColor;
+      uniform vec3 uFillDirection;
+      uniform vec3 uFillColor;
+      uniform vec3 uSkyColor;
+      uniform vec3 uGroundColor;
+      uniform float uRoughness;
+      uniform float uMetallic;
+      uniform float uIridescence;
+      uniform float uGratingSpacing;
+      varying vec3 vWorldPosition;
+      varying vec3 vWorldNormal;
+      varying vec3 vWorldForward;
+
+      vec3 snakeLight(vec3 albedo, vec3 n, vec3 v, vec3 t, vec3 l, vec3 lightColor, float shininess) {
+        float diffuse = max(dot(n, l), 0.0);
+        vec3 h = normalize(l + v);
+        // Normalised Blinn: rough = broad and dim, smooth = small and bright.
+        float specular = pow(max(dot(n, h), 0.0), shininess) * (shininess + 8.0) / 25.0 * step(0.0, dot(n, l));
+        vec3 specularColor = mix(vec3(0.04), albedo, uMetallic);
+        vec3 grating = snakeDiffraction(-v, t, l, uGratingSpacing) * sqrt(diffuse);
+        return lightColor * (albedo * (1.0 - uMetallic) * diffuse + specularColor * specular + grating * uIridescence * 1.5);
+      }
+
+      void main() {
+        vec4 body = snakeBodyColor(vSnakeBody);
+        if (body.a < 0.5) discard;
+        vec3 albedo = body.rgb;
+        vec3 n = normalize(vWorldNormal) * (gl_FrontFacing ? 1.0 : -1.0);
+        vec3 v = normalize(cameraPosition - vWorldPosition);
+        vec3 t = normalize(vWorldForward);
+        float shininess = exp2(mix(10.0, 1.5, uRoughness));
+        vec3 ambient = mix(uGroundColor, uSkyColor, n.y * 0.5 + 0.5) * albedo * (1.0 - 0.6 * uMetallic) * 2.0;
+        vec3 color = ambient
+          + snakeLight(albedo, n, v, t, uKeyDirection, uKeyColor, shininess)
+          + snakeLight(albedo, n, v, t, uFillDirection, uFillColor, shininess);
+        gl_FragColor = vec4(color, 1.0);
+        #include <tonemapping_fragment>
+        #include <colorspace_fragment>
+      }
+    `,
   });
-  material.onBeforeCompile = (shader: WebGLProgramParametersWithUniforms) => {
-    Object.assign(shader.uniforms, uniforms);
-    let vertex = injectAfter(shader.vertexShader, '#include <common>', SNAKE_VERTEX_COMMON);
-    vertex = injectAfter(vertex, '#include <beginnormal_vertex>', 'vec3 snakeP, snakeN;\nsnakeDeform(position, snakeP, snakeN);\nobjectNormal = snakeN;');
-    shader.vertexShader = injectAfter(vertex, '#include <begin_vertex>', 'transformed = snakeP;');
-    const fragment = injectAfter(shader.fragmentShader, '#include <common>', SNAKE_FRAGMENT_COMMON);
-    shader.fragmentShader = injectAfter(
-      fragment,
-      '#include <color_fragment>',
-      'vec4 snakeColor = snakeBodyColor(vSnakeBody);\nif (snakeColor.a < 0.5) discard;\ndiffuseColor.rgb *= snakeColor.rgb;',
-    );
-  };
-  material.customProgramCacheKey = () => 'cyberdelic-snake-v2';
+  material.toneMapped = true;
 
   const mesh = new Mesh(createSnakeGeometry(), material);
   mesh.name = 'snake';
@@ -168,13 +217,12 @@ export const createSnakeRenderer = () => {
       uniforms.uSnakeWidth.value = look.width;
       uniforms.uSnakeBodyLength.value = Math.abs(crawl.head - crawl.tail) * curveLength;
       uniforms.uSnakeGradientRepeats.value = gradientRepeats(look.spread);
-      uniforms.uSnakeBackgroundMode.value = look.background ? 1 : 0;
+      uniforms.uSnakeBackgroundMode.value = look.transparent ? 0 : 1;
       uniforms.uSnakeBackgroundOffset.value = look.backgroundOffset;
       uniforms.uSnakeBackgroundBrightness.value = look.backgroundBrightness;
-      material.metalness = look.metallic;
-      material.roughness = look.roughness;
-      material.iridescence = look.iridescence;
-      material.clearcoat = look.gloss;
+      uniforms.uRoughness.value = look.roughness;
+      uniforms.uMetallic.value = look.metallic;
+      uniforms.uIridescence.value = look.iridescence;
     },
     dispose() {
       mesh.geometry.dispose();

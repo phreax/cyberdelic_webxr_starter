@@ -1,4 +1,4 @@
-import { BufferAttribute, BufferGeometry, Hovered, Line, LineBasicMaterial, Vector3, type UIKitMLAsset } from '@iwsdk/core';
+import { BufferAttribute, BufferGeometry, Hovered, InputComponent, Line, LineBasicMaterial, Vector3, type UIKitMLAsset } from '@iwsdk/core';
 import { bindButton, bindSlider, bindTabs, bindToggle, requireElement, type UIElement } from '../../components/ui/controls.js';
 import { createPanelMenu } from '../../components/ui/panel-menu.js';
 import { bindSessionSection, standardFeedback } from '../../components/ui/standard-sections.js';
@@ -9,6 +9,8 @@ import type { Experience } from '../../core/xr/lifecycle.js';
 import { panelStyle } from '../../themes/cyberdelic.js';
 import { sampleCurve } from './curve.js';
 import { SNAKE_PALETTES, type SnakePaletteName } from './gradient.js';
+
+const DEFAULT_PALETTE: SnakePaletteName = 'Ethereal Garden';
 import {
   deleteAnchors,
   distance,
@@ -18,6 +20,7 @@ import {
   moveAnchor,
   segmentCount,
   simplifyStroke,
+  smoothStroke,
   strokeLength,
   type Anchor,
   type Point,
@@ -51,22 +54,21 @@ export const SNAKE_PARAMS = {
   spread: { default: 0.05, min: 0, max: 1, label: 'Gradient spread' },
   scale: { default: 1, min: 0.2, max: 4, label: 'Pattern scale' },
   width: { default: 0.5, min: 0, max: 1, label: 'Pattern width' },
-  background: { default: 0, type: 'boolean', label: 'Background' },
+  transparent: { default: 0, type: 'boolean', label: 'Transparent' },
   backgroundOffset: { default: 0.5, min: 0, max: 1, label: 'Hue offset' },
-  backgroundBrightness: { default: 0.35, min: 0, max: 1.5, label: 'Brightness' },
-  iridescence: { default: 0.4, min: 0, max: 1, label: 'Iridescence' },
-  gloss: { default: 0.6, min: 0, max: 1, label: 'Gloss' },
-  metallic: { default: 0.1, min: 0, max: 1, label: 'Metallic' },
+  backgroundBrightness: { default: 0, min: 0, max: 1.5, label: 'Brightness' },
+  iridescence: { default: 0.5, min: 0, max: 1, label: 'Iridescence' },
+  metallic: { default: 0.2, min: 0, max: 1, label: 'Metallic' },
   roughness: { default: 0.35, min: 0.05, max: 1, label: 'Roughness' },
   speed: { default: 0.15, min: 0, max: 1, label: 'Speed' },
   reverse: { default: 0, type: 'boolean', label: 'Reverse' },
 } satisfies Record<string, ParameterDefinition>;
 type ParamId = keyof typeof SNAKE_PARAMS;
-const BOOLEAN_PARAMS = new Set<ParamId>(['background', 'reverse']);
+const BOOLEAN_PARAMS = new Set<ParamId>(['transparent', 'reverse']);
 
 const SLIDER_STEPS: Partial<Record<ParamId, number>> = {
   thickness: 0.001, length: 0.01, headTaper: 0.01, tailTaper: 0.01, headShape: 0.01, twist: 0.25, spread: 0.01,
-  scale: 0.05, width: 0.01, backgroundOffset: 0.01, backgroundBrightness: 0.01, iridescence: 0.01, gloss: 0.01,
+  scale: 0.05, width: 0.01, backgroundOffset: 0.01, backgroundBrightness: 0.01, iridescence: 0.01,
   metallic: 0.01, roughness: 0.01, speed: 0.01,
 };
 
@@ -228,7 +230,7 @@ export const createSnakeExperience = (): Experience<ExperienceContext> => {
       const toolButtons = new Map<Tool, ReturnType<typeof bindButton>>();
       const hints: Record<Tool, string> = {
         draw: 'Draw: hold trigger or pinch with your right hand and move through the air. End near the start for a loop.',
-        move: 'Move: grab the dots with a ray to reshape. The last one you grabbed is selected (orange).',
+        move: 'Move: grab the dots with a ray to reshape. The last one you grabbed is selected (orange); press B to delete it.',
       };
       const setTool = (next: Tool) => {
         tool = next;
@@ -275,18 +277,15 @@ export const createSnakeExperience = (): Experience<ExperienceContext> => {
           },
         }),
       );
-      track(
-        bindButton(editPanel, 'btn-delete-point', {
-          ...common,
-          onClick: () => {
-            const selected = selectedSnake(state);
-            const object = selected && objects.get(selected.id);
-            if (!selected || !object || object.selectedHandle < 0) return;
-            updatePath(deleteAnchors(selected.path, new Set([object.selectedHandle])), selected.closed);
-            object.selectHandle(-1);
-          },
-        }),
-      );
+      const deleteSelectedPoint = (): boolean => {
+        const selected = selectedSnake(state);
+        const object = selected && objects.get(selected.id);
+        if (!selected || !object || object.selectedHandle < 0) return false;
+        updatePath(deleteAnchors(selected.path, new Set([object.selectedHandle])), selected.closed);
+        object.selectHandle(-1);
+        return true;
+      };
+      track(bindButton(editPanel, 'btn-delete-point', { ...common, onClick: deleteSelectedPoint }));
       track(bindButton(editPanel, 'btn-demo-loop', { ...common, onClick: () => updatePath(demoLoopPath(), true) }));
       track(bindButton(editPanel, 'btn-demo-wave', { ...common, onClick: () => updatePath(demoWavePath(), false) }));
 
@@ -311,15 +310,17 @@ export const createSnakeExperience = (): Experience<ExperienceContext> => {
         }
         track(
           params.subscribe(id, (value, source) => {
-            if (id === 'background') bgSettings.setProperties({ display: value >= 0.5 ? 'flex' : 'none' });
+            // Background colour settings apply only when the gaps are filled (not transparent).
+            if (id === 'transparent') bgSettings.setProperties({ display: value >= 0.5 ? 'none' : 'flex' });
             if (source === 'code') return;
             writeLook({ [id]: BOOLEAN_PARAMS.has(id) ? value >= 0.5 : value } as Partial<SnakeLook>);
           }),
         );
       }
+      const slug = (name: string) => name.toLowerCase().replace(/\s+/g, '-');
       const choice = <T extends string>(panel: UIKitMLAsset, prefix: string, names: readonly T[], apply: (name: T) => void) => {
         const buttons = names.map((name) =>
-          track(bindButton(panel, `${prefix}-${name.toLowerCase()}`, { ...common, onClick: () => select(name, true) })),
+          track(bindButton(panel, `${prefix}-${slug(name)}`, { ...common, onClick: () => select(name, true) })),
         );
         const select = (name: T, write: boolean) => {
           buttons.forEach((button, i) => button.setSelected(names[i] === name));
@@ -344,8 +345,8 @@ export const createSnakeExperience = (): Experience<ExperienceContext> => {
         params.apply(values, 'code');
         selectProfile(look.profile === 4 ? 'Square' : 'Round', false);
         selectPattern((look.pattern.charAt(0).toUpperCase() + look.pattern.slice(1)) as 'Solid' | 'Rings' | 'Hilbert', false);
-        selectPalette((palette in SNAKE_PALETTES ? palette : 'Cyberdelic') as SnakePaletteName, false);
-        bgSettings.setProperties({ display: look.background ? 'flex' : 'none' });
+        selectPalette((palette in SNAKE_PALETTES ? palette : DEFAULT_PALETTE) as SnakePaletteName, false);
+        bgSettings.setProperties({ display: look.transparent ? 'none' : 'flex' });
         loading = false;
       }
 
@@ -380,7 +381,7 @@ export const createSnakeExperience = (): Experience<ExperienceContext> => {
           return;
         }
         const loop = isLoopStroke(local);
-        updatePath(fitPathFromStroke(simplifyStroke(local, 0.012), { closed: loop }), loop);
+        updatePath(fitPathFromStroke(simplifyStroke(smoothStroke(local, 3), 0.015), { closed: loop }), loop);
         setTool('move');
         haptics.play('right', 'select');
         sounds.play('select');
@@ -421,6 +422,11 @@ export const createSnakeExperience = (): Experience<ExperienceContext> => {
         editMenu.update();
         paramsMenu.update();
         updateDrawing();
+        // Controller shortcut: B deletes the selected vertex while editing.
+        if (state.editing && world.input.xr.gamepads.right?.getButtonDown(InputComponent.B_Button) && deleteSelectedPoint()) {
+          haptics.play('right', 'click');
+          sounds.play('release');
+        }
         for (const object of objects.values()) {
           const dragged = object.update(dt);
           if (dragged) {

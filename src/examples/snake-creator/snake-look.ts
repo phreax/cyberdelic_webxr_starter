@@ -25,13 +25,12 @@ export type SnakeLook = {
   width: number;
   /** Gradient repetition along the body (0..1 → 1x at 0.05, 20x at 1). */
   spread: number;
-  /** Off = gaps between pattern lines are cut out; on = filled with the gradient at an offset. */
-  background: boolean;
+  /** Gaps between pattern lines are cut out (see-through). Off: filled with the background colour. */
+  transparent: boolean;
   backgroundOffset: number;
   backgroundBrightness: number;
+  /** Diffraction-grating shimmer along the body. */
   iridescence: number;
-  /** Clearcoat amount. */
-  gloss: number;
   metallic: number;
   roughness: number;
   /** Path fractions per second. */
@@ -41,7 +40,7 @@ export type SnakeLook = {
 
 export const DEFAULT_LOOK: Readonly<SnakeLook> = {
   thickness: 0.02, length: 0.35, headTaper: 0.1, tailTaper: 0.5, headShape: 0.6, profile: 0, twist: 0,
-  pattern: 'rings', scale: 1, width: 0.5, spread: 0.05, background: false, backgroundOffset: 0.5,
-  backgroundBrightness: 0.35, iridescence: 0.4, gloss: 0.6, metallic: 0.1, roughness: 0.35, speed: 0.15, reverse: false,
+  pattern: 'rings', scale: 1, width: 0.5, spread: 0.05, transparent: false, backgroundOffset: 0.5,
+  backgroundBrightness: 0, iridescence: 0.5, metallic: 0.2, roughness: 0.35, speed: 0.15, reverse: false,
 };
 

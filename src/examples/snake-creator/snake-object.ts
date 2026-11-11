@@ -149,7 +149,7 @@ export const createSnakeObject = (ctx: ExperienceContext, initial: SnakeRecord) 
       const pathChanged = next.path !== record.path || next.closed !== record.closed;
       const countChanged = next.path.length !== record.path.length;
       record = next;
-      renderer.setGradient(SNAKE_PALETTES[(next.palette as SnakePaletteName) in SNAKE_PALETTES ? (next.palette as SnakePaletteName) : 'Cyberdelic']);
+      renderer.setGradient(SNAKE_PALETTES[(next.palette as SnakePaletteName) in SNAKE_PALETTES ? (next.palette as SnakePaletteName) : 'Ethereal Garden']);
       if (pathChanged) rebuildCurve();
       if (countChanged || pathChanged) {
         if (selectedHandle >= next.path.length) selectedHandle = -1;
@@ -220,7 +220,7 @@ export const createSnakeObject = (ctx: ExperienceContext, initial: SnakeRecord) 
     proxy.visible = !editing && curve !== null;
   };
 
-  renderer.setGradient(SNAKE_PALETTES.Cyberdelic);
+  renderer.setGradient(SNAKE_PALETTES[(initial.palette as SnakePaletteName) in SNAKE_PALETTES ? (initial.palette as SnakePaletteName) : 'Ethereal Garden']);
   rebuildCurve();
   applyMode();
   return object;
