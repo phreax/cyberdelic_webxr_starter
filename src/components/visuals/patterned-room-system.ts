@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: CC-BY-NC-SA-4.0
 import { createSystem, DoubleSide, Mesh, ShaderMaterial, Vector2, XRMesh, XRPlane, type Material } from '@iwsdk/core';
 import { handAppearanceState, patternedVisionFragment } from './patterned-hands.js';
 import vertexShader from './patterned-room.vert.glsl?raw';

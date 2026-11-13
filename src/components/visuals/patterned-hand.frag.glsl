@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: CC-BY-NC-SA-4.0
 // Patterned Vision on the tracked hand geometry.
 uniform float uAlpha;
 varying vec2 vPatternUv;

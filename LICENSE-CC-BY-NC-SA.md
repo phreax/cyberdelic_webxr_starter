@@ -1,6 +1,6 @@
-# CC BY-NC-SA 4.0 — creative example experiences
+# CC BY-NC-SA 4.0 — creative demos and effects
 
-The following example experiences are licensed under
+The following demos and effects are licensed under
 **Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)**,
 not under the repository's MIT license:
 
@@ -18,6 +18,7 @@ distribute adaptations under the same license.
 | Scene Creator | `src/demos/scene-creator/`, `public/scenes/scene.iwsdk.scene.json` |
 | Cubes | `src/demos/magic-cubes/`, `public/ui/cubes-panel.uikitml`, `public/scenes/cubes.iwsdk.scene.json` |
 | Meta Chrome | `src/demos/meta-chrome/`, `public/ui/chrome-panel.uikitml`, `public/scenes/chrome.iwsdk.scene.json`, `public/textures/warm-ball-room/` |
+| Patterned Vision | `src/components/visuals/patterned-*` (patterned hands and room, shown in every demo via the Session page) |
 
 Private experiments in `src/lab/` (when present) carry their own license notes in `src/lab/LICENSE.md`.
 
@@ -30,3 +31,4 @@ remains MIT-licensed (see `LICENSE`).
   shader-lab (Karleido) by phreax; diffraction shading from "gold fractal" (phreax).
 - **Cubes** — by phreax / jiagual, shadertoy.com/view/MfGBRD, via shader-lab (Karleido).
 - **Meta Chrome** — original shader by phreax/jiagual (2026), adapted for XR.
+- **Patterned Vision** — original work by jiagual (2026).

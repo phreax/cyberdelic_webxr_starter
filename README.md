@@ -110,6 +110,11 @@ IWSDK skills). They read `AGENTS.md`, then `vision.md`, then `aidd-custom/AGENTS
 ## License
 
 The starter (framework, components, shared shaders, Sculpture, Garden) is **MIT**, see
-[`LICENSE`](LICENSE). The creative demos listed in
+[`LICENSE`](LICENSE). The creative demos and effects listed in
 [`LICENSE-CC-BY-NC-SA.md`](LICENSE-CC-BY-NC-SA.md) (Snake Creator, Scene Creator, Cubes,
-Meta Chrome) are **CC BY-NC-SA 4.0**: remix them freely for non-commercial work, with credit.
+Meta Chrome, and the Patterned Vision hand/room effect) are **CC BY-NC-SA 4.0**: remix them
+freely for non-commercial work, with credit.
+
+Heads-up: Patterned Vision (which also draws the hand outlines) is part of the shared Session
+page, so every demo ships it. A fully MIT build has to remove `src/components/visuals/patterned-*`
+and its uses in `src/index.ts` and `src/components/ui/standard-sections.ts`.

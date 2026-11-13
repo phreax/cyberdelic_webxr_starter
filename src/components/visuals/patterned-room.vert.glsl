@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: CC-BY-NC-SA-4.0
 varying vec3 vWorldPosition;
 
 void main() {

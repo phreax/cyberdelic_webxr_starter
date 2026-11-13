@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: CC-BY-NC-SA-4.0
 // World-locked projection onto detected room surfaces.
 uniform float uAlpha;
 varying vec3 vWorldPosition;

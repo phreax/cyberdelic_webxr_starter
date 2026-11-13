@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: CC-BY-NC-SA-4.0
 // Procedural core adapted from Patterned Vision. Shared by hand and room surfaces.
 uniform float uTime;
 uniform float uScale;

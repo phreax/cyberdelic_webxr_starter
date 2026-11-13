@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: CC-BY-NC-SA-4.0
 import { FrontSide, ShaderMaterial, SkinnedMesh, Vector2, type Material, type Object3D, type World } from '@iwsdk/core';
 import vertexShader from './patterned-hand.vert.glsl?raw';
 import fragmentShader from './patterned-hand.frag.glsl?raw';

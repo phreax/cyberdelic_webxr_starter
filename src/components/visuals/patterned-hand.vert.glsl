@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: CC-BY-NC-SA-4.0
 #include <skinning_pars_vertex>
 attribute float wristDist;
 uniform float uFingerLength;
