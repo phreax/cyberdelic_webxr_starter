@@ -13,7 +13,23 @@ XR app ──wss /osc──▶ bridge ──UDP──▶ 127.0.0.1:9001
 
 ```sh
 npm run osc-bridge            # defaults: UDP in 9000, UDP out 127.0.0.1:9001, WebSocket 8080
+```
+
+Change ports or the target with environment variables:
+
+```sh
+# macOS / Linux
 OSC_UDP_PORT=7000 OSC_TARGET_HOST=192.168.1.20 OSC_TARGET_PORT=7001 npm run osc-bridge
+```
+
+```powershell
+# Windows (PowerShell)
+$env:OSC_UDP_PORT=7000; $env:OSC_TARGET_HOST="192.168.1.20"; $env:OSC_TARGET_PORT=7001; npm run osc-bridge
+```
+
+```bat
+:: Windows (cmd)
+set OSC_UDP_PORT=7000&& set OSC_TARGET_HOST=192.168.1.20&& set OSC_TARGET_PORT=7001&& npm run osc-bridge
 ```
 
 ## Use in an experience

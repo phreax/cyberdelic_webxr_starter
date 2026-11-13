@@ -9,7 +9,7 @@ npm install
 npm run dev
 ```
 
-Node.js **20.19+**, **22.12+** or **24+** is required (`node -v` shows yours).
+Node.js **22.12+** or **24+** is required (`node -v` shows yours).
 
 `npm run dev` starts the dev server and opens a managed browser at `https://localhost:8081`.
 Edit any file and the page reloads by itself.

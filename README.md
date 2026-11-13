@@ -32,7 +32,7 @@ More in [docs/demos.md](docs/demos.md).
 
 ## Get started (about 3 minutes)
 
-You need [Node.js](https://nodejs.org) **20.19+**, **22.12+** or **24+**.
+You need [Node.js](https://nodejs.org) **22.12+** or **24+** (the LTS installer is fine).
 
 ```sh
 git clone <this repo> cyberdelic-xr

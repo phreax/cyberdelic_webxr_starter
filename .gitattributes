@@ -1,0 +1,16 @@
+# Same line endings on Windows, macOS and Linux (shell hooks break with CRLF).
+* text=auto eol=lf
+
+# Binary assets: never touch.
+*.glb binary
+*.gltf -text
+*.fbx binary
+*.jpg binary
+*.jpeg binary
+*.png binary
+*.webp binary
+*.ktx2 binary
+*.hdr binary
+*.mp3 binary
+*.wav binary
+*.ogg binary
