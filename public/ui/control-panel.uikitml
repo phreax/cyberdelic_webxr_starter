@@ -241,6 +241,7 @@
   }
   .demos {
     flex-direction: row;
+    flex-wrap: wrap;
     align-items: center;
     gap: 6px;
   }
@@ -261,6 +262,12 @@
     font-size: 13px;
     font-weight: 700;
   }
+
+  .primary { border-color: #ff9500; background-color: #ff9500; color: #071514; }
+  .console-nav { width: 48px; height: 48px; align-items: center; justify-content: center; border-radius: 11px; border-width: 2px; border-color: #00d9c7; color: #f1f7f5; }
+  .console-page { flex-direction: column; gap: 12px; }
+  .console-grid { flex-direction: row; flex-wrap: wrap; gap: 8px; }
+  .console-choice { width: 160px; padding-top: 10px; padding-bottom: 10px; padding-left: 10px; padding-right: 10px; border-width: 2px; border-color: #00d9c7; border-radius: 10px; color: #f1f7f5; font-size: 16px; }
 </style>
 
 <!--
@@ -273,106 +280,29 @@
     <div class="column">
       <span class="eyebrow">CYBERDELIC XR</span>
       <span class="title">Reactive Sculpture</span>
-      <div class="status">
-        <div id="mode-dot" class="status-dot"></div>
-        <span id="status" class="muted">Desktop preview</span>
-      </div>
-    </div>
-    <div id="btn-hide" class="icon-button">Hide</div>
-  </div>
 
-  <div class="demos">
-    <span class="demos-label">Demos</span>
-    <div id="example-sculpture" class="demo-chip">Sculpture</div>
-    <div id="example-garden" class="demo-chip">Garden</div>
-    <div id="example-snake" class="demo-chip">Snake</div>
-    <div id="example-playground" class="demo-chip">Playground</div>
+    </div>
+    <div class="row"><div id="btn-hide" class="console-nav"><X /></div></div>
   </div>
+  <div id="console-object" class="console-page">
+
+
 
   <div class="tabs">
     <div id="tab-shape" class="tab">Shape</div>
     <div id="tab-audio" class="tab">Audio</div>
-    <div id="tab-presets" class="tab">Presets</div>
-    <div id="tab-session" class="tab">Session</div>
+    <div id="tab-material" class="tab">Material</div>
+
   </div>
 
   <div id="page-shape" class="page">
-      <div class="column">
-        <div class="row">
-          <span class="label">Growth</span>
-          <span id="growth-value" class="value">0.45</span>
-        </div>
-        <div id="growth" class="track">
-          <div id="growth-fill" class="fill"></div>
-        </div>
-      </div>
-      <div class="column">
-        <div class="row">
-          <span class="label">Complexity</span>
-          <span id="complexity-value" class="value">1.60</span>
-        </div>
-        <div id="complexity" class="track">
-          <div id="complexity-fill" class="fill"></div>
-        </div>
-      </div>
-      <div class="column">
-        <div class="row">
-          <span class="label">Flow</span>
-          <span id="flow-value" class="value">0.40</span>
-        </div>
-        <div id="flow" class="track">
-          <div id="flow-fill" class="fill"></div>
-        </div>
-      </div>
-      <div class="column">
-        <div class="row">
-          <span class="label">Glow</span>
-          <span id="glow-value" class="value">0.35</span>
-        </div>
-        <div id="glow" class="track">
-          <div id="glow-fill" class="fill"></div>
-        </div>
-      </div>
-      <div class="column">
-        <div class="row">
-          <span class="label">Alpha</span>
-          <span id="alpha-value" class="value">1.00</span>
-        </div>
-        <div id="alpha" class="track">
-          <div id="alpha-fill" class="fill"></div>
-        </div>
-      </div>
-    <div class="row">
-        <div class="row">
-          <div id="twist" class="knob">
-            <div id="twist-indicator" class="knob-indicator">
-              <div class="knob-dot"></div>
-            </div>
-          </div>
-          <div class="column">
-            <span class="label">Twist</span>
-            <span id="twist-value" class="knob-value">0.00</span>
-          </div>
-        </div>
-        <div class="row">
-          <div id="hue" class="knob">
-            <div id="hue-indicator" class="knob-indicator">
-              <div class="knob-dot"></div>
-            </div>
-          </div>
-          <div class="column">
-            <span class="label">Hue</span>
-            <span id="hue-value" class="knob-value">0.00</span>
-          </div>
-        </div>
-    </div>
-    <div class="row">
-      <span class="label">Auto spin</span>
-      <div id="spin" class="toggle">
-        <div id="spin-thumb" class="toggle-thumb"></div>
-      </div>
-      <div id="btn-reset" class="small-button">Reset</div>
-    </div>
+    <div class="column"><div class="row"><span class="label">Growth</span><span id="growth-value" class="value">0.45</span></div><div id="growth" class="track"><div id="growth-fill" class="fill"></div></div></div>
+    <div class="column"><div class="row"><span class="label">Complexity</span><span id="complexity-value" class="value">1.60</span></div><div id="complexity" class="track"><div id="complexity-fill" class="fill"></div></div></div>
+    <div class="column"><div class="row"><span class="label">Flow</span><span id="flow-value" class="value">0.40</span></div><div id="flow" class="track"><div id="flow-fill" class="fill"></div></div></div>
+    <div class="column"><div class="row"><span class="label">Glow</span><span id="glow-value" class="value">0.35</span></div><div id="glow" class="track"><div id="glow-fill" class="fill"></div></div></div>
+    <div class="row"><div id="twist" class="knob"><div id="twist-indicator" class="knob-indicator"><div class="knob-dot"></div></div></div><div class="column"><span class="label">Twist</span><span id="twist-value" class="knob-value">0.00</span></div></div>
+    <div class="column"><span class="label">Mesh quality</span><div class="row"><div id="quality-low" class="small-button">Low</div><div id="quality-medium" class="small-button">Medium</div><div id="quality-high" class="small-button">High</div></div></div>
+    <div class="row"><span class="label">Auto spin</span><div id="spin" class="toggle"><div id="spin-thumb" class="toggle-thumb"></div></div><div id="btn-reset" class="small-button">Reset</div></div>
   </div>
 
   <div id="page-audio" class="page">
@@ -434,50 +364,14 @@
       </div>
   </div>
 
-  <div id="page-presets" class="page">
-    <div class="grid">
-        <div id="preset-coral" class="preset">
-          <span class="preset-name">Coral</span>
-          <span class="muted">Grown, warm teal</span>
-        </div>
-        <div id="preset-nebula" class="preset">
-          <span class="preset-name">Nebula</span>
-          <span class="muted">Soft, drifting</span>
-        </div>
-        <div id="preset-ember" class="preset">
-          <span class="preset-name">Ember</span>
-          <span class="muted">Busy, hot</span>
-        </div>
-        <div id="preset-void" class="preset">
-          <span class="preset-name">Void</span>
-          <span class="muted">Sharp, quiet</span>
-        </div>
-    </div>
-    <span class="muted">Presets ease in; tweak anything afterwards in Shape.</span>
+  <div id="page-material" class="page">
+    <div class="column"><span class="label">Material</span><div class="row"><div id="material-chrome" class="small-button">Chrome</div><div id="material-iridescent" class="small-button">Iridescent</div></div></div>
+    <div class="column"><div class="row"><span class="label">Alpha</span><span id="alpha-value" class="value">1.00</span></div><div id="alpha" class="track"><div id="alpha-fill" class="fill"></div></div></div>
+    <div id="reflection-warmth-control" class="column"><div class="row"><span class="label">Reflection warmth</span><span id="reflectionWarmth-value" class="value">0.50</span></div><div id="reflectionWarmth" class="track"><div id="reflectionWarmth-fill" class="fill"></div></div></div>
+    <div id="matcap-brightness-control" class="column"><div class="row"><span class="label">Iridescent brightness</span><span id="matcapBrightness-value" class="value">0.80</span></div><div id="matcapBrightness" class="track"><div id="matcapBrightness-fill" class="fill"></div></div></div>
+    <div id="iridescence-control" class="column"><div class="row"><span class="label">Iridescence</span><span id="iridescence-value" class="value">0.70</span></div><div id="iridescence" class="track"><div id="iridescence-fill" class="fill"></div></div></div>
   </div>
 
-  <div id="page-session" class="page">
-    <div class="row">
-      <div id="btn-vr" class="button">Enter VR</div>
-      <div id="btn-mr" class="button">Enter MR</div>
-    </div>
-    <div class="row">
-      <div id="btn-exit" class="button">Exit to browser</div>
-    </div>
-    <div class="row">
-      <span class="label">Haptics</span>
-      <div id="haptics" class="toggle">
-        <div id="haptics-thumb" class="toggle-thumb"></div>
-      </div>
-    </div>
-    <div class="row">
-      <div id="btn-reset-settings" class="small-button">Reset settings</div>
-    </div>
-    <div class="status">
-      <div id="fps-dot" class="status-dot"></div>
-      <span id="fps" class="muted">-- fps</span>
-    </div>
-    <span id="xr-info" class="muted">Checking XR support...</span>
-    <span class="muted">Menu: drag the bar below to move. Show or hide: M, left Menu or Y button, or touch the wrist button.</span>
-  </div>
+
+</div>
 </div>

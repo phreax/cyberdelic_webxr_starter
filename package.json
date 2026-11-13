@@ -47,7 +47,7 @@
     "node": ">=20.19.0 <21.0.0-0 || >=22.12.0 <23.0.0-0 || >=24.0.0"
   },
   "description": "Cyberdelic XR — WebXR starter kit for beautiful, interactive VR/MR experiences (IWSDK + Three.js)",
-  "license": "MIT",
+  "license": "(MIT AND CC-BY-NC-SA-4.0)",
   "workspaces": [
     "apps/*"
   ]

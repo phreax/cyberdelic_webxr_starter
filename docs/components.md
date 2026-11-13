@@ -1,12 +1,19 @@
 # Component reference
 
-Open the **Developer Playground** to try everything: `https://localhost:8081/?example=playground`.
 
-## Examples
+Short reference for the reusable building blocks. Everything lives in `src/components/` and
+`src/core/`; demos only import from there (never from each other).
 
-Switch from any panel's **Demos** row (in place, the XR session stays open) or with the URL. 
-`?example=sculpture` (default) · `?example=garden` · `?example=snake` · `?example=playground`. Register new ones in `src/examples/registry.ts`
-(each can load its own scene with `level`).
+## Demos and plug-ins (`src/core/demos/`)
+
+| Helper | Use |
+|---|---|
+| `defineDemo({ id, title, order, panelNode, config })` | Default export of a demo's `demo.ts`; found automatically |
+| `uikitml(file, name)`, `lazyModel(file, name)` | Entries for a demo's `assets.ts` |
+| `defineCenterObject` / `shaderCenter` | `center.ts`: a Scene Creator object (`src/demos/scene-creator/center-object.ts`) |
+| `defineSnakeBody` | `snake-body.ts`: a Snake Creator body (`src/demos/snake-creator/body-plugin.ts`) |
+
+See [make-a-demo.md](make-a-demo.md).
 
 ## UI (`src/components/ui/`)
 
@@ -22,8 +29,9 @@ Switch from any panel's **Demos** row (in place, the XR session stays open) or w
 | Label / ValueDisplay | `bindValueDisplay(source, id, format)` → `set(value)` | `id` |
 | ColorPicker | `bindColorPicker(source, id, { palette, onChange })` | `id-swatch-N`, `id-hue` (+`-fill`), `id-preview` |
 | PresetSelector | `bindPresetSelector(source, prefix, { params, presets })` | `prefix-<name>` |
-| Toolbar | markup `public/ui/toolbar.uikitml` + `bindButton` per tool | |
 | StatusIndicator | `bindStatus(source, { dot, text })` → `set(level, text)` | dot + text |
+| Panel menu | `createPanelMenu(ctx, { nodeId })`: move bar, hide/show (Menu/Y, wrist button, `M`) | |
+| Shared console | `bindSharedConsole(ctx, panel, common, menu)`: the Demos picker + Session page | |
 
 Bind to parameters two-way with `controlOptions(params, id)` + `bindUI(params, id, control)`.
 
@@ -42,6 +50,12 @@ Bind to parameters two-way with `controlOptions(params, id)` + `bindUI(params, i
 | HapticFeedback | `ctx.haptics.pulse(hand, { intensity, duration })`, `.play(hand, 'click' \| 'select' \| 'grab' \| 'release' \| 'impact')` |
 | Surface placement (MR) | `createSurfacePlacer(ctx, entity).start()` |
 
+## Visuals (`src/components/visuals/`)
+
+Patterned vision: hands (and optionally the room mesh in MR) drawn with an animated pattern.
+Toggle it from Demos → ⚙ Session → **Patterned hands / Patterned room**, which also shows scale,
+opacity, warp, chroma and offset sliders. Code: `createPatternedHands(world)`, `PatternedRoomSystem`.
+
 ## Audio (`src/components/audio/`)
 
 `ctx.audio` (see docs/audio.md) · `ctx.sounds.play('click' | 'select' | 'grab' | 'release')` ·
@@ -49,7 +63,7 @@ Bind to parameters two-way with `controlOptions(params, id)` + `bindUI(params, i
 
 ## OSC (`src/components/osc/`)
 
-`ctx.osc` (see docs/osc.md) · `createOscMonitor()` + `osc.onAny()` for a live monitor (Playground → OSC tab).
+`ctx.osc` (see docs/osc.md) · `createOscMonitor()` + `osc.onAny()` for a live monitor.
 
 ## Settings persistence (`src/core/persistence/`)
 

@@ -2,9 +2,9 @@
   .panel {
     flex-direction: column;
     width: 420px;
-    gap: 18px;
-    padding-top: 26px;
-    padding-bottom: 26px;
+    gap: 6px;
+    padding-top: 18px;
+    padding-bottom: 18px;
     padding-left: 26px;
     padding-right: 26px;
     border-radius: 22px;
@@ -55,7 +55,7 @@
   }
   .page {
     flex-direction: column;
-    gap: 20px;
+    gap: 9px;
   }
   .row {
     flex-direction: row;
@@ -291,6 +291,7 @@
   }
   .demos {
     flex-direction: row;
+    flex-wrap: wrap;
     align-items: center;
     gap: 6px;
   }
@@ -331,18 +332,21 @@
   .narrow {
     width: 340px;
   }
-</style>
 
-<!--
-  Snake Creator: settings window for the selected snake.
--->
+  .primary { border-color: #ff9500; background-color: #ff9500; color: #071514; }
+  .console-nav { width: 48px; height: 48px; align-items: center; justify-content: center; border-radius: 11px; border-width: 2px; border-color: #00d9c7; color: #f1f7f5; }
+  .console-page { flex-direction: column; gap: 12px; }
+  .console-grid { flex-direction: row; flex-wrap: wrap; gap: 8px; }
+  .console-choice { width: 160px; padding-top: 10px; padding-bottom: 10px; padding-left: 10px; padding-right: 10px; border-width: 2px; border-color: #00d9c7; border-radius: 10px; color: #f1f7f5; font-size: 16px; }
+  .setting { min-height: 36px; }
+  .setting-controls { width: 170px; }
+  .setting-track { width: 100%; }
+  .choice { width: 124px; }
+  .color-preview { width: 48px; height: 40px; border-radius: 8px; border-width: 2px; border-color: #f1f7f5; background-color: #64f4ff; }
+</style>
 <div id="panel" class="panel">
-  <div class="row">
-    <div class="column">
-      <span class="eyebrow">SNAKE SETTINGS</span>
-      <span id="params-name" class="title">Snake</span>
-    </div>
-  </div>
+<div id="scene-snake-settings" class="console-page"><div class="row"><span id="params-name" class="title">Snake Settings</span><div id="btn-close-snake-settings" class="console-nav"><X /></div></div>
+
   <div class="tabs">
     <div id="tab-shape" class="tab">Shape</div>
     <div id="tab-pattern" class="tab">Pattern</div>
@@ -351,6 +355,8 @@
   </div>
 
   <div id="page-shape" class="page">
+    <div class="row"><span class="label">Mirror across YZ</span><div id="mirror" class="toggle"><div id="mirror-thumb" class="toggle-thumb"></div></div></div>
+    <div id="mirror-settings" class="column"><div class="row"><span class="label">Mirror distance</span><span id="mirrorDistance-value" class="value">0.20</span></div><div id="mirrorDistance" class="track"><div id="mirrorDistance-fill" class="fill"></div></div></div>
     <div class="row">
       <div id="body-tube" class="small-button">Tube</div>
       <div id="body-spheres" class="small-button">Spheres</div>
@@ -426,7 +432,7 @@
     </div>
     <div class="column">
       <div class="row">
-        <span class="label">Twist (square)</span>
+        <span class="label">Twist</span>
         <span id="twist-value" class="value">0.00</span>
       </div>
       <div id="twist" class="track">
@@ -441,6 +447,10 @@
       <div id="pattern-rings" class="small-button">Rings</div>
       <div id="pattern-hilbert" class="small-button">Hilbert</div>
     </div>
+    <div id="hilbert-settings" class="column">
+      <div class="row"><span class="label">Hilbert edge sharpness</span><span id="hilbertSharpness-value" class="value">1.00</span></div>
+      <div id="hilbertSharpness" class="track"><div id="hilbertSharpness-fill" class="fill"></div></div>
+    </div>
     <div class="row">
       <div id="palette-ethereal-garden" class="small-button">Ethereal Garden</div>
       <div id="palette-cyberdelic" class="small-button">Cyberdelic</div>
@@ -448,6 +458,10 @@
     <div class="row">
       <div id="palette-ocean" class="small-button">Ocean</div>
       <div id="palette-ember" class="small-button">Ember</div>
+    </div>
+    <div class="row">
+      <div id="palette-white" class="small-button">White</div>
+      <div id="palette-scifi-machine" class="small-button">SciFi Machine</div>
     </div>
     <div class="column">
       <div class="row">
@@ -457,6 +471,10 @@
       <div id="spread" class="track">
         <div id="spread-fill" class="fill"></div>
       </div>
+    </div>
+    <div class="column">
+      <div class="row"><span class="label">Color offset</span><span id="gradientOffset-value" class="value">0.00</span></div>
+      <div id="gradientOffset" class="track"><div id="gradientOffset-fill" class="fill"></div></div>
     </div>
     <div class="column">
       <div class="row">
@@ -525,6 +543,15 @@
     </div>
     <div class="column">
       <div class="row">
+        <span class="label">Environment reflection</span>
+        <span id="environmentAmount-value" class="value">0.20</span>
+      </div>
+      <div id="environmentAmount" class="track">
+        <div id="environmentAmount-fill" class="fill"></div>
+      </div>
+    </div>
+    <div class="column">
+      <div class="row">
         <span class="label">Roughness</span>
         <span id="roughness-value" class="value">0.35</span>
       </div>
@@ -551,4 +578,53 @@
       </div>
     </div>
   </div>
+</div>
+<div id="scene-center-settings" class="console-page"><div class="row"><span class="title">Center Object</span><div id="btn-close-center" class="console-nav"><X /></div></div>
+
+  <span id="center-status" class="muted">Choose one Center Object</span>
+  <div id="btn-change-center" class="button primary">Choose Object</div>
+  <div id="center-choices" class="grid">
+    <div id="choose-sculpture" class="button choice">Sculpture</div>
+    <div id="choose-cubes" class="button choice">Cubes</div>
+    <div id="choose-chrome" class="button choice">Meta Chrome</div>
+  </div>
+  <div class="row"><div id="btn-visibility-center" class="button">Hide</div><div id="btn-remove-center" class="button">Remove</div></div>
+  <div class="tabs"><div id="tab-form" class="tab">Form</div><div id="tab-color" class="tab">Color</div><div id="center-tab-motion" class="tab">Motion</div></div>
+  <div id="page-form" class="page">
+    <div id="setting-sculpture-growth" class="setting row"><span class="label">Growth</span><div class="column setting-controls"><span id="center-sculpture-growth-value" class="value">0.00</span><div id="center-sculpture-growth" class="track setting-track"><div id="center-sculpture-growth-fill" class="fill"></div></div></div></div>
+    <div id="setting-sculpture-complexity" class="setting row"><span class="label">Complexity</span><div class="column setting-controls"><span id="center-sculpture-complexity-value" class="value">0.00</span><div id="center-sculpture-complexity" class="track setting-track"><div id="center-sculpture-complexity-fill" class="fill"></div></div></div></div>
+    <div id="setting-sculpture-quality" class="setting column"><span class="label">Mesh quality</span><div class="row"><div id="center-sculpture-quality-low" class="small-button">Low</div><div id="center-sculpture-quality-medium" class="small-button">Medium</div><div id="center-sculpture-quality-high" class="small-button">High</div></div></div>
+    <div id="setting-cubes-kaleidoscope" class="setting row"><span class="label">Kaleidoscope</span><div id="center-cubes-kaleidoscope" class="toggle"><div id="center-cubes-kaleidoscope-thumb" class="toggle-thumb"></div></div></div>
+    <div id="setting-cubes-mode" class="setting row"><span class="label">Mode</span><div class="column setting-controls"><span id="center-cubes-mode-value" class="value">0.00</span><div id="center-cubes-mode" class="track setting-track"><div id="center-cubes-mode-fill" class="fill"></div></div></div></div>
+    <div id="setting-cubes-quality" class="setting column"><span class="label">Quality</span><div class="row"><div id="center-cubes-quality-low" class="small-button">Low</div><div id="center-cubes-quality-medium" class="small-button">Medium</div><div id="center-cubes-quality-high" class="small-button">High</div></div></div>
+    <div id="setting-chrome-sphereSize" class="setting row"><span class="label">Sphere size</span><div class="column setting-controls"><span id="center-chrome-sphereSize-value" class="value">0.00</span><div id="center-chrome-sphereSize" class="track setting-track"><div id="center-chrome-sphereSize-fill" class="fill"></div></div></div></div>
+    <div id="setting-chrome-showSpheres" class="setting row"><span class="label">Show spheres</span><div id="center-chrome-showSpheres" class="toggle"><div id="center-chrome-showSpheres-thumb" class="toggle-thumb"></div></div></div>
+    <div id="setting-chrome-sminFactor" class="setting row"><span class="label">Smin blend</span><div class="column setting-controls"><span id="center-chrome-sminFactor-value" class="value">0.00</span><div id="center-chrome-sminFactor" class="track setting-track"><div id="center-chrome-sminFactor-fill" class="fill"></div></div></div></div>
+    <div id="setting-chrome-quality" class="setting column"><span class="label">Quality</span><div class="row"><div id="center-chrome-quality-low" class="small-button">Low</div><div id="center-chrome-quality-medium" class="small-button">Medium</div><div id="center-chrome-quality-high" class="small-button">High</div></div></div>
+  </div>
+  <div id="page-color" class="page">
+    <div id="setting-sculpture-glow" class="setting row"><span class="label">Glow</span><div class="column setting-controls"><span id="center-sculpture-glow-value" class="value">0.00</span><div id="center-sculpture-glow" class="track setting-track"><div id="center-sculpture-glow-fill" class="fill"></div></div></div></div>
+    <div id="setting-sculpture-alpha" class="setting row"><span class="label">Alpha</span><div class="column setting-controls"><span id="center-sculpture-alpha-value" class="value">0.00</span><div id="center-sculpture-alpha" class="track setting-track"><div id="center-sculpture-alpha-fill" class="fill"></div></div></div></div>
+    <div id="setting-sculpture-finish" class="setting row"><span class="label">Material</span><div class="column setting-controls"><span id="center-sculpture-finish-value" class="value">0.00</span><div id="center-sculpture-finish" class="track setting-track"><div id="center-sculpture-finish-fill" class="fill"></div></div></div></div>
+    <div id="setting-sculpture-matcapBrightness" class="setting row"><span class="label">MatCap brightness</span><div class="column setting-controls"><span id="center-sculpture-matcapBrightness-value" class="value">0.00</span><div id="center-sculpture-matcapBrightness" class="track setting-track"><div id="center-sculpture-matcapBrightness-fill" class="fill"></div></div></div></div>
+    <div id="setting-sculpture-iridescence" class="setting row"><span class="label">Iridescence</span><div class="column setting-controls"><span id="center-sculpture-iridescence-value" class="value">0.00</span><div id="center-sculpture-iridescence" class="track setting-track"><div id="center-sculpture-iridescence-fill" class="fill"></div></div></div></div>
+    <div id="setting-cubes-colorMode" class="setting row"><span class="label">Color mode</span><div class="column setting-controls"><span id="center-cubes-colorMode-value" class="value">0.00</span><div id="center-cubes-colorMode" class="track setting-track"><div id="center-cubes-colorMode-fill" class="fill"></div></div></div></div>
+    <div id="setting-cubes-colorOffset" class="setting row"><span class="label">Color offset</span><div class="column setting-controls"><span id="center-cubes-colorOffset-value" class="value">0.00</span><div id="center-cubes-colorOffset" class="track setting-track"><div id="center-cubes-colorOffset-fill" class="fill"></div></div></div></div>
+    <div id="setting-cubes-glow" class="setting row"><span class="label">Glow</span><div id="center-cubes-glow" class="toggle"><div id="center-cubes-glow-thumb" class="toggle-thumb"></div></div></div>
+    <div id="setting-cubes-palette" class="setting row"><span class="label">Palette</span><div class="column setting-controls"><span id="center-cubes-palette-value" class="value">0.00</span><div id="center-cubes-palette" class="track setting-track"><div id="center-cubes-palette-fill" class="fill"></div></div></div></div>
+    <div id="setting-chrome-glowAmount" class="setting row"><span class="label">Glow amount</span><div class="column setting-controls"><span id="center-chrome-glowAmount-value" class="value">0.00</span><div id="center-chrome-glowAmount" class="track setting-track"><div id="center-chrome-glowAmount-fill" class="fill"></div></div></div></div>
+    <div id="setting-chrome-glowColor" class="setting row"><span class="label">Glow color</span><div class="column setting-controls"><span id="center-chrome-glowColor-value" class="value">0.00</span><div id="center-chrome-glowColor" class="track setting-track"><div id="center-chrome-glowColor-fill" class="fill"></div></div></div></div>
+    <div id="setting-chrome-exposure" class="setting row"><span class="label">Exposure</span><div class="column setting-controls"><span id="center-chrome-exposure-value" class="value">0.00</span><div id="center-chrome-exposure" class="track setting-track"><div id="center-chrome-exposure-fill" class="fill"></div></div></div></div>
+    <div id="setting-chrome-iridescent" class="setting row"><span class="label">Iridescent</span><div class="column setting-controls"><span id="center-chrome-iridescent-value" class="value">0.00</span><div id="center-chrome-iridescent" class="track setting-track"><div id="center-chrome-iridescent-fill" class="fill"></div></div></div></div>
+  </div>
+  <div id="center-page-motion" class="page">
+    <div id="setting-center-manipulate" class="setting row"><span class="label">Manipulate</span><div id="center-manipulate" class="toggle"><div id="center-manipulate-thumb" class="toggle-thumb"></div></div></div>
+    <div id="setting-sculpture-twist" class="setting row"><span class="label">Twist</span><div class="column setting-controls"><span id="center-sculpture-twist-value" class="value">0.00</span><div id="center-sculpture-twist" class="track setting-track"><div id="center-sculpture-twist-fill" class="fill"></div></div></div></div>
+    <div id="setting-sculpture-flow" class="setting row"><span class="label">Flow</span><div class="column setting-controls"><span id="center-sculpture-flow-value" class="value">0.00</span><div id="center-sculpture-flow" class="track setting-track"><div id="center-sculpture-flow-fill" class="fill"></div></div></div></div>
+    <div id="setting-sculpture-spin" class="setting row"><span class="label">Auto spin</span><div id="center-sculpture-spin" class="toggle"><div id="center-sculpture-spin-thumb" class="toggle-thumb"></div></div></div>
+    <div id="setting-cubes-speed" class="setting row"><span class="label">Speed</span><div class="column setting-controls"><span id="center-cubes-speed-value" class="value">0.00</span><div id="center-cubes-speed" class="track setting-track"><div id="center-cubes-speed-fill" class="fill"></div></div></div></div>
+    <div id="setting-chrome-speed" class="setting row"><span class="label">Speed</span><div class="column setting-controls"><span id="center-chrome-speed-value" class="value">0.00</span><div id="center-chrome-speed" class="track setting-track"><div id="center-chrome-speed-fill" class="fill"></div></div></div></div>
+  </div>
+  <span class="muted">Grab to move; use both hands to rotate and scale.</span>
+</div>
 </div>

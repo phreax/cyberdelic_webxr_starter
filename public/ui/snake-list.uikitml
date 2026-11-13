@@ -2,9 +2,9 @@
   .panel {
     flex-direction: column;
     width: 420px;
-    gap: 18px;
-    padding-top: 26px;
-    padding-bottom: 26px;
+    gap: 6px;
+    padding-top: 18px;
+    padding-bottom: 18px;
     padding-left: 26px;
     padding-right: 26px;
     border-radius: 22px;
@@ -55,7 +55,7 @@
   }
   .page {
     flex-direction: column;
-    gap: 20px;
+    gap: 9px;
   }
   .row {
     flex-direction: row;
@@ -291,6 +291,7 @@
   }
   .demos {
     flex-direction: row;
+    flex-wrap: wrap;
     align-items: center;
     gap: 6px;
   }
@@ -331,6 +332,14 @@
   .narrow {
     width: 340px;
   }
+
+  .primary { border-color: #ff9500; background-color: #ff9500; color: #071514; }
+  .console-nav { width: 48px; height: 48px; align-items: center; justify-content: center; border-radius: 11px; border-width: 2px; border-color: #00d9c7; color: #f1f7f5; }
+  .console-page { flex-direction: column; gap: 12px; }
+  .console-grid { flex-direction: row; flex-wrap: wrap; gap: 8px; }
+  .console-choice { width: 160px; padding-top: 10px; padding-bottom: 10px; padding-left: 10px; padding-right: 10px; border-width: 2px; border-color: #00d9c7; border-radius: 10px; color: #f1f7f5; font-size: 16px; }
+  .setting { min-height: 36px; }
+  .choice { width: 124px; }
 </style>
 
 <!--
@@ -341,21 +350,14 @@
   <div class="row">
     <div class="column">
       <span class="eyebrow">CYBERDELIC XR</span>
-      <span class="title">Snakes</span>
-      <div class="status">
-        <div id="mode-dot" class="status-dot"></div>
-        <span id="status" class="muted">Desktop preview</span>
-      </div>
+      <span id="dashboard-title" class="title">Snakes</span>
+
     </div>
-    <div id="btn-hide" class="icon-button">Hide</div>
+    <div class="row"><div id="btn-hide" class="console-nav"><X /></div></div>
   </div>
-  <div class="demos">
-    <span class="demos-label">Demos</span>
-    <div id="example-sculpture" class="demo-chip">Sculpture</div>
-    <div id="example-garden" class="demo-chip">Garden</div>
-    <div id="example-snake" class="demo-chip">Snake</div>
-    <div id="example-playground" class="demo-chip">Playground</div>
-  </div>
+  <div id="console-object" class="console-page">
+  <div id="scene-dashboard" class="console-page">
+
 
   <div class="column">
     <div id="snake-row-0" class="list-row">
@@ -399,18 +401,17 @@
   <div class="row">
     <div id="btn-edit" class="button">Edit path</div>
   </div>
+  <div class="row"><div id="btn-open-snake-settings" class="small-button">Snake Settings</div><div id="center-controls" class="row"><div id="btn-open-center-settings" class="small-button">Center Object Settings</div></div></div>
+  <div id="center-summary" class="column"><span id="center-summary-text" class="muted">No Center Object</span></div>
   <span class="muted">Grab a snake to move it, use both hands to resize it.</span>
 
-  <div class="row">
-    <div id="btn-vr" class="small-button">Enter VR</div>
-    <div id="btn-mr" class="small-button">Enter MR</div>
-    <div id="btn-exit" class="small-button">Exit</div>
+  <div class="column">
+    <div class="row"><span class="label">Environment warmth</span><span id="environmentWarmth-value" class="value">0.50</span></div>
+    <div id="environmentWarmth" class="track"><div id="environmentWarmth-fill" class="fill"></div></div>
   </div>
-  <div class="row">
-    <div id="btn-reset-settings" class="small-button">Reset settings</div>
-  </div>
-  <div class="status">
-    <div id="fps-dot" class="status-dot"></div>
-    <span id="fps" class="muted">-- fps</span>
-  </div>
+
+</div>
+
+
+</div>
 </div>

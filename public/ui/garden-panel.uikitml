@@ -241,6 +241,7 @@
   }
   .demos {
     flex-direction: row;
+    flex-wrap: wrap;
     align-items: center;
     gap: 6px;
   }
@@ -261,6 +262,12 @@
     font-size: 13px;
     font-weight: 700;
   }
+
+  .primary { border-color: #ff9500; background-color: #ff9500; color: #071514; }
+  .console-nav { width: 48px; height: 48px; align-items: center; justify-content: center; border-radius: 11px; border-width: 2px; border-color: #00d9c7; color: #f1f7f5; }
+  .console-page { flex-direction: column; gap: 12px; }
+  .console-grid { flex-direction: row; flex-wrap: wrap; gap: 8px; }
+  .console-choice { width: 160px; padding-top: 10px; padding-bottom: 10px; padding-left: 10px; padding-right: 10px; border-width: 2px; border-color: #00d9c7; border-radius: 10px; color: #f1f7f5; font-size: 16px; }
 </style>
 
 <!--
@@ -272,26 +279,18 @@
     <div class="column">
       <span class="eyebrow">CYBERDELIC XR</span>
       <span class="title">Particle Garden</span>
-      <div class="status">
-        <div id="mode-dot" class="status-dot"></div>
-        <span id="status" class="muted">Desktop preview</span>
-      </div>
-    </div>
-    <div id="btn-hide" class="icon-button">Hide</div>
-  </div>
 
-  <div class="demos">
-    <span class="demos-label">Demos</span>
-    <div id="example-sculpture" class="demo-chip">Sculpture</div>
-    <div id="example-garden" class="demo-chip">Garden</div>
-    <div id="example-snake" class="demo-chip">Snake</div>
-    <div id="example-playground" class="demo-chip">Playground</div>
+    </div>
+    <div class="row"><div id="btn-hide" class="console-nav"><X /></div></div>
   </div>
+  <div id="console-object" class="console-page">
+
+
 
   <div class="tabs">
     <div id="tab-garden" class="tab">Garden</div>
     <div id="tab-audio" class="tab">Audio</div>
-    <div id="tab-session" class="tab">Session</div>
+
   </div>
 
   <div id="page-garden" class="page">
@@ -382,21 +381,6 @@
     </div>
   </div>
 
-  <div id="page-session" class="page">
-    <div class="row">
-      <div id="btn-vr" class="button">Enter VR</div>
-      <div id="btn-mr" class="button">Enter MR</div>
-    </div>
-    <div class="row">
-      <div id="btn-exit" class="button">Exit to browser</div>
-    </div>
-    <div class="row">
-      <div id="btn-reset-settings" class="small-button">Reset settings</div>
-    </div>
-    <div class="status">
-      <div id="fps-dot" class="status-dot"></div>
-      <span id="fps" class="muted">-- fps</span>
-    </div>
-    <span class="muted">Menu: drag the bar below to move. Show or hide: M, left Menu or Y button, or touch the wrist button.</span>
-  </div>
+
+</div>
 </div>

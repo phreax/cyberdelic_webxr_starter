@@ -38,3 +38,26 @@ describe('bakePalette()', () => {
     });
   });
 });
+
+describe('shader-lab palette set', () => {
+  test('shader-lab palettes', () => {
+    const names = ['Vibrant Coral', 'Neon', 'Ocean Sunset', 'Cosine Rainbow', 'Chameleon', 'Spectral Rainbow', 'Candy Land', 'Pastel', 'Vulcano', 'Cyberdelic', 'Ethereal Garden', 'SciFi Machine', 'B&W'];
+    assert({
+      given: 'the shader-lab palette options used by the raymarched demos',
+      should: 'all be available and bake to opaque textures',
+      actual: names.filter((name) => !(name in PALETTES) || bakePalette(name as keyof typeof PALETTES)[3] !== 255),
+      expected: [],
+    });
+  });
+
+  test('B&W', () => {
+    const data = bakePalette('B&W' as keyof typeof PALETTES);
+    const quarter = (PALETTE_SIZE / 4) * 4;
+    assert({
+      given: 'the generative B&W palette (0.5 + 0.5·sin(2πt))',
+      should: 'be grey at 0 and white a quarter of the way',
+      actual: [Math.abs(data[0]! - 128) <= 1, data[quarter]! >= 254, data[0] === data[1]],
+      expected: [true, true, true],
+    });
+  });
+});

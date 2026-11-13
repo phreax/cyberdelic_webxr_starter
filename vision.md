@@ -1,7 +1,6 @@
 # Vision — Cyberdelic XR Starter Kit
 
-> Source of truth for agents and contributors. Derived from
-> [`cyberdelic-webxr-starter-prd.md`](./cyberdelic-webxr-starter-prd.md) (v0.1 MVP).
+> Source of truth for agents and contributors.
 > If a task conflicts with this document, stop and ask (see `AGENTS.md`).
 
 ## Promise
@@ -31,13 +30,17 @@ experience.
 8. Stable **72 FPS on Quest 3S** for the reference scene.
 9. Approachable codebase for contributors of mixed experience.
 
-## Examples
+## Demos
 
-1. **Reactive Sculpture** (MVP) — organic generative sculpture; grab/rotate/scale, UI shader params, audio-reactive deformation, VR + MR.
-2. **Particle Garden** — hand-driven attraction/repulsion, organic flows, audio-reactive color/movement, interaction zones.
-3. **Snake Creator in Space** — draw and edit a curve in space (open or closed loop), pick shape/color/texture/animation from a spatial menu, render a GPU-bent snake flowing along it in real time. Reuses shader-lab (Karleido) snake render setup and materials.
+Each demo is a self-contained folder in `src/demos/` (see `docs/make-a-demo.md`):
 
-Spatial Synth is removed for now. No example uses OSC in the MVP.
+1. **Sculpture**: organic generative sculpture; grab/rotate/scale, shader params, audio-reactive deformation, VR + MR. The reference demo.
+2. **Garden**: GPU particles in a hand-stirred flow field; audio-reactive colour and movement.
+3. **Snake Creator**: draw and edit a curve in space; a GPU-bent snake crawls along it (renderer after shader-lab by Karleido). Extra bodies are plug-ins (`snake-body.ts`).
+4. **Scene Creator**: snakes plus one Center Object chosen from every demo's `center.ts`.
+5. **Cubes** and 6. **Meta Chrome**: raymarched inside a bounding sphere (`src/shaders/raymarch/bounded-sphere.ts`) with shared hand gestures (`createObjectGestures`).
+
+`src/lab/` holds the same kind of folders for private experiments; it never ships on the public branch.
 
 ## Non-goals (MVP)
 
@@ -57,8 +60,10 @@ full gesture recognition · scene-building editor · asset marketplace.
 | OSC | `osc-js` bridge in `apps/osc-bridge` (npm workspace) | Browsers can't receive UDP. |
 | Build/dev | Vite via `iwsdk dev` CLI; `iwsdk.config.json` is project authority | Required by IWSDK tooling. |
 | Tests | Vitest + Riteway (unit), Playwright/IWER (browser, later) | aidd standard. |
-| Package manager | npm (+ workspaces) | PRD onboarding is `npm install`. |
+| Package manager | npm (+ workspaces) | Onboarding is `npm install`. |
+| Licensing | MIT starter; CC BY-NC-SA 4.0 for the creative demos listed in LICENSE-CC-BY-NC-SA.md | The ported shaders are non-commercial by origin. |
 | Repo layout | Single root app/library + `apps/osc-bridge` workspace | Split packages only on demonstrated need. |
+| Demo modularity | One folder per demo, discovered via `demo.ts` / `assets.ts` / `center.ts` / `snake-body.ts` | Add or remove a demo without touching shared files; keeps public and private branches merge-friendly. |
 
 **Explicitly not used:** NextJS, React, Redux/Autodux, shadcn, `@adobe/data/ecs`.
 aidd skills targeting those are out of scope for this project (see `aidd-custom/AGENTS.md`).
@@ -83,32 +88,32 @@ aidd skills targeting those are out of scope for this project (see `aidd-custom/
 ## Project structure
 
 IWSDK-required files stay where IWSDK expects them; framework code lives in
-PRD §13 folders beside them.
+framework folders beside them.
 
 ```text
 iwsdk.config.json          IWSDK project authority (scene, features, XR mode)
 src/index.ts               World.create() + system registration
-src/assets.ts              asset manifest (side-effect free, two realms)
+src/assets.ts              shared assets + every demo's assets.ts (side-effect free, two realms)
 src/components.ts          defineComponents() manifest for editor + runtime
-src/scene-assets/          procedural Object3D prototypes
-src/core/{xr,parameters,events}/
+src/demos/<demo>/          one folder per demo (demo.ts, assets.ts, *.scene-asset.ts, experience, shaders, tests)
+src/lab/<demo>/            private experiments, same shape (never on the public branch)
+src/core/{demos,xr,parameters,persistence}/
 src/components/{ui,interaction,audio,osc,visuals}/
-src/shaders/{noise,sdf,effects}/
-src/themes/  src/examples/  src/utils/
-public/{scenes,ui,models,textures,audio}/
-apps/osc-bridge/           Node OSC UDP ↔ WebSocket bridge (Phase 3)
-tasks/                     aidd epics; plan.md indexes them
+src/shaders/{noise,color,raymarch}/
+src/themes/  src/utils/
+public/{scenes,ui,models,textures}/   (lab/ subfolders are private)
+apps/osc-bridge/           Node OSC UDP ↔ WebSocket bridge
 ```
 
 No barrel `index.ts` files (IWSDK convention). Tests are colocated (`*.test.ts`).
 
 ## Success criteria
 
-The 15 acceptance criteria in PRD §15, notably: runs in Quest Browser; desktop
+Notably: runs in Quest Browser; desktop
 emulation; VR + passthrough MR; readable interactive UI via controllers and hands;
 grab/rotate/scale; haptics; audio drives the same parameters as UI (OSC binds via the same API, unused by examples); custom
-GLSL with minimal boilerplate; 72 FPS on Quest 3S; new experience without touching
-framework internals; new contributor productive in ~15 minutes.
+GLSL with minimal boilerplate; 72 FPS on Quest 3S; new demo without touching
+framework internals or other demos; new contributor productive in ~15 minutes.
 
 ## Open questions
 
@@ -118,6 +123,7 @@ framework internals; new contributor productive in ~15 minutes.
 
 ## Decisions log
 
-- 2026-11-11: Snake Creator ports the shader-lab-app snake renderer under MIT (owner approved).
+- 2026-11-11: Licensing: the starter is MIT; the creative demos listed in LICENSE-CC-BY-NC-SA.md are CC BY-NC-SA 4.0. Code ported from those sources stays inside their demo folders.
 - 2026-11-11: Closed snake loops crawl endlessly (no entry/exit).
-- 2026-11-11: Each example has its own scene file, selected with `?example=<id>`.
+- 2026-11-11: Each demo has its own scene file, selected with `?example=<id>`.
+- 2026-11-13: Demos are self-registering folder modules (`src/demos/*`, private `src/lab/*`); the public branch carries no lab files or history.

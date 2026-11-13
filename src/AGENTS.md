@@ -120,7 +120,8 @@ until it is registered here.
 
 ## Procedural assets
 
-Export a parentless `Object3D` from `src/scene-assets/*.scene-asset.ts` and
+Export a parentless `Object3D` from a demo folder's `*.scene-asset.ts` (this project:
+`src/demos/<name>/`, see `aidd-custom/AGENTS.md`) and
 register it under a stable ID. The registry rejects an already-parented
 prototype.
 

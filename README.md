@@ -1,80 +1,115 @@
-# Cyberdelic XR Starter Kit
+# Cyberdelic XR Starter
 
-WebXR boilerplate + component library for beautiful, interactive VR/MR experiences
-on Meta Quest 3/3S and desktop. Built on Meta IWSDK + Three.js + TypeScript + Vite.
+**Make trippy, touchable VR and mixed-reality worlds in your browser.**
+Glowing sculptures that breathe with your music, particle gardens you stir with your hands,
+snakes you draw in the air. Open it on a Meta Quest, or right on your laptop.
 
-- Vision: [`vision.md`](./vision.md) · PRD: [`cyberdelic-webxr-starter-prd.md`](./cyberdelic-webxr-starter-prd.md) · Roadmap: [`plan.md`](./plan.md)
+<!-- Screenshot / GIF goes here -->
 
-## Quick start
+## What is this?
 
-```sh
-npm install
-npm run dev        # managed dev server + browser with IWER (XR emulator)
-npm test           # Vitest + Riteway unit tests
-npm run check      # typecheck + tests
-npm run build      # production bundle in dist/
-```
+A ready-to-hack WebXR starter kit: a small framework, a library of spatial UI and interaction
+components, and a handful of demos you can copy, remix and tear apart.
 
-Requires Node `>=20.19 <21`, `>=22.12 <23`, or `>=24`.
+**Who it's for:** artists, VJs, creative coders and curious beginners. If you can edit a
+JavaScript file, you can make something here. No game engine and no app store. It's just a
+web page that turns into a world when you put on a headset.
 
-Examples: `?example=sculpture` (default) · `?example=garden` (Particle Garden) · `?example=snake` (Snake Creator) · `?example=playground` (all components).
+## The demos
 
-Docs: [components](./docs/components.md) · [testing](./docs/testing.md) · [create an experience](./docs/creating-experiences.md) · [audio](./docs/audio.md) · [OSC](./docs/osc.md) · [performance](./docs/performance.md)
+Switch between them from the floating **Demos** menu, or add `?example=<id>` to the URL.
 
-**On Quest:** run `npm run dev:status`, open one of the network URLs on a headset on
-the same Wi-Fi, accept the local certificate warning. See
-[Testing your experience](https://iwsdk.dev/guides/02-testing-experience.html).
+| Demo | What it does | `?example=` |
+|---|---|---|
+| **Sculpture** | A glowing orb that grows, flows and pulses with sound. Grab it, scale it with two hands. | `sculpture` |
+| **Garden** | Thousands of GPU particles in a flow field you stir with your hands. | `garden` |
+| **Snake Creator** | Draw a path in the air and a snake crawls along it. Tune its shape, pattern and material. | `snake` |
+| **Scene Creator** | Snakes plus one center object (Sculpture, Cubes or Meta Chrome), saved for next time. | `scene` |
+| **Cubes** | A raymarched kaleidoscope of cubes and rings. | `cubes` |
+| **Meta Chrome** | Liquid chrome blobs you can pinch and pull. | `chrome` |
 
-## AI-assisted development
+More in [docs/demos.md](docs/demos.md).
 
-This repo uses [aidd](https://github.com/paralleldrive/aidd). Agents read
-`AGENTS.md` → `vision.md` → `aidd-custom/AGENTS.md` → `IWSDK.md`. Plan work with
-`/task`, implement with TDD, review with `/review`.
+## Get started (about 3 minutes)
 
----
-
-## IWSDK scaffold notes
-
-This project uses `iwsdk.config.json` for declarative scene, asset, component,
-XR, and emulator configuration. Application systems remain explicit in
-`src/index.ts`.
+You need [Node.js](https://nodejs.org) **20.19+**, **22.12+** or **24+**.
 
 ```sh
+git clone <this repo> cyberdelic-xr
+cd cyberdelic-xr
 npm install
 npm run dev
 ```
 
-Use the Runtime and Editor controls in the managed browser to switch between
-the running experience and its authored scene.
+`npm run dev` opens a browser window with **IWER**, a built-in XR emulator. It fakes a Quest 3
+headset with controllers and hands, so you can try everything without a headset.
 
-## Starter content
+**On a Quest 3 / 3S:** connect it to the same Wi-Fi, run `npm run dev:status`, open one of
+the `network` URLs in the Quest Browser and accept the certificate warning. Then press
+**Enter VR** or **Enter MR**.
 
-The robot and welcome panel are small examples of authored scene content plus
-runtime systems. The robot turns toward the player's head and plays a sound
-when pressed. To remove the robot, delete its scene node, its `RobotSystem`
-registration from `src/index.ts` or `src/index.js`, and its `Robot` registration
-from `src/components.ts` or `src/components.js`; you can then delete the unused
-robot component and system files. To remove the welcome panel, delete its scene
-node and its `PanelSystem` registration from the application entry point.
+Before you share your changes:
 
-The robot stands on the second of three numbered stations. The first holds dark
-pieces you can grab and move, and the third holds a ring you can spin in place.
-The studio props (the plinths and the dark pieces, plus the floor and stage in VR
-and Desktop 3D) are built in code in `src/scene-assets/studio.scene-asset.ts` or
-`.js`. The VR and Desktop 3D background furniture is built the same way in
-`src/scene-assets/decor.scene-asset.ts` or `.js`, so the starter downloads no
-extra models. To remove any of them, delete their scene nodes and their entries
-in `src/assets.ts` or `src/assets.js`, then delete the files you no longer use.
-The station labels are `public/ui/label-*.uikitml`.
+```sh
+npm run check   # typecheck + unit tests
+npm run build   # production bundle in dist/
+```
 
-The rest of the look is built-in components in the scene, which you can edit in
-the editor without code. The soft light on every object is the scene root's
-`IBLGradient` (select the Level Root to edit it), and the soft shadows under
-each object are `ContactShadow` nodes. In VR and Desktop 3D, the sky is the
-scene root's `DomeGradient` (its colors, tilt and dither are also on the Level
-Root), and the floor fades into it through the `DomeFade` on the floor node. AR
-projects have no sky or floor, so passthrough stays visible, and a
-`ShadowCatcher` node grounds the stations.
+Stuck? See [docs/getting-started.md](docs/getting-started.md).
 
-- Minimal scene walkthrough: https://iwsdk.dev/guides/01b-minimal-scene.html
-- XR-enabled projects — IWER emulator controls: https://iwsdk.dev/guides/02-testing-experience.html#iwer-controls
+## Make your own demo in 5 steps
+
+1. Copy a folder in `src/demos/` (e.g. `reactive-sculpture`) and rename it.
+2. In its `demo.ts`, give it a new `id`, `title` and `order`.
+3. Point it at your scene in `public/scenes/` and your panel in `public/ui/`.
+4. Change the visuals. Shaders are plain GLSL files right next to the code.
+5. `npm run dev`. Your demo is already in the Demos menu. No registration needed.
+
+The full walkthrough is in [docs/make-a-demo.md](docs/make-a-demo.md).
+
+## Stack
+
+- **[Meta IWSDK](https://iwsdk.dev)**: WebXR framework (entity-component system, spatial UI, grabbing, hand tracking, XR emulator)
+- **[Three.js](https://threejs.org)**: 3D rendering and GLSL shaders
+- **TypeScript + Vite**: fast dev server with hot reload
+- **Vitest + Riteway**: readable unit tests
+- **OSC bridge** (optional): talk to TouchDesigner, Ableton and friends
+
+## Project map
+
+```text
+src/
+  demos/<demo>/      one folder per demo: demo.ts, assets.ts, experience, shaders, tests
+  components/        reusable library: UI controls, interaction, audio, OSC, visuals
+  core/              experience lifecycle, parameters, XR entry, persistence
+  shaders/           shared GLSL (noise, palettes, raymarching)
+public/
+  scenes/            scene layouts (JSON)
+  ui/                spatial panels (UIKitML)
+apps/osc-bridge/     tiny Node bridge between OSC (UDP) and the browser
+docs/                short guides
+```
+
+## Docs
+
+- [Getting started & testing on Quest](docs/getting-started.md)
+- [The demos](docs/demos.md)
+- [Make a demo](docs/make-a-demo.md)
+- [Component library](docs/components.md)
+- [Audio reactivity](docs/audio.md)
+- [OSC](docs/osc.md)
+- [Testing](docs/testing.md)
+- [Performance on Quest](docs/performance.md)
+
+## Hacking with AI agents
+
+This repo is set up for coding agents ([aidd](https://github.com/paralleldrive/aidd) and
+IWSDK skills). They read `AGENTS.md`, then `vision.md`, then `aidd-custom/AGENTS.md`, then
+`IWSDK.md`. Ask them for a new demo and they will follow the same folder conventions.
+
+## License
+
+The starter (framework, components, shared shaders, Sculpture, Garden) is **MIT**, see
+[`LICENSE`](LICENSE). The creative demos listed in
+[`LICENSE-CC-BY-NC-SA.md`](LICENSE-CC-BY-NC-SA.md) (Snake Creator, Scene Creator, Cubes,
+Meta Chrome) are **CC BY-NC-SA 4.0**: remix them freely for non-commercial work, with credit.

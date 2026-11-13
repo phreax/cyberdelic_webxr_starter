@@ -27,7 +27,7 @@ services (audio engine, OSC client, haptics)               ← side effects isol
    ↑
 ECS components + systems (src/components/**)                ← IWSDK; read params, no business logic
    ↑
-experiences (src/examples/**, createExperience config)      ← composition only
+demos (src/demos/**, src/lab/**: demo.ts config)      ← composition only
 ```
 
 Constraints {

@@ -1,47 +1,19 @@
-import { AssetType, defineAssets } from '@iwsdk/core';
-import {
-  createPlaygroundBell,
-  createPlaygroundButton,
-  createPlaygroundCube,
-  createPlaygroundGazeOrb,
-  createPlaygroundGem,
-  createPlaygroundRail,
-  createPlaygroundSlider,
-} from './scene-assets/playground.scene-asset.js';
-import { createGardenZone, createParticleGarden } from './scene-assets/particle-garden.scene-asset.js';
-import { createReactiveSculpture } from './scene-assets/reactive-sculpture.scene-asset.js';
+import { defineAssets } from '@iwsdk/core';
+import { uikitml } from './core/demos/asset-helpers.js';
 
-const publicAssetUrl = (filePath: string): string =>
-  `${import.meta.env.BASE_URL}${filePath.replace(/^\/+/u, '')}`;
+type AssetModule = { default: Record<string, unknown> };
 
-const uikitml = (fileName: string, name: string) => ({
-  url: publicAssetUrl(`ui/${fileName}`),
-  type: AssetType.UIKitML,
-  name,
-});
+/**
+ * Shared assets plus every demo's own `assets.ts` (src/demos/* and the private src/lab/*).
+ * Evaluated by both the app and the editor: keep every assets.ts pure and deterministic.
+ */
+const demoAssets = Object.assign(
+  {},
+  ...Object.values(import.meta.glob<AssetModule>('./demos/*/assets.ts', { eager: true })).map((module) => module.default),
+  ...Object.values(import.meta.glob<AssetModule>('./lab/*/assets.ts', { eager: true })).map((module) => module.default),
+) as Parameters<typeof defineAssets>[0];
 
 export default defineAssets({
-  'reactive-sculpture': createReactiveSculpture(),
-  'control-panel': uikitml('control-panel.uikitml', 'Control Panel'),
-
-  // Playground (?example=playground)
-  'playground-panel': uikitml('playground-panel.uikitml', 'Playground Panel'),
-  toolbar: uikitml('toolbar.uikitml', 'Toolbar'),
-  'playground-cube': createPlaygroundCube(),
-  'playground-gem': createPlaygroundGem(),
-  'playground-slider': createPlaygroundSlider(),
-  'playground-rail': createPlaygroundRail(),
-  'playground-bell': createPlaygroundBell(),
-  'playground-gaze-orb': createPlaygroundGazeOrb(),
-  'playground-button': createPlaygroundButton(),
-
-  // Particle Garden (?example=garden)
-  'particle-garden': createParticleGarden(),
-  'garden-zone': createGardenZone(),
-  'garden-panel': uikitml('garden-panel.uikitml', 'Garden Panel'),
-
-  // Snake Creator (?example=snake)
-  'snake-list': uikitml('snake-list.uikitml', 'Snake List'),
-  'snake-edit': uikitml('snake-edit.uikitml', 'Snake Edit'),
-  'snake-params': uikitml('snake-params.uikitml', 'Snake Settings'),
+  'demos-panel': uikitml('demos-panel.uikitml', 'Demos'),
+  ...demoAssets,
 });

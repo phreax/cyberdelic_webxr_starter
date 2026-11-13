@@ -10,6 +10,31 @@
   "resources": {},
   "nodes": [
     {
+      "id": "demos-panel",
+      "name": "Demos",
+      "content": {
+        "type": "asset",
+        "asset": "demos-panel"
+      },
+      "transform": {
+        "position": [
+          -0.8,
+          1.35,
+          -0.9
+        ],
+        "rotationDeg": [
+          0,
+          40,
+          0
+        ],
+        "scale": 0.1
+      },
+      "components": {
+        "RayInteractable": {},
+        "PokeInteractable": {}
+      }
+    },
+    {
       "id": "particle-garden",
       "name": "Particle Garden",
       "content": {
@@ -22,6 +47,9 @@
           0,
           0
         ]
+      },
+      "components": {
+        "DepthOccludable": {}
       }
     },
     {
@@ -33,19 +61,20 @@
       },
       "transform": {
         "position": [
-          -0.75,
-          1.25,
-          -0.55
+          -0.25,
+          1.35,
+          -1.05
         ],
         "rotationDeg": [
           0,
-          53.75,
+          13,
           0
         ],
         "scale": 0.1
       },
       "components": {
-        "RayInteractable": {}
+        "RayInteractable": {},
+        "PokeInteractable": {}
       }
     },
     {
@@ -66,6 +95,9 @@
           0,
           0
         ]
+      },
+      "components": {
+        "DepthOccludable": {}
       }
     },
     {
@@ -86,6 +118,9 @@
           0,
           0
         ]
+      },
+      "components": {
+        "DepthOccludable": {}
       }
     },
     {
@@ -106,6 +141,9 @@
           0,
           0
         ]
+      },
+      "components": {
+        "DepthOccludable": {}
       }
     },
     {
@@ -126,6 +164,9 @@
           0,
           0
         ]
+      },
+      "components": {
+        "DepthOccludable": {}
       }
     },
     {

@@ -8,36 +8,18 @@ npm run check     # typecheck + tests
 npm run build     # production bundle; also validates every public/ui/*.uikitml
 ```
 
-## 2. Desktop with XR emulation (IWER)
+## 2. In the emulator and on Quest
 
-```sh
-npm run dev
-```
+See [getting-started.md](getting-started.md).
 
-Opens the managed IWSDK browser at `https://localhost:8081` with **IWER**, IWSDK's
-browser XR emulator (emulates a Quest 3 in a living room). You get:
+## 3. Contract tests you get for free
 
-- **Desktop preview**: mouse clicks the control panel (canvas pointer events).
-- **Emulated XR**: click *Session → Enter VR / Enter MR* on the panel, then use the
-  IWER controls to move the head, controllers and hands
-  ([IWER controls](https://iwsdk.dev/guides/02-testing-experience.html#iwer-controls)).
-
-> **macOS 13 note:** the managed browser uses Playwright's Chromium, which no longer
-> runs on macOS 13 (Ventura). Use `npm run dev:runtime` (plain Vite with the IWSDK
-> plugin) and open `https://localhost:8081` in your own Chrome instead (not yet verified),
-> or upgrade macOS.
-
-## 3. On Quest 3 / 3S
-
-1. Put the computer and headset on the same Wi-Fi.
-2. `npm run dev` (or `npm run dev:runtime`), then `npm run dev:status` and pick a URL from `runtimeUrls.network`.
-3. Open it in Quest Browser and accept the local certificate warning (WebXR needs HTTPS).
-4. Use the panel: *Enter VR* / *Enter MR*. Grab the orb with squeeze or pinch; use a second hand to scale.
-
-USB alternative: `adb reverse tcp:8081 tcp:8081` and open `https://localhost:8081`.
-
-Performance check: target **72 FPS on Quest 3S**. Use the Meta Quest Developer Hub
-performance HUD or OVR Metrics Tool while the orb animates.
+- `src/demos/registry.test.ts`: every demo has a unique id, a valid scene that places the
+  Demos picker, and the picker has room for it.
+- `src/demos/scene-creator/center-controls.test.ts`: every `center.ts` has its controls in
+  `snake-params.uikitml`.
+- `shaders.test.ts` in each demo: GLSL compiles the way three.js wraps it (needs
+  `glslangValidator`, otherwise skipped).
 
 ## Manual checklist
 
@@ -58,9 +40,14 @@ performance HUD or OVR Metrics Tool while the orb animates.
 - [ ] Snake list: + Add snake → edit mode with Draw; draw a stroke (trigger / pinch, not while pointing at a window); Done; select rows; Delete selects a neighbour.
 - [ ] Snake edit: only curve + vertices visible; Move tool drags vertices; Closed loop toggle works even for two-point paths; Add / Delete point.
 - [ ] Snake settings: changes apply only to the selected snake; Background off = see-through gaps, on = offset gradient colour with brightness; iridescence and gloss visible.
-- [ ] Snake look: Tube / Spheres body (density + size); roughness and metallic clearly change the highlights; Iridescence shows rainbow diffraction along the body; no frosted edge sheen at grazing angles; gradient repeats without a seam; Hilbert tiles have no seams; black background by default, Transparent cuts the gaps; B deletes the selected vertex.
+- [ ] Snake look: Tube / Spheres body (plus any plug-in bodies) (density + size); roughness and metallic clearly change the highlights; Iridescence shows rainbow diffraction along the body; no frosted edge sheen at grazing angles; gradient repeats without a seam; Hilbert tiles have no seams; black background by default, Transparent cuts the gaps; B deletes the selected vertex.
 - [ ] Snake objects: grab to move / rotate, two hands to resize uniformly; grabbing selects the snake.
-- [ ] Playground (?example=playground): every control, trigger, toolbar button, hum sound, surface placement (MR), OSC tab.
-- [ ] Demos row: switching between all four examples works on desktop and inside an XR session (no exit), and back again without duplicated behaviour (e.g. single haptic pulse on grab).
+- [ ] Magic Cubes (?example=cubes): Mode / Kaleidoscope / Color mode / Color offset / Glow / palettes apply.
+- [ ] Raymarched demos (cubes, chrome): both hands zoom + rotate; right hand moves + rotates; left hand drags a parameter; 72 FPS on Quest 3S at Medium.
+- [ ] Meta Chrome (?example=chrome): Manipulate on → pinches pull the surface.
+- [ ] Scene Creator (?example=scene): choose, change, hide and remove the Center Object; it comes back after a reload.
+- [ ] Session page: Patterned hands / Patterned room toggles show their sliders and change the look.
+- [ ] Wrist button (hands): poking it hides/shows the menus; pinching elsewhere never does.
+- [ ] Demos row: switching between all demos works on desktop and inside an XR session (no exit), and back again without duplicated behaviour (e.g. single haptic pulse on grab).
 - [ ] Settings persist per demo after a reload (sculpture / garden parameters, garden mood, all snakes with paths, looks and placement); Reset settings (session section) restores defaults in place.
 - [ ] Quest 3S: stable 72 FPS (see docs/performance.md).

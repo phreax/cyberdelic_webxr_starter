@@ -342,7 +342,7 @@
       <span class="eyebrow">SNAKE EDIT</span>
       <span id="edit-name" class="title">Snake</span>
     </div>
-    <div id="btn-done" class="icon-button">Done</div>
+    <div id="btn-settings" class="icon-button"><Settings /></div><div id="btn-done" class="icon-button"><X /></div>
   </div>
   <div class="row">
       <div id="tool-draw" class="small-button">Draw</div>

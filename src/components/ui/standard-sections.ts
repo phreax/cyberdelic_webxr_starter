@@ -1,13 +1,14 @@
 import { VisibilityState } from '@iwsdk/core';
 import type { AudioState } from '../audio/audio-engine.js';
+import { createPatternedHands, type HandAppearanceState } from '../visuals/patterned-hands.js';
 import type { ExperienceContext } from '../../core/xr/experience.js';
 import { createFpsMeter } from '../../utils/fps-meter.js';
-import { bindButton, bindStatus, bindToggle, type BindOptions, type ElementSource, type StatusLevel, type UIElement } from './controls.js';
+import { bindButton, bindSlider, bindStatus, bindToggle, type BindOptions, type ElementSource, type StatusLevel, type UIElement } from './controls.js';
 
 /**
  * Reusable panel sections shared by the examples. Optional elements are skipped when absent.
  * Audio: btn-mic, btn-capture, btn-demo, [btn-file], btn-stop, audio-dot, audio-status.
- * Session: btn-vr, btn-mr, btn-exit, mode-dot, status, [xr-info], [haptics], [fps-dot, fps].
+ * Session: btn-vr, btn-mr, btn-exit, mode-dot, status, [xr-info], [haptics], [hand-outlines], [fps-dot, fps].
  */
 const has = (source: ElementSource, id: string) => source.getElementById(id) != null;
 
@@ -52,7 +53,6 @@ export const bindAudioSection = (ctx: ExperienceContext, panel: ElementSource, c
 
 export const bindSessionSection = (ctx: ExperienceContext, panel: ElementSource, common: BindOptions) => {
   const { world, theme, track, haptics } = ctx;
-  bindExampleSwitcher(ctx, panel, common);
   const { support } = ctx.xr;
   const noXR = !support.vr && !support.ar;
   const xrInfo = has(panel, 'xr-info') ? (panel.getElementById('xr-info') as UIElement) : undefined;
@@ -69,6 +69,45 @@ export const bindSessionSection = (ctx: ExperienceContext, panel: ElementSource,
     track(bindButton(panel, 'btn-reset-settings', { ...common, onClick: () => setTimeout(() => ctx.resetSettings(), 0) }));
   }
   if (has(panel, 'haptics')) track(bindToggle(panel, 'haptics', { ...common, value: true, onChange: (v) => haptics.setEnabled(v) }));
+  const hands = track(createPatternedHands(world));
+  const handState = hands.state;
+  hands.update(0);
+  ctx.onFrame((dt) => hands.update(dt));
+  if (has(panel, 'hand-outlines')) {
+    track(bindToggle(panel, 'hand-outlines', {
+      ...common, value: handState.outlines, onChange: (enabled) => { handState.outlines = enabled; hands.update(0); },
+    }));
+  }
+  if (has(panel, 'patterned-vision')) {
+    const controls = panel.getElementById('patterned-hand-controls') as UIElement | null;
+    const showControls = () => controls?.setProperties({ display: handState.patterned || handState.roomPatterned ? 'flex' : 'none' });
+    track(bindToggle(panel, 'patterned-vision', {
+      ...common, value: handState.patterned,
+      onChange: (enabled) => { handState.patterned = enabled; showControls(); hands.update(0); },
+    }));
+    if (has(panel, 'patterned-room')) {
+      track(bindToggle(panel, 'patterned-room', {
+        ...common, value: handState.roomPatterned,
+        onChange: (enabled) => { handState.roomPatterned = enabled; showControls(); },
+      }));
+    }
+    showControls();
+    const sliders: ReadonlyArray<readonly [string, keyof Pick<HandAppearanceState, 'scale' | 'roomScale' | 'warpAmount' | 'positionX' | 'positionY' | 'alpha' | 'roomAlpha' | 'chromaAmount' | 'fingerLength'>, number, number, number]> = [
+      ['pattern-scale', 'scale', 0, 1, .01],
+      ['pattern-room-scale', 'roomScale', 0, 1, .01],
+      ['pattern-warp', 'warpAmount', 0, 1, .01],
+      ['pattern-position-x', 'positionX', -1, 1, .01],
+      ['pattern-position-y', 'positionY', -1, 1, .01],
+      ['pattern-alpha', 'alpha', 0, 1, .01],
+      ['pattern-room-alpha', 'roomAlpha', 0, 1, .01],
+      ['pattern-chroma', 'chromaAmount', 0, .03, .001],
+      ['pattern-finger-length', 'fingerLength', .75, 1.5, .01],
+    ];
+    for (const [id, key, min, max, step] of sliders) {
+      if (!has(panel, id)) continue;
+      track(bindSlider(panel, id, { ...common, min, max, step, value: handState[key], onChange: (value) => { handState[key] = value; } }));
+    }
+  }
   xrInfo?.setProperties({ text: `VR ${support.vr ? 'available' : 'unavailable'} | MR ${support.ar ? 'available' : 'unavailable'}` });
   track(
     world.visibilityState.subscribe((state) => {
@@ -96,25 +135,33 @@ export const bindSessionSection = (ctx: ExperienceContext, panel: ElementSource,
   }
 };
 
+/** How many demo buttons `public/ui/demos-panel.uikitml` provides (`demo-slot-0` … `demo-slot-15`). */
+export const DEMO_SLOTS = 16;
+
 /**
- * "Demos" row: one button per example (`example-<id>`), current one selected. Switching happens
+ * "Demos" row: generic slots (`demo-slot-<n>` + `demo-slot-<n>-label`) filled from the demo registry
+ * in menu order, so adding a demo folder never requires editing the panel markup. Switching happens
  * after the click finishes, so the panel isn't torn down mid-event.
  */
-export const bindExampleSwitcher = (ctx: ExperienceContext, panel: ElementSource, common: BindOptions) => {
+export const bindExampleSwitcher = (ctx: ExperienceContext, panel: ElementSource, common: BindOptions, onCurrent?: () => void) => {
   const { examples, track } = ctx;
   if (!examples) return;
-  for (const { id } of examples.list) {
-    if (!has(panel, `example-${id}`)) continue;
+  if (examples.list.length > DEMO_SLOTS) console.warn(`[cyberdelic] ${examples.list.length} demos but only ${DEMO_SLOTS} menu slots`);
+  examples.list.slice(0, DEMO_SLOTS).forEach(({ id, title }, slot) => {
+    if (!has(panel, `demo-slot-${slot}`)) return;
+    (panel.getElementById(`demo-slot-${slot}`) as UIElement).setProperties({ display: 'flex' });
+    (panel.getElementById(`demo-slot-${slot}-label`) as UIElement | undefined)?.setProperties({ text: title });
     track(
-      bindButton(panel, `example-${id}`, {
+      bindButton(panel, `demo-slot-${slot}`, {
         ...common,
         selected: id === examples.current,
         onClick: () => {
           if (id !== examples.current) setTimeout(() => examples.switchTo(id), 0);
+          else onCurrent?.();
         },
       }),
     );
-  }
+  });
 };
 
 /** Haptic + sound feedback used by every example's controls. */

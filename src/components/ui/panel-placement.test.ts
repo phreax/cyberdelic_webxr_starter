@@ -1,6 +1,6 @@
 import { describe, test } from 'vitest';
 import { assert } from 'riteway/vitest';
-import { summonPose, yawToward } from './panel-placement.js';
+import { consoleArcPoses, summonPose, yawToward } from './panel-placement.js';
 
 const round = (values: readonly number[]) => values.map((v) => Math.round(v * 1000) / 1000);
 
@@ -54,5 +54,17 @@ describe('summonPose()', () => {
       actual: round(pose.position),
       expected: [1, 1.4, 0.5],
     });
+  });
+});
+
+describe('consoleArcPoses()', () => {
+  test('uses three stable, separated slots around one anchor', () => {
+    const anchor = { position: [0, 1.6, 0] as const, forward: [0, 0, -1] as const };
+    const first = consoleArcPoses(anchor);
+    const second = consoleArcPoses(anchor);
+    assert({ given: 'a demo switch or inspector reopen with the same viewer anchor',
+      should: 'keep the picker, demo and inspector at fixed positions with room between panels',
+      actual: [round(first.picker.position), round(first.demo.position), round(first.inspector.position), second],
+      expected: [[-0.58, 1.38, -0.95], [0, 1.38, -0.95], [0.58, 1.38, -0.95], first] });
   });
 });

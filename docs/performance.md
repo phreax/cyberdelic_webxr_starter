@@ -12,7 +12,7 @@ Target: **72 FPS** (≈13.9 ms/frame) on Quest 3S; 90 FPS where feasible.
 | Per frame JS | No allocation in `update()` | Uniforms written from the param store. |
 
 Levers if a device drops frames: `SphereGeometry` segments in
-`src/scene-assets/reactive-sculpture.scene-asset.ts` (160×120 → 96×72 quarters the vertex cost),
+`src/demos/reactive-sculpture/reactive-sculpture.scene-asset.ts` (160×120 → 96×72 quarters the vertex cost),
 `FBM_OCTAVES` (2 → 1), and the `Complexity` range.
 
 ## Test configuration
@@ -37,3 +37,12 @@ Levers if a device drops frames: `SphereGeometry` segments in
 |---|---|---|
 | Snake | 1 draw, 192 × 24 grid (~9k triangles), MeshStandardMaterial | Vertex shader bends the fixed grid; curve is a 256 × 3 float texture rewritten only when the path changes. |
 | Path edits | CPU resample (≤ 48 anchors × 64 steps) only while an anchor moves | |
+
+## Raymarched demos (Cubes, Meta Chrome)
+
+| Item | Cost | Notes |
+|---|---|---|
+| Raymarch | Only pixels covered by the bounding sphere; steps Low 48 / Medium 72 / High 110 | Rays march between sphere entry and exit only. |
+| Shading | Normal + environment reflection at the hit | Depth comes from the hit, so occlusion stays correct. |
+
+Cost grows with how much of the view the sphere covers: stepping back or zooming out is the cheapest win.

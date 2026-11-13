@@ -1,0 +1,104 @@
+{
+  "version": "iwsdk.scene.v1",
+  "units": "meters",
+  "components": {},
+  "environment": {
+    "toneMapping": "aces",
+    "exposure": 1,
+    "shadows": false
+  },
+  "resources": {},
+  "nodes": [
+    {
+      "id": "demos-panel",
+      "name": "Demos",
+      "content": {
+        "type": "asset",
+        "asset": "demos-panel"
+      },
+      "transform": {
+        "position": [
+          -0.8,
+          1.35,
+          -0.9
+        ],
+        "rotationDeg": [
+          0,
+          40,
+          0
+        ],
+        "scale": 0.1
+      },
+      "components": {
+        "RayInteractable": {},
+        "PokeInteractable": {}
+      }
+    },
+    {
+      "id": "magic-cubes",
+      "name": "Magic Cubes",
+      "content": {
+        "type": "asset",
+        "asset": "magic-cubes"
+      },
+      "transform": {
+        "position": [
+          0.1,
+          1.35,
+          -1.1
+        ],
+        "scale": 0.45
+      },
+      "components": {
+        "DepthOccludable": {
+          "mode": "MinMaxSoftOcclusion"
+        }
+      }
+    },
+    {
+      "id": "cubes-panel",
+      "name": "Cubes Panel",
+      "content": {
+        "type": "asset",
+        "asset": "cubes-panel"
+      },
+      "transform": {
+        "position": [
+          -0.25,
+          1.35,
+          -1.05
+        ],
+        "rotationDeg": [
+          0,
+          13,
+          0
+        ],
+        "scale": 0.1
+      },
+      "components": {
+        "RayInteractable": {},
+        "PokeInteractable": {}
+      }
+    }
+  ],
+  "authoring": {
+    "views": [
+      {
+        "id": "hero",
+        "role": "hero",
+        "projection": "perspective",
+        "position": [
+          0,
+          1.5,
+          0.4
+        ],
+        "target": [
+          0,
+          1.3,
+          -1.1
+        ],
+        "fov": 65
+      }
+    ]
+  }
+}

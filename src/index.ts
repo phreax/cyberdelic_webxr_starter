@@ -1,28 +1,36 @@
-import { World } from '@iwsdk/core';
+import { DepthSensingSystem, World } from '@iwsdk/core';
 import projectOptions from 'virtual:iwsdk-project';
 import { resolveExample } from './core/xr/example-registry.js';
-import { createExperience } from './core/xr/experience.js';
-import { DEFAULT_EXAMPLE, EXAMPLES } from './examples/registry.js';
+import { installLightEstimationOptIn } from './core/xr/light-estimation-opt-in.js';
+import { createExperience, type ExampleSwitcher } from './core/xr/experience.js';
+import { PatternedRoomSystem } from './components/visuals/patterned-room-system.js';
+import { DEFAULT_EXAMPLE, DEMOS, EXAMPLES } from './demos/registry.js';
 
-type ExampleId = keyof typeof EXAMPLES;
+installLightEstimationOptIn();
 
 // Pick the first example with ?example=<id>; the menu's "Demos" row switches in place (no reload,
 // the XR session stays open).
 const { id: initial, fallbackReason } = resolveExample(location.search, EXAMPLES, DEFAULT_EXAMPLE);
 if (fallbackReason) console.warn(`[cyberdelic] ${fallbackReason}`);
 
-const list = (Object.keys(EXAMPLES) as ExampleId[]).map((id) => ({ id, title: EXAMPLES[id].title }));
+const list = DEMOS.map(({ id, title, panelNode }) => ({ id, title, panelNode }));
 
 World.create(document.getElementById('scene-container') as HTMLDivElement, projectOptions).then((world) => {
+  world.registerSystem(DepthSensingSystem, {
+    configData: { enableDepthTexture: true, enableOcclusion: true, useFloat32: true, blurRadius: 20 },
+  });
+  world.registerSystem(PatternedRoomSystem);
   let current: { dispose(): void } | undefined;
+  let currentId: string | undefined;
+  const consolePlacement: NonNullable<ExampleSwitcher['consolePlacement']> = {};
   let switching: Promise<void> = Promise.resolve();
 
-  const start = (id: ExampleId, first: boolean) => {
+  const start = (id: string, first: boolean) => {
     switching = switching.then(async () => {
       current?.dispose();
       current = undefined;
       try {
-        const config = EXAMPLES[id].config();
+        const config = EXAMPLES[id]!.config();
         current = await createExperience(world, {
           mode: 'mixed-reality',
           ...config,
@@ -31,14 +39,16 @@ World.create(document.getElementById('scene-container') as HTMLDivElement, proje
           examples: {
             current: id,
             list,
+            consolePlacement,
             switchTo: (next) => {
               if (!(next in EXAMPLES) || next === id) return;
               history.replaceState(null, '', `?example=${next}`);
-              start(next as ExampleId, false);
+              start(next, false);
             },
             reload: () => start(id, false),
           },
         });
+        currentId = id;
       } catch (error) {
         console.error(`[cyberdelic] Failed to start example "${id}"`, error);
       }

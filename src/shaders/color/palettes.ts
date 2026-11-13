@@ -11,6 +11,18 @@ export const PALETTES = {
   Ember: ['#2B0A3D', '#C81D25', '#FF9500', '#FFE066'],
   /** Generative: shader-lab "Cosine Rainbow". */
   Rainbow: 'cosine-rainbow',
+  // shader-lab (Karleido) config/palettes.json — used by the raymarched demos (e.g. Cubes).
+  'Vibrant Coral': ['#540d6e', '#ee4266', '#ffd23f', '#3bceac', '#0ead69'],
+  Neon: ['#00ccff', '#00ffcc', '#ffff00', '#ff00cc', '#cc00ff'],
+  'Ocean Sunset': ['#1be7ff', '#6eeb83', '#e4ff1a', '#ffb800', '#ff5714'],
+  'Cosine Rainbow': 'cosine-rainbow',
+  Chameleon: ['#2bc2b7', '#5b8402', '#9ad942', '#d13c32', '#851305'],
+  'Spectral Rainbow': 'spectral',
+  'Candy Land': ['#ff1a88', '#c666f9', '#1be7ff', '#6eeb83', '#e4ff1a', '#ffb800', '#ff5714'],
+  Pastel: ['#9b5de5', '#f15bb5', '#fee440', '#00bbf9', '#00f5d4'],
+  Vulcano: ['#edae49', '#d1495b', '#00798c', '#30638e', '#003d5b'],
+  'SciFi Machine': ['#002439', '#005066', '#4e7988', '#78cce2', '#e4eff0'],
+  'B&W': 'black-white',
 } as const;
 export type PaletteName = keyof typeof PALETTES;
 
@@ -45,13 +57,33 @@ export const buildGradientData = (stops: readonly string[], sharpness = 0): Uint
   return data;
 };
 
+/** Zucconi spectral palette (shader-lab "Spectral Rainbow"). */
+export const spectralZucconi = (t: number): [number, number, number] => {
+  const x = t - Math.floor(t);
+  const c1 = [3.54585104, 2.93225262, 2.41593945], x1 = [0.69549072, 0.49228336, 0.2769988], y1 = [0.02312639, 0.15225084, 0.52607955];
+  const c2 = [3.9030714, 3.21182957, 3.96587128], x2 = [0.11748627, 0.86755042, 0.6607786], y2 = [0.8489713, 0.88445281, 0.73949448];
+  const bump = (c: number, x0: number, y0: number) => Math.min(1, Math.max(0, 1 - (c * (x - x0)) ** 2 - y0));
+  return [0, 1, 2].map((i) => bump(c1[i]!, x1[i]!, y1[i]!) + bump(c2[i]!, x2[i]!, y2[i]!)) as [number, number, number];
+};
+
+const GENERATORS: Record<string, (t: number) => [number, number, number]> = {
+  'cosine-rainbow': cosineRainbow,
+  spectral: spectralZucconi,
+  'black-white': (t) => {
+    const v = 0.5 + 0.5 * Math.sin(t * 2 * Math.PI);
+    return [v, v, v];
+  },
+};
+
 export const bakePalette = (name: PaletteName): Uint8Array => {
   const entry = PALETTES[name];
   if (typeof entry !== 'string') return buildGradientData(entry);
+  const generate = GENERATORS[entry]!;
   const data = new Uint8Array(PALETTE_SIZE * 4);
+  const byte = (v: number) => Math.round(Math.min(1, Math.max(0, v)) * 255);
   for (let i = 0; i < PALETTE_SIZE; i += 1) {
-    const [r, g, b] = cosineRainbow(i / PALETTE_SIZE);
-    data.set([Math.round(r * 255), Math.round(g * 255), Math.round(b * 255), 255], i * 4);
+    const [r, g, b] = generate(i / PALETTE_SIZE);
+    data.set([byte(r), byte(g), byte(b), 255], i * 4);
   }
   return data;
 };

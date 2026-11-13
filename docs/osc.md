@@ -1,7 +1,8 @@
 # OSC (base structure)
 
-OSC is ready to use but **not wired into the examples** (MVP decision). Browsers can't receive UDP,
-so a small Node bridge translates between OSC/UDP and a WebSocket.
+OSC lets music and visual tools (TouchDesigner, Ableton, Max, Python…) drive your demo, and the
+demo talk back. It's ready to use but off in the bundled demos. Browsers can't receive UDP, so a
+small Node bridge translates between OSC/UDP and a WebSocket.
 
 ```text
 TouchDesigner / Ableton / Python ──UDP :9000──▶ apps/osc-bridge ──ws :8080──▶ Vite dev server (wss /osc) ──▶ XR app
@@ -18,7 +19,8 @@ OSC_UDP_PORT=7000 OSC_TARGET_HOST=192.168.1.20 OSC_TARGET_PORT=7001 npm run osc-
 ## Use in an experience
 
 ```ts
-const { dispose } = await createExperience(world, { osc: true, scene: myScene }); // ctx.osc
+// demo.ts: turn OSC on for your demo → ctx.osc
+config: () => ({ level: sceneUrl('my-demo.iwsdk.scene.json'), osc: true, scene: createMyExperience() }),
 
 // inside init(ctx)
 import { bindOSC } from '../../core/parameters/bindings.js';
@@ -37,4 +39,4 @@ connects to `wss://<dev-host>/osc` and the Vite dev server (already HTTPS) proxi
 (`vite.config.ts → server.proxy['/osc']`), so the Quest needs no extra certificate.
 
 For production, put the bridge behind a TLS reverse proxy (Caddy, nginx) on the venue network and
-pass its URL: `createExperience(world, { osc: { url: 'wss://osc.venue.local' }, ... })`.
+pass its URL in `demo.ts`: `config: () => ({ osc: { url: 'wss://osc.venue.local' }, ... })`.

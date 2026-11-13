@@ -5,7 +5,7 @@ import { bindButton, bindSlider, requireElement, type BindOptions, type ElementS
 
 /**
  * Composite controls built on the basic binders. Markup conventions (element ids) are listed per
- * binder; see public/ui/playground-panel.uikitml for working examples.
+ * binder.
  */
 
 /** Label / ValueDisplay: a text element showing a formatted value. */
@@ -113,10 +113,26 @@ export const bindColorPicker = (
       options.onChange(color);
     },
   });
+  const componentSlider = (suffix: 'saturation' | 'value', label: 's' | 'v') =>
+    source.getElementById(`${id}-${suffix}`) ? bindSlider(source, `${id}-${suffix}`, {
+      ...options, min: 0, max: 1, step: 0.005, value: hexToHsv(color)[label],
+      format: (v) => `${Math.round(v * 100)}%`,
+      onChange: (v) => {
+        color = hsvToHex({ ...hexToHsv(color), [label]: v });
+        render();
+        highlight();
+        options.onChange(color);
+      },
+    }) : undefined;
+  const saturation = componentSlider('saturation', 's');
+  const value = componentSlider('value', 'v');
   const highlight = () => swatches.forEach((swatch, i) => swatch.setSelected(options.palette[i]!.toLowerCase() === color.toLowerCase()));
   const set = (hex: string) => {
     color = hex.toLowerCase();
-    hue.setValue(hexToHsv(color).h);
+    const hsv = hexToHsv(color);
+    hue.setValue(hsv.h);
+    saturation?.setValue(hsv.s);
+    value?.setValue(hsv.v);
     render();
     highlight();
   };
@@ -129,10 +145,14 @@ export const bindColorPicker = (
     setDisabled: (disabled: boolean) => {
       swatches.forEach((s) => s.setDisabled(disabled));
       hue.setDisabled(disabled);
+      saturation?.setDisabled(disabled);
+      value?.setDisabled(disabled);
     },
     dispose: () => {
       swatches.forEach((s) => s.dispose());
       hue.dispose();
+      saturation?.dispose();
+      value?.dispose();
     },
   };
 };
@@ -168,6 +188,33 @@ export const bindPresetSelector = (
     refresh,
     dispose: () => {
       offs.forEach((off) => off());
+      buttons.forEach((button) => button.dispose());
+    },
+  };
+};
+
+export const slugify = (name: string) => name.toLowerCase().replace(/&/g, '').replace(/\s+/g, '-');
+
+/**
+ * Choice row bound to a numeric parameter: button `${prefix}-${slug(name)}` sets the parameter to
+ * its index; the selected button follows the parameter (presets, saved settings, gestures).
+ */
+export const bindParamChoice = (
+  source: ElementSource,
+  prefix: string,
+  names: readonly string[],
+  options: BindOptions & { params: Pick<ParameterStore, 'set' | 'getBase' | 'subscribe'>; id: string },
+) => {
+  const { params, id } = options;
+  const buttons = names.map((name, index) =>
+    bindButton(source, `${prefix}-${slugify(name)}`, { ...options, onClick: () => params.set(id, index, 'ui') }),
+  );
+  const show = (value: number) => buttons.forEach((button, i) => button.setSelected(i === Math.round(value)));
+  const off = params.subscribe(id, show);
+  show(params.getBase(id));
+  return {
+    dispose() {
+      off();
       buttons.forEach((button) => button.dispose());
     },
   };

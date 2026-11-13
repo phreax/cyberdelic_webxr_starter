@@ -49,6 +49,31 @@
   },
   "nodes": [
     {
+      "id": "demos-panel",
+      "name": "Demos",
+      "content": {
+        "type": "asset",
+        "asset": "demos-panel"
+      },
+      "transform": {
+        "position": [
+          -0.8,
+          1.35,
+          -0.9
+        ],
+        "rotationDeg": [
+          0,
+          40,
+          0
+        ],
+        "scale": 0.1
+      },
+      "components": {
+        "RayInteractable": {},
+        "PokeInteractable": {}
+      }
+    },
+    {
       "content": {
         "type": "asset",
         "asset": "reactive-sculpture"
@@ -61,11 +86,17 @@
           1.35,
           -1.0
         ]
+      },
+      "components": {
+        "DepthOccludable": {
+          "mode": "MinMaxSoftOcclusion"
+        }
       }
     },
     {
       "components": {
-        "RayInteractable": {}
+        "RayInteractable": {},
+        "PokeInteractable": {}
       },
       "content": {
         "asset": "control-panel",
@@ -75,13 +106,13 @@
       "name": "Control Panel",
       "transform": {
         "position": [
-          -0.42,
-          1.3,
-          -0.85
+          -0.25,
+          1.35,
+          -1.05
         ],
         "rotationDeg": [
           0,
-          26.29,
+          13,
           0
         ],
         "scale": 0.1

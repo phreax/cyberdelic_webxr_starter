@@ -1,0 +1,71 @@
+<style>
+  .panel { flex-direction: column; width: 420px; gap: 14px; padding-top: 20px; padding-bottom: 20px; padding-left: 24px; padding-right: 24px; border-radius: 20px; border-width: 2px; border-color: #00d9c740; background-color: #152322ed; }
+  .header { flex-direction: row; align-items: center; justify-content: space-between; gap: 12px; }
+  .title { color: #f1f7f5; font-size: 29px; font-weight: 700; flex-grow: 1; }
+  .eyebrow { color: #ff9500; font-size: 13px; font-weight: 700; letter-spacing: 2px; }
+  .icon { width: 48px; height: 48px; align-items: center; justify-content: center; border-radius: 11px; border-width: 2px; border-color: #00d9c7; color: #f1f7f5; }
+  .page { flex-direction: column; gap: 12px; }
+  .grid { flex-direction: row; flex-wrap: wrap; gap: 10px; }
+  .choice { width: 178px; min-height: 48px; align-items: center; padding-left: 12px; padding-right: 10px; border-radius: 10px; border-width: 2px; border-color: #00d9c7; color: #f1f7f5; font-size: 17px; }
+  .row { flex-direction: row; align-items: center; justify-content: space-between; gap: 12px; }
+  .demo-slot { display: none; }
+  .column { flex-direction: column; gap: 6px; }
+  .value { color: #00d9c7; font-size: 16px; font-weight: 700; }
+  .track { height: 26px; border-radius: 13px; border-width: 2px; border-color: #00d9c7; background-color: #071514; padding-top: 4px; padding-bottom: 4px; padding-left: 4px; padding-right: 4px; }
+  .fill { height: 100%; border-radius: 9px; background-color: #00d9c7; }
+  .patterned-hand-controls { display: none; flex-direction: column; gap: 10px; }
+  .button { flex-grow: 1; min-height: 48px; justify-content: center; align-items: center; border-radius: 11px; border-width: 2px; border-color: #00d9c7; color: #f1f7f5; font-size: 17px; font-weight: 700; }
+  .primary { border-color: #ff9500; background-color: #ff9500; color: #071514; }
+  .label { color: #f1f7f5; font-size: 18px; }
+  .muted { color: #9baeab; font-size: 16px; }
+  .toggle { flex-direction: row; align-items: center; width: 72px; height: 38px; border-radius: 19px; border-width: 2px; border-color: #00d9c7; padding-left: 5px; padding-right: 5px; }
+  .toggle-thumb { width: 26px; height: 26px; border-radius: 13px; background-color: #9baeab; }
+  .status-dot { width: 12px; height: 12px; border-radius: 6px; background-color: #9baeab; }
+</style>
+<div id="panel" class="panel">
+  <div class="header"><span id="demos-title" class="title">Demos</span><div id="btn-settings" class="icon"><Settings /></div><div id="btn-close-demos" class="icon"><X /></div></div>
+  <div id="console-demos" class="page">
+    <span class="eyebrow">CYBERDELIC XR</span>
+    <div class="grid">
+      <div id="demo-slot-0" class="choice demo-slot"><span id="demo-slot-0-label">Demo</span></div>
+      <div id="demo-slot-1" class="choice demo-slot"><span id="demo-slot-1-label">Demo</span></div>
+      <div id="demo-slot-2" class="choice demo-slot"><span id="demo-slot-2-label">Demo</span></div>
+      <div id="demo-slot-3" class="choice demo-slot"><span id="demo-slot-3-label">Demo</span></div>
+      <div id="demo-slot-4" class="choice demo-slot"><span id="demo-slot-4-label">Demo</span></div>
+      <div id="demo-slot-5" class="choice demo-slot"><span id="demo-slot-5-label">Demo</span></div>
+      <div id="demo-slot-6" class="choice demo-slot"><span id="demo-slot-6-label">Demo</span></div>
+      <div id="demo-slot-7" class="choice demo-slot"><span id="demo-slot-7-label">Demo</span></div>
+      <div id="demo-slot-8" class="choice demo-slot"><span id="demo-slot-8-label">Demo</span></div>
+      <div id="demo-slot-9" class="choice demo-slot"><span id="demo-slot-9-label">Demo</span></div>
+      <div id="demo-slot-10" class="choice demo-slot"><span id="demo-slot-10-label">Demo</span></div>
+      <div id="demo-slot-11" class="choice demo-slot"><span id="demo-slot-11-label">Demo</span></div>
+      <div id="demo-slot-12" class="choice demo-slot"><span id="demo-slot-12-label">Demo</span></div>
+      <div id="demo-slot-13" class="choice demo-slot"><span id="demo-slot-13-label">Demo</span></div>
+      <div id="demo-slot-14" class="choice demo-slot"><span id="demo-slot-14-label">Demo</span></div>
+      <div id="demo-slot-15" class="choice demo-slot"><span id="demo-slot-15-label">Demo</span></div>
+    </div>
+  </div>
+  <div id="console-session" class="page">
+    <div id="btn-back-demos" class="button">Back to Demos</div>
+    <div class="row"><div id="mode-dot" class="status-dot"></div><span id="status" class="muted">Desktop preview</span></div>
+    <div class="row"><div id="btn-vr" class="button primary">Enter VR</div><div id="btn-mr" class="button primary">Enter MR</div></div>
+    <div id="btn-exit" class="button">Exit to browser</div>
+    <div class="row"><span class="label">Haptics</span><div id="haptics" class="toggle"><div id="haptics-thumb" class="toggle-thumb"></div></div></div>
+    <div class="row"><span class="label">Hand outlines</span><div id="hand-outlines" class="toggle"><div id="hand-outlines-thumb" class="toggle-thumb"></div></div></div>
+    <div class="row"><span class="label">Patterned hands</span><div id="patterned-vision" class="toggle"><div id="patterned-vision-thumb" class="toggle-thumb"></div></div></div>
+    <div class="row"><span class="label">Patterned room</span><div id="patterned-room" class="toggle"><div id="patterned-room-thumb" class="toggle-thumb"></div></div></div>
+    <div id="patterned-hand-controls" class="patterned-hand-controls">
+      <div class="column"><div class="row"><span class="label">Hand pattern scale</span><span id="pattern-scale-value" class="value">0.50</span></div><div id="pattern-scale" class="track"><div id="pattern-scale-fill" class="fill"></div></div></div>
+      <div class="column"><div class="row"><span class="label">Hand opacity</span><span id="pattern-alpha-value" class="value">1.00</span></div><div id="pattern-alpha" class="track"><div id="pattern-alpha-fill" class="fill"></div></div></div>
+      <div class="column"><div class="row"><span class="label">Finger length</span><span id="pattern-finger-length-value" class="value">1.00</span></div><div id="pattern-finger-length" class="track"><div id="pattern-finger-length-fill" class="fill"></div></div></div>
+      <div class="column"><div class="row"><span class="label">Room pattern scale</span><span id="pattern-room-scale-value" class="value">0.50</span></div><div id="pattern-room-scale" class="track"><div id="pattern-room-scale-fill" class="fill"></div></div></div>
+      <div class="column"><div class="row"><span class="label">Room opacity</span><span id="pattern-room-alpha-value" class="value">1.00</span></div><div id="pattern-room-alpha" class="track"><div id="pattern-room-alpha-fill" class="fill"></div></div></div>
+      <div class="column"><div class="row"><span class="label">Warp</span><span id="pattern-warp-value" class="value">0.00</span></div><div id="pattern-warp" class="track"><div id="pattern-warp-fill" class="fill"></div></div></div>
+      <div class="column"><div class="row"><span class="label">Chroma shift</span><span id="pattern-chroma-value" class="value">0.000</span></div><div id="pattern-chroma" class="track"><div id="pattern-chroma-fill" class="fill"></div></div></div>
+      <div class="column"><div class="row"><span class="label">Offset X</span><span id="pattern-position-x-value" class="value">0.00</span></div><div id="pattern-position-x" class="track"><div id="pattern-position-x-fill" class="fill"></div></div></div>
+      <div class="column"><div class="row"><span class="label">Offset Y</span><span id="pattern-position-y-value" class="value">0.00</span></div><div id="pattern-position-y" class="track"><div id="pattern-position-y-fill" class="fill"></div></div></div>
+    </div>
+    <div class="row"><div id="fps-dot" class="status-dot"></div><span id="fps" class="muted">-- fps</span></div>
+    <span id="xr-info" class="muted">Checking XR support...</span>
+  </div>
+</div>

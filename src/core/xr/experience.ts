@@ -23,7 +23,9 @@ import { resolveXRMode, type ExperienceMode, type ResolvedXRMode, type XRSupport
 /** Lets an experience offer the other examples (menu "Demos" row) without a page reload. */
 export type ExampleSwitcher = {
   current: string;
-  list: ReadonlyArray<{ id: string; title: string }>;
+  list: ReadonlyArray<{ id: string; title: string; panelNode?: string }>;
+  /** Shared viewer pose captured once so demo windows keep stable positions. */
+  consolePlacement?: { anchor?: { position: [number, number, number]; forward: [number, number, number] } };
   switchTo(id: string): void;
   /** Restart the current example (e.g. after a settings reset). */
   reload(): void;

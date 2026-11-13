@@ -32,6 +32,31 @@
   "resources": {},
   "nodes": [
     {
+      "id": "demos-panel",
+      "name": "Demos",
+      "content": {
+        "type": "asset",
+        "asset": "demos-panel"
+      },
+      "transform": {
+        "position": [
+          -0.8,
+          1.35,
+          -0.9
+        ],
+        "rotationDeg": [
+          0,
+          40,
+          0
+        ],
+        "scale": 0.1
+      },
+      "components": {
+        "RayInteractable": {},
+        "PokeInteractable": {}
+      }
+    },
+    {
       "id": "snake-list",
       "name": "Snake List",
       "content": {
@@ -40,19 +65,20 @@
       },
       "transform": {
         "position": [
-          -0.72,
-          1.25,
-          -0.6
+          -0.25,
+          1.35,
+          -1.05
         ],
         "rotationDeg": [
           0,
-          50.19,
+          13,
           0
         ],
         "scale": 0.1
       },
       "components": {
-        "RayInteractable": {}
+        "RayInteractable": {},
+        "PokeInteractable": {}
       }
     },
     {
@@ -64,19 +90,20 @@
       },
       "transform": {
         "position": [
-          0.72,
-          1.25,
-          -0.6
+          0.35,
+          1.35,
+          -1.02
         ],
         "rotationDeg": [
           0,
-          -50.19,
+          -19,
           0
         ],
         "scale": 0.1
       },
       "components": {
-        "RayInteractable": {}
+        "RayInteractable": {},
+        "PokeInteractable": {}
       }
     },
     {
@@ -88,19 +115,20 @@
       },
       "transform": {
         "position": [
-          0,
-          0.92,
-          -0.55
+          0.35,
+          1.35,
+          -1.02
         ],
         "rotationDeg": [
-          -30,
           0,
+          -19,
           0
         ],
         "scale": 0.1
       },
       "components": {
-        "RayInteractable": {}
+        "RayInteractable": {},
+        "PokeInteractable": {}
       }
     },
     {

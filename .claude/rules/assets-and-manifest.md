@@ -3,6 +3,10 @@ paths:
   - "src/assets.ts"
   - "src/assets.js"
   - "src/scene-assets/**"
+  - "src/demos/**/assets.ts"
+  - "src/demos/**/*.scene-asset.ts"
+  - "src/lab/**/assets.ts"
+  - "src/lab/**/*.scene-asset.ts"
 ---
 
 # Asset manifest contract
@@ -26,7 +30,8 @@ until it is registered here.
 
 ## Procedural assets
 
-Export a parentless `Object3D` from `src/scene-assets/*.scene-asset.ts` and
+Export a parentless `Object3D` from a demo folder's `*.scene-asset.ts` (this project:
+`src/demos/<name>/`, see `aidd-custom/AGENTS.md`) and
 register it under a stable ID. The registry rejects an already-parented
 prototype.
 

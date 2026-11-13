@@ -1,12 +1,18 @@
 import {
   CapsuleGeometry,
+  BufferGeometry,
   CylinderGeometry,
+  DoubleSide,
+  Float32BufferAttribute,
   Grabbed,
   Hovered,
   InputComponent,
   Mesh,
   MeshBasicMaterial,
+  Quaternion,
+  GrabSystem,
   Pressed,
+  PokeInteractable,
   RayInteractable,
   Vector3,
   VisibilityState,
@@ -16,9 +22,9 @@ import {
 } from '@iwsdk/core';
 import type { ExperienceContext } from '../../core/xr/experience.js';
 import { makeManipulable } from '../interaction/manipulable.js';
-import { createProximityState } from '../interaction/triggers.js';
 import { requireElement } from './controls.js';
 import { summonPose, yawToward, type SummonOptions } from './panel-placement.js';
+import { createWristToggle } from './wrist-toggle.js';
 
 /**
  * Standard XR menu behaviour for a placed UIKitML panel:
@@ -38,6 +44,10 @@ export type PanelMenuOptions = SummonOptions & {
   rootElementId?: string;
   /** Own toggle inputs (key, Menu/Y button, wrist button). Off for secondary windows. */
   inputs?: boolean;
+  /** Keep the wrist and keyboard shortcut, without taking the main controller Menu/Y button. */
+  controllerInputs?: boolean;
+  /** Horizontal offset so two wrist shortcuts can coexist. */
+  wristX?: number;
   /** Re-place in front of the viewer when shown in XR. */
   summonOnShow?: boolean;
   /** Called whenever the window is shown or hidden (e.g. to toggle a window group). */
@@ -49,6 +59,7 @@ export type PanelMenu = {
   show(): void;
   hide(): void;
   toggle(): void;
+  setToggleShortcut(onActivate: () => void): void;
   update(): void;
   dispose(): void;
 };
@@ -58,9 +69,33 @@ const setParentLocal = (object: Object3D, worldPosition: Vector3) => {
   object.parent?.worldToLocal(object.position);
 };
 
+const wristIcon = (segments: readonly number[], color: string) => {
+  const geometry = new BufferGeometry();
+  const vertices: number[] = [];
+  const indices: number[] = [];
+  const halfWidth = 0.0013;
+  for (let i = 0; i < segments.length; i += 6) {
+    const x0 = segments[i]!, y0 = segments[i + 1]!, z0 = segments[i + 2]!;
+    const x1 = segments[i + 3]!, y1 = segments[i + 4]!, z1 = segments[i + 5]!;
+    const dx = x1 - x0, dz = z1 - z0;
+    const length = Math.hypot(dx, dz) || 1;
+    const ox = -dz / length * halfWidth, oz = dx / length * halfWidth;
+    const base = vertices.length / 3;
+    vertices.push(x0 + ox, y0, z0 + oz, x0 - ox, y0, z0 - oz,
+      x1 + ox, y1, z1 + oz, x1 - ox, y1, z1 - oz);
+    indices.push(base, base + 1, base + 2, base + 2, base + 1, base + 3);
+  }
+  geometry.setAttribute('position', new Float32BufferAttribute(vertices, 3));
+  geometry.setIndex(indices);
+  const material = new MeshBasicMaterial({ color, side: DoubleSide, depthTest: false, depthWrite: false });
+  const icon = new Mesh(geometry, material);
+  icon.renderOrder = 101;
+  return { icon, dispose: () => { geometry.dispose(); material.dispose(); } };
+};
+
 export const createPanelMenu = (ctx: ExperienceContext, options: PanelMenuOptions): PanelMenu => {
   const { world, theme, haptics } = ctx;
-  const { nodeId, key = 'KeyM', barGap = 0.03, rootElementId = 'panel', inputs = true, summonOnShow = true, onVisibilityChange } = options;
+  const { nodeId, key = 'KeyM', barGap = 0.03, rootElementId = 'panel', inputs = true, controllerInputs = true, wristX = 0, summonOnShow = true, onVisibilityChange } = options;
   const panelEntity: Entity = world.requireSceneEntity(nodeId);
   const panel = panelEntity.object3D!;
   // Hide through UIKit's own layout state: toggling Object3D.visible is not observed by UIKit's
@@ -78,37 +113,47 @@ export const createPanelMenu = (ctx: ExperienceContext, options: PanelMenuOption
     return -(height * UIKIT_PIXEL_SIZE * panelScale.y) / 2 - barGap;
   };
 
-  const barMaterial = new MeshBasicMaterial({ color: theme.colors.primary, transparent: true, opacity: 0.45 });
+  const barMaterial = new MeshBasicMaterial({ color: theme.colors.primary, transparent: true, opacity: 0.65, depthTest: false, depthWrite: false });
   const bar = new Mesh(new CapsuleGeometry(0.009, 0.11, 4, 12), barMaterial);
+  bar.renderOrder = 100;
   bar.rotation.z = Math.PI / 2;
   bar.name = `${nodeId}-grab-bar`;
   const barEntity = world.createTransformEntity(bar);
   makeManipulable(barEntity, { grab: 'distance', rotate: false, scale: false });
 
   // Wrist button for hand tracking (left hand), pressed with the other hand's ray or pinch.
-  const wristMaterial = new MeshBasicMaterial({ color: theme.colors.secondary, transparent: true, opacity: 0.85 });
-  const wrist = new Mesh(new CylinderGeometry(0.016, 0.016, 0.006, 24), wristMaterial);
+  const wristMaterial = new MeshBasicMaterial({ color: theme.colors.background, depthTest: false, depthWrite: false });
+  const wrist = new Mesh(new CylinderGeometry(0.024, 0.024, 0.006, 24), wristMaterial);
+  const windowsIcon = wristIcon([
+    -0.010, 0.0035, -0.008, 0.006, 0.0035, -0.008,
+    0.006, 0.0035, -0.008, 0.006, 0.0035, 0.005,
+    0.006, 0.0035, 0.005, -0.010, 0.0035, 0.005,
+    -0.010, 0.0035, 0.005, -0.010, 0.0035, -0.008,
+    -0.006, 0.0035, 0.008, 0.010, 0.0035, 0.008,
+    0.010, 0.0035, 0.008, 0.010, 0.0035, -0.005,
+  ], theme.colors.primary);
+  wrist.add(windowsIcon.icon);
   wrist.name = `${nodeId}-wrist-toggle`;
-  wrist.position.set(0, 0.035, 0.07);
+  wrist.position.set(wristX, 0.035, 0.07);
   const wristEntity = world.createTransformEntity(wrist, { parent: world.playerSpaceEntities.gripSpaces.left });
-  wristEntity.addComponent(RayInteractable);
-
-  const fingertip = new Vector3();
-  const wristWorld = new Vector3();
-  const wristTouch = createProximityState({ radius: 0.025, hysteresis: 0.02 });
   const head = new Vector3();
   const forward = new Vector3();
   const panelWorld = new Vector3();
   const barWorld = new Vector3();
+  const panelWorldRotation = new Quaternion();
+  const barShapeRotation = new Quaternion().setFromAxisAngle(new Vector3(0, 0, 1), Math.PI / 2);
   let visible = true;
-  let wristWasPressed = false;
+  const wristToggle = createWristToggle();
+  let onToggleShortcut: (() => void) | undefined;
   let barWasGrabbed = false;
+  let wasImmersive = false;
 
   const placeBarUnderPanel = () => {
     panel.getWorldPosition(barWorld);
     barWorld.y += barOffsetY();
     setParentLocal(bar, barWorld);
-    bar.rotation.set(0, panel.rotation.y, Math.PI / 2, 'YXZ');
+    panel.getWorldQuaternion(panelWorldRotation);
+    bar.quaternion.copy(panelWorldRotation).multiply(barShapeRotation);
   };
 
   const facePanelToHead = () => {
@@ -128,6 +173,11 @@ export const createPanelMenu = (ctx: ExperienceContext, options: PanelMenuOption
   const setInteractive = (entity: Entity, on: boolean) => {
     if (on && !entity.hasComponent(RayInteractable)) entity.addComponent(RayInteractable);
     if (!on && entity.hasComponent(RayInteractable)) entity.removeComponent(RayInteractable);
+  };
+  const setWristInteractive = (entity: Entity, on: boolean) => {
+    setInteractive(entity, on);
+    if (on && !entity.hasComponent(PokeInteractable)) entity.addComponent(PokeInteractable);
+    if (!on && entity.hasComponent(PokeInteractable)) entity.removeComponent(PokeInteractable);
   };
 
   const apply = () => {
@@ -151,6 +201,8 @@ export const createPanelMenu = (ctx: ExperienceContext, options: PanelMenuOption
     },
     hide() {
       if (!visible) return;
+      if (barEntity.hasComponent(Grabbed)) world.getSystem(GrabSystem)?.forceRelease(barEntity);
+      barWasGrabbed = false;
       visible = false;
       apply();
       onVisibilityChange?.(false);
@@ -159,37 +211,38 @@ export const createPanelMenu = (ctx: ExperienceContext, options: PanelMenuOption
       if (visible) menu.hide();
       else menu.show();
     },
+    setToggleShortcut(onActivate) { onToggleShortcut = onActivate; },
     update() {
       const immersive = world.visibilityState.peek() !== VisibilityState.NonImmersive;
+      if (immersive && !wasImmersive && visible && summonOnShow) {
+        summon();
+        placeBarUnderPanel();
+        onVisibilityChange?.(true);
+      }
+      wasImmersive = immersive;
 
       // Toggle inputs: keyboard, left controller menu button, wrist button (hands only).
       if (!inputs) {
         wrist.visible = false;
-        setInteractive(wristEntity, false);
+        setWristInteractive(wristEntity, false);
       }
-      if (inputs && world.input.keyboard.getKeyDown(key)) menu.toggle();
-      const left = inputs ? world.input.xr.gamepads.left : undefined;
+      const toggleShortcut = () => onToggleShortcut ? onToggleShortcut() : menu.toggle();
+      if (inputs && world.input.keyboard.getKeyDown(key)) toggleShortcut();
+      const left = inputs && controllerInputs ? world.input.xr.gamepads.left : undefined;
       if (left?.getButtonDown(InputComponent.Menu) || left?.getButtonDown(InputComponent.Y_Button)) {
-        menu.toggle();
+        toggleShortcut();
         haptics.play('left', 'click');
       }
       const handsActive = inputs && immersive && world.input.xr.isPrimary('hand', 'left');
       wrist.visible = handsActive;
-      setInteractive(wristEntity, handsActive);
-      // Wrist button: touch it with the right index fingertip, or point at it and pinch.
-      let touched = false;
-      if (handsActive) {
-        world.player.indexTipSpaces.right.getWorldPosition(fingertip);
-        wrist.getWorldPosition(wristWorld);
-        touched = wristTouch.update(fingertip.distanceTo(wristWorld)) === 'enter';
-      }
-      const wristPressed = handsActive && wristEntity.hasComponent(Pressed);
-      if (touched || (wristPressed && !wristWasPressed)) {
-        menu.toggle();
+      setWristInteractive(wristEntity, handsActive);
+      // Only a real press of the button counts: a fingertip poke, or the ray aimed at it plus a
+      // pinch. Pinching while the ray merely hovers the button (e.g. grabbing something) must not.
+      if (wristToggle.update(handsActive && wristEntity.hasComponent(Pressed), performance.now())) {
+        toggleShortcut();
         ctx.sounds.play('click');
+        haptics.play('right', 'click');
       }
-      wristWasPressed = wristPressed;
-      wristMaterial.opacity = wristEntity.hasComponent(Hovered) ? 1 : 0.85;
 
       if (!visible) return;
 
@@ -200,7 +253,8 @@ export const createPanelMenu = (ctx: ExperienceContext, options: PanelMenuOption
         barWorld.y -= barOffsetY();
         setParentLocal(panel, barWorld);
         facePanelToHead();
-        bar.rotation.set(0, panel.rotation.y, Math.PI / 2, 'YXZ');
+        panel.getWorldQuaternion(panelWorldRotation);
+        bar.quaternion.copy(panelWorldRotation).multiply(barShapeRotation);
       } else {
         placeBarUnderPanel();
       }
@@ -213,6 +267,8 @@ export const createPanelMenu = (ctx: ExperienceContext, options: PanelMenuOption
       wristEntity.dispose();
       barMaterial.dispose();
       wristMaterial.dispose();
+      (wrist.geometry as CylinderGeometry).dispose();
+      windowsIcon.dispose();
     },
   };
 

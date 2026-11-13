@@ -1,6 +1,6 @@
 # Audio input & analysis
 
-Enable with `createExperience(world, { audio: true, ... })` → `ctx.audio`. Nothing starts until a
+Make a demo react to sound: set `audio: true` in its `demo.ts` config → `ctx.audio`. Nothing starts until a
 source is chosen from a user gesture (panel button / XR select).
 
 | Source | Call | Notes |
