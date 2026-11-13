@@ -25,7 +25,7 @@ const states = new WeakMap<World, HandAppearanceState>();
 export const handAppearanceState = (world: World): HandAppearanceState => {
   let state = states.get(world);
   if (!state) {
-    state = { outlines: true, patterned: false, roomPatterned: false, scale: 0, roomScale: 0, warpAmount: 0, positionX: 0, positionY: 0, alpha: 1, roomAlpha: 1, chromaAmount: .008, fingerLength: 1.08 };
+    state = { outlines: true, patterned: false, roomPatterned: false, scale: 1, roomScale: 0, warpAmount: 0, positionX: 0, positionY: 0, alpha: .4, roomAlpha: .2, chromaAmount: .008, fingerLength: 1.08 };
     states.set(world, state);
   }
   return state;

@@ -4,6 +4,8 @@ import { spawnSync } from 'node:child_process';
 import { ShaderChunk } from '@iwsdk/core';
 import { describe, test } from 'vitest';
 import { assert } from 'riteway/vitest';
+import type { World } from '@iwsdk/core';
+import { handAppearanceState } from './patterned-hands.js';
 
 const vertex = readFileSync(new URL('./patterned-hand.vert.glsl', import.meta.url), 'utf8');
 const pattern = readFileSync(new URL('./patterned-vision-pattern.glsl', import.meta.url), 'utf8');
@@ -46,5 +48,13 @@ describe('Patterned Vision hands', () => {
       actual: [compile('vert', roomVertPrefix + roomVertex), compile('frag', fragPrefix + expand(roomFragment))],
       expected: ['ok', 'ok'],
     });
+  });
+});
+
+describe('patterned vision defaults', () => {
+  test('first-run look', () => {
+    const { scale, alpha, roomAlpha } = handAppearanceState({} as World);
+    assert({ given: 'a fresh world', should: 'start with full hand pattern scale, hands at 0.4 and room at 0.2 opacity',
+      actual: { scale, alpha, roomAlpha }, expected: { scale: 1, alpha: 0.4, roomAlpha: 0.2 } });
   });
 });
